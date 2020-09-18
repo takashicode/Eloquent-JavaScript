@@ -1,0 +1,226 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>イントロダクション :: Eloquent JavaScript</title>
+  <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
+  <script src="js/acorn_codemirror.js"></script>
+  <link rel=stylesheet href="css/ejs.css">
+  <script src="js/sandbox.js"></script>
+  <script src="js/ejs.js"></script><script>var sandboxLoadFiles = ["code/intro.js"];</script></head>
+
+<article>
+<nav><a href="index.html" title="cover">◆</a> <a href="01_values.html" title="next chapter">▶</a></nav>
+
+<h1>イントロダクション</h1>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>私たちは自分の目的に沿ったシステムを作ったつもりでいる。私たちは自分のイメージに沿ってシステムを作っていると思い込んでいる。実際のところ、コンピュータは我々とは似ていない。そこには我々のほんの一面が反映されるにすぎない。それは論理や秩序や規則や明快さに従う一面だ。</p>
+
+<footer>Ellen Ullman, <cite>Close to the Machine: Technophilia and its Discontents</cite></footer>
+
+</blockquote><figure class="chapter framed"><img src="img/chapter_picture_00.jpg" alt="Picture of a screwdriver and a circuit board"></figure>
+
+<p>この本は コンピュータ に指示をすることについて扱う。今時ではコンピュータはねじ回しみたいにありふれている。でもそれよりは多少複雑だし、僕らの言うとおりのことをさせるのが難しいこともある。</p>
+
+<p>もし、君のさせたいタスクが分かりやすくてありふれたものだったら(メールを表示するとか電卓にするとか)、ただアプリを開いて作業にかかればいい。でも、固有で制限がないようなタスクにはちょうどいいアプリケーションがないかもしれない。</p>
+
+<p>ここでプログラミングが登場する。プログラミングとは、プログラムを構築する作業だ。一連の指示を与えてコンピュータに何をすればいいか伝える。コンピュータはまぬけで了見がせまいから、基本的にプログラミングは面倒でイラつくものだ。</p>
+
+<p>幸いなことに、こういう事実を受け入れてまぬけなコンピュータに合わせた厳密な思考法をむしろ楽しんでしまえば、プログラミングは実りある作業になる。手でやったら永遠にかかる作業を数秒で片付けられるし、コンピュータのツールがこれまでできなかったことが可能になる。それから、抽象的な思考についての素晴らしいエクササイズにもなる。</p>
+
+<p>たいていのプログラミングはプログラミング言語で行われる。 プログラミング言語 はコンピュータに指示するための人工的な言語だ。コンピュータとコミュニケートする一番効率的な方法が、人間同士のコミュニケーションによく似てるのは面白い。人間の言語みたいに、コンピュータの言語も単語やフレーズを新しく組み合わせれば、新しい概念を表現することだってできる。</p>
+
+<p><a class="p_ident" id="p_52sjhFZAvY" href="#p_52sjhFZAvY" tabindex="-1" role="presentation"></a>80,90年代のBASICやDOSのような言語ベースのインターフェースが、ある時点まではコンピュータとやりとりする主な方法だった。それはヴィジュアルインターフェースに大きく取って代わられたけど、これは学習はしやすいけどその分自由が制限される。もし君がどこを見ればいいか知ってたら、コンピュータ言語はまだそこ存在しているんだ。そういう言語の1つ、JavaScriptはたいていのモダンWebブラウザーに組み込まれている。だから、どんなデバイスでも使えるといっていい。</p>
+
+<p>この本は、君をそんな言語に親しませて、便利なことや楽しいことができるようになることを目指していく。</p>
+
+<h2><a class="h_ident" id="h_Nrd8ftcZhB" href="#h_Nrd8ftcZhB" tabindex="-1" role="presentation"></a>プログラミングについて</h2>
+
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>JavaScriptについて説明する前に、プログラミングの基本原則を紹介したい。プログラミングというのは、ふたをあけてみれば、大変なものだ。基本的なルールはシンプルで明快だ。だけど、そのルールの上に組み上げられていくプログラムはどんどん複雑になっていって、それ自体がルールや複雑さを持つようになっていく。ある意味で、自分で迷路を組み上げて、自分でその中を迷うようなものだ。</p>
+
+<p>この本を読んでいるとものすごくイラつくこともあるだろう。君がプログラミング初心者だったら、消化しないといけない材料がたくさんある。しかもその材料が組み合わされていくから、君はうまくつなぎ合わせることを要求される。</p>
+
+<p>必要な努力をするかどうかは君次第だ。本を追っていくのがむずかしくても、自分の能力について見きってしまうのはやめよう。大丈夫だから。ただやり続ければいい。休憩したり、読み返したり、プログラムの例やエクササイズを理解してるか確認したりすればいい。学ぶというのは大変なことだ。でも学んだことは全部君のものになって、その後の学びをもっと簡単にしてくれる。</p>
+
+<blockquote>
+
+<p>活動が無益に至れば、情報を集めよ。情報が無益に至れば、寝てしまえ。</p>
+
+<footer>Ursula K. Le Guin, <cite>The Left Hand of Darkness</cite></footer>
+
+</blockquote>
+
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a>1つのプログラムには色々な面がある。それはプログラマーのタイプしたちょっとしたテキストともいえるし、コンピュータが何をするか方向づける力でもあるし、コンピュータのメモリ上のデータでもありながら、同じメモリへの作業をコントロールもする。プログラムを僕らがよく知っているものに例えても、たいてい十分に表現できない。でも表面的に合うのはマシーンの例えだ。たくさんの独立した部品が関わり合いながら、全体が正しく動くようにしている。僕らは、この部品同士を協力し合わせて全体の動きに貢献させる方法を考えないといけない。</p>
+
+<p>コンピュータとは、そうした形がないマシーンのホストとして動作する物理的なマシーンのことだ。コンピュータ自体はバカみたいに真っ正直なことができるだけだ。それがなぜこんなに便利なのかというと、それをものすごいスピードでやってくれるからだ。プログラムはものすごい数の単純な動作をうまく組み合わせて、とても複雑なことを実現する。</p>
+
+<p>プログラムとは人間の考えでできた建物みたいなものだ。建てるのにコストはかからないし、重さもないし、タイピングする手の中で簡単に大きくなっていく。</p>
+
+<p>でも注意していないとプログラムの大きさと複雑さがコントロール不能になって、作った本人でさえ混乱させられることになる。プログラムを自分のコントロール下に置くことが、プログラミングの大きな課題だ。プログラムがきちんと動いているときは、それは素晴らしい。プログミング技術というのは、複雑さをコントロールするスキルのことだ。すごいプログラムというのは、抑制されている。つまり複雑さの中でもシンプルさが保たれているんだ。</p>
+
+<p>プログラマーの中には、よく理解された少しのテクニックのセットだけ使っていれば、複雑さをうまくコントロールできると信じる人もいる。そういう人たちは厳しいルールを作って(&quot;ベストプラクティス&quot;)、プログラムがこうあるべきという形式をあらかじめ決めて、その狭くて安全なゾーンに注意深くとどまろうとする。</p>
+
+<p>このやり方は退屈なだけじゃなくて、効果もない。新しい問題には新しい解決方法が要求されることが多い。プログラミングという分野は若いし、成長も速いし、いろいろなアプローチが有効になる余地が十分にある。プログラムデザインでは、ひどいミスをたくさん起こるものだ。やってみて実際にミスってみよう。そうすればミスをより理解できる。良いプログラムがどういう感じかは実践の中で分かってくる。ルールのリストを見ても分かるものじゃないんだ。</p>
+
+<h2><a class="h_ident" id="h_WiIYONofNW" href="#h_WiIYONofNW" tabindex="-1" role="presentation"></a>なぜ言語が重要か</h2>
+
+<p>まず初めに、コンピュータの生まれた頃には、プログラミング言語は存在しなかった。プログラムはこんな見た目をしていた。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_D6PkB3Wa2f" href="#c_D6PkB3Wa2f" tabindex="-1" role="presentation"></a>00110001 00000000 00000000
+00110001 00000001 00000001
+00110011 00000001 00000010
+01010001 00001011 00000010
+00100010 00000010 00001000
+01000011 00000001 00000000
+01000001 00000001 00000001
+00010000 00000010 00000000
+01100010 00000000 00000000</pre>
+
+<p><a class="p_ident" id="p_9BRGz3+vpJ" href="#p_9BRGz3+vpJ" tabindex="-1" role="presentation"></a>これは数字を1から10まで足しあわせて結果をプリントアウトするプログラムだ(1 + 2 + ... + 10 = 55)。これは単純な架空のマシーン上で実行できるかもしれない。初期のコンピュータをプログラムするには、大量のスイッチの並びを正しいポジションにしたり、ボール紙に穴を空けてコンピュータに与えたりしないといけなかった。これがどんなに退屈でエラーが起こりやすいか想像できるだろう。単純なプログラムを書くにも賢さや規律が必要だった。複雑なプログラムを書くなんてほとんど想像もできなかった。</p>
+
+<p><a class="p_ident" id="p_U9mavMZxuB" href="#p_U9mavMZxuB" tabindex="-1" role="presentation"></a>もちろん、手作業でこの難解なビット(1と0)のパターンを打ち込む作業はプログラマーに偉大な魔法使いになったような深淵な気分を与えてくれた。それは仕事の満足という面でも何かしらの価値があったに違いない。</p>
+
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a>上のプログラムでは1行ごとに1つ指示をしている。人間の言葉ではこのように書ける。</p>
+
+<ol>
+
+<li>
+
+<p><a class="p_ident" id="p_cXpMwVrt3i" href="#p_cXpMwVrt3i" tabindex="-1" role="presentation"></a>数字の0をメモリロケーション0に保持する。</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_3T1zkDN+tm" href="#p_3T1zkDN+tm" tabindex="-1" role="presentation"></a>数字の0をメモリロケーション1に保持する。</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_PCjQN+Ms0w" href="#p_PCjQN+Ms0w" tabindex="-1" role="presentation"></a>メモリロケーション1の値をメモリロケーション2に保持する。</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_j+yF1Sy70o" href="#p_j+yF1Sy70o" tabindex="-1" role="presentation"></a>11をメモリロケーション2の値から引く。</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_TpKdwHqZQU" href="#p_TpKdwHqZQU" tabindex="-1" role="presentation"></a>メモリロケーション2の値が0だったら9番の指示へ進む。</p></li>
+
+<li>
+
+<p>メモリロケーション1の値をメモリロケーション0へ加える。</p></li>
+
+<li>
+
+<p>メモリロケーション1の値に1を加える。</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_d95o2uzYI7" href="#p_d95o2uzYI7" tabindex="-1" role="presentation"></a>指示3へ進む。</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_tlifxqsNyC" href="#p_tlifxqsNyC" tabindex="-1" role="presentation"></a>メモリロケーション0の値を出力する。</p></li>
+
+</ol>
+
+<p>これはビットのごった煮よりは読みやすいが、なんだかあいまいだ。名前を使って、指示やメモリロケーションの数字を置き換えると助けになるだろう。</p>
+
+<pre class="snippet cm-s-default" data-language="text/plain" ><a class="c_ident" id="c_Z0jlA6dfj3" href="#c_Z0jlA6dfj3" tabindex="-1" role="presentation"></a> Set “total” to 0.
+ Set “count” to 1.
+[loop]
+ Set “compare” to “count”.
+ Subtract 11 from “compare”.
+ If “compare” is zero, continue at [end].
+ Add “count” to “total”.
+ Add 1 to “count”.
+ Continue at [loop].
+[end]
+ Output “total”.</pre>
+
+<p><a class="p_ident" id="p_CPVXJPvHkq" href="#p_CPVXJPvHkq" tabindex="-1" role="presentation"></a>これでプログラムがどう動くか分かるだろうか?はじめの2行は2つのメモリロケーションに初期値を与える。<code>total</code>は計算結果を組み上げるの使われて、<code>count</code>はその時に扱っている数字を追いかける。<code>compare</code>を使っている行が一番変に思えるかもしれない。プログラムは<code>count</code>が11と等しいか調べて、実行を止められるか決める。ぼくらの空想マシーンは原始的なものだから、数字が0かどうか調べて、それで意思決定することしかできない。だから<code>compare</code>というメモリロケーションを使って<code>count - 11</code>という計算をして、その結果によって意思決定をする。その次の2行は、<code>count</code>がまだ11になってなければ、<code>count</code>の値を結果に足して、<code>count</code>の数字を1つ増やす。</p>
+
+<p>同じプログラムがJavaScriptではこうなる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_KfhVPRGaZ0" href="#c_KfhVPRGaZ0" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">total</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>, <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+<span class="cm-keyword">while</span> (<span class="cm-variable">count</span> <span class="cm-operator">&lt;=</span> <span class="cm-number">10</span>) {
+  <span class="cm-variable">total</span> <span class="cm-operator">+=</span> <span class="cm-variable">count</span>;
+  <span class="cm-variable">count</span> <span class="cm-operator">+=</span> <span class="cm-number">1</span>;
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">total</span>);
+<span class="cm-comment">// → 55</span></pre>
+
+<p><a class="p_ident" id="p_rfJqU0U1og" href="#p_rfJqU0U1og" tabindex="-1" role="presentation"></a>このバージョンにはもう少し前進がみられる。一番大事なのは、プログラムにどうやって行ったり来たりするか指示する必要がなくなっていることだ。そこは<code>while</code>の部分がやっておいてくれる。<code>while</code>は、与えられた条件が満たされている間は、ブロック(波括弧に囲まれた部分)の中身を実行し続ける。その条件とは、<code>count &lt;= 10</code>で、“<code>count</code>が10以下である&quot;という意味だ。もう一時的な値を作って0と比べたりしなくてもいい。そんなのはつまらないディティールでしかなかった。プログラミング言語の威力の1つはこういうつまらないところを代りにやっておいてくれることだ。</p>
+
+<p>プログラムの最後で、<code>while</code>構文が終わった後に、<code>console.log</code>の操作が結果を書き出す。</p>
+
+<p><a class="p_ident" id="p_Oqf5dV/7MI" href="#p_Oqf5dV/7MI" tabindex="-1" role="presentation"></a>最後に、もしたまたま<code>range</code>と<code>sum</code>という便利な操作があったとしたらプログラムは以下のようになるだろう。ここで、<code>range</code>はある範囲(“range”)の数値の集合を作り、<code>sum</code>は数値の集合の和(“sum”)を計算する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_yYSVMpVrKE" href="#c_yYSVMpVrKE" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sum</span>(<span class="cm-variable">range</span>(<span class="cm-number">1</span>, <span class="cm-number">10</span>)));
+<span class="cm-comment">// → 55</span></pre>
+
+<p><a class="p_ident" id="p_J0S6J81mZ+" href="#p_J0S6J81mZ+" tabindex="-1" role="presentation"></a>この話の教訓は、同じプログラムも表現によって長くもなれば短くもなるし、読みやすくもなれば読みづらくもなるということだ。はじめのバージョンはとんでもなく見通しが悪かったけど、最後のはほとんど英語だ。<code>log</code> the <code>sum</code> of the <code>range</code> of numbers from 1 to 10(1-10の<code>range</code>の<code>sum</code>を<code>log</code>する)。<a href="04_data.html">後の章</a>では<code>sum</code>や<code>range</code>のような操作を定義する方法を学んでいこう。</p>
+
+<p>良いプログラミング言語とは、コンピュータがする動作について、プログラマーが高いレベルで指示できるようにしてくれるものだ。そして、ディティールを省略できるように便利な部品(<code>while</code>や<code>console.lgo</code>のような)を与えてくれて、オリジナルの部品を定義させてくれるし(<code>sum</code>や<code>range</code>)、その部品を組み合わせるのも簡単にしてくれる。</p>
+
+<h2><a class="h_ident" id="h_nfZMVhP24V" href="#h_nfZMVhP24V" tabindex="-1" role="presentation"></a>JavaScriptとは何か?</h2>
+
+<p><a class="p_ident" id="p_Pav+tiU5cQ" href="#p_Pav+tiU5cQ" tabindex="-1" role="presentation"></a>JavaScriptは1995年に、Netscape Navigator browserのウェブページにプログラムを加えるために導入された。それからずっと主なグラフィックベースのウェブブラウザに採用されている。そして、操作のたびにリロードしないでも良いような、モダンなウェブアプリを可能にしてきた。昔ながらのウェブサイトでも、ページとやり取りできるようにしたり、ページをお利口にしたりしている。</p>
+
+<p><a class="p_ident" id="p_3pz/oBqShM" href="#p_3pz/oBqShM" tabindex="-1" role="presentation"></a>これは重要な点なんだけど、JavaScriptはJavaという名前の言語とはほとんど関係がない。そっくりな名前は、正気の判断ではなくてマーケティング考慮がもたらしたものだ。JavaScriptが導入されたとき、Java言語はゴリ押しされていて人気を得始めてもいた。誰かがこの成功に乗っかりたいと良いと考えた。そうして僕らは名前で行き詰まることになる。</p>
+
+<p><a class="p_ident" id="p_jHi5EPQZJN" href="#p_jHi5EPQZJN" tabindex="-1" role="presentation"></a>JavaScriptがNetscapeの外でも採用された時、どう動作するべきか決める標準化ドキュメントが書かれた。そうすればJavaScriptをサポートしていると主張している色々なソフトウェアが本当に同じ言語について話していることになる。これは、標準化をしたECMAインターナショナルの名前をとって、ECMAScript標準と呼ばれる。実際のところ、ECMAScriptとJavaScript、どちらを使っても変わらない。同じ言語に付けられた2つの名前だからだ。</p>
+
+<p><a class="p_ident" id="p_OUCpx6roRg" href="#p_OUCpx6roRg" tabindex="-1" role="presentation"></a>JavaScriptについて <em>ひどい</em> ことを言う人もいる。そしてそれはたいてい本当だ。はじめてJavaScriptで何か書く必要に迫られたとき、すぐに嫌になってしまった。書いたことをほとんど何でも受け入れてくれるのに、全然意図したようには解釈してくれないからだ。これは僕が自分で何をしているか分かっていなかったからだ、もちろん。でも、ここには本当の問題もある。つまり、JavaScriptは何を許容するかにかけてはバカみたいに自由なんだ。この設計の元にある思想は初心者にもJavaScriptでのプログラミングを簡単にすることだ。実際のところ、この設計はプログラムの問題を見つけるのを難しくする。というのも、システム自体が見つけて教えてくれないからだ。</p>
+
+<p><a class="p_ident" id="p_2hrsheUVR1" href="#p_2hrsheUVR1" tabindex="-1" role="presentation"></a>とはいえ、この柔軟さにはアドバンテージもある。もっと堅苦しい言語では不可能なワザを使う余地もあるし、後にみていくように(例えば<a href="10_modules.html">Chapter 10</a>で)JavaScriptの欠点を乗り越えるために役立つこともある。JavaScriptを正しく学んで、しばらく取り組んでみてようやく、僕はJavaScriptが本当に <em>好きになる</em> ということが分かった。</p>
+
+<p><a class="p_ident" id="p_WiWiQZ8aPB" href="#p_WiWiQZ8aPB" tabindex="-1" role="presentation"></a>JavaScriptにはいろいろなバージョンがある。ECMAScriptバージョン3はJavaScriptが優位に登りつめたときに広くサポートされていたものだ。それはだいたい2000年から2010年の間のことだった。この間にも、野望に満ちたバージョン4の作業が進められていた。それは過激な改善や拡張をいくつか含むものだった。すでに広く使われている言語に過激な変更を加えるのは政治的にむずかしいことが分って、バージョン4の作業は2008に廃棄された。そして控え目な野望で当たり障りのない改善を加えたバージョン5が2009年に発表された。そして2015年にはバージョン6が登場した。それはバージョン4のために計画されたアイデアも取り込まれたメジャーアップデートだった。以来、毎年スモールアップデートが重ねられている。</p>
+
+<p><a class="p_ident" id="p_AbXvX+/4K6" href="#p_AbXvX+/4K6" tabindex="-1" role="presentation"></a>言語が進化しているということは、ブラウザもそれについていかないといけないということだ。もし君が古いブラウザを使っているなら全ての機能をサポートしていないかもしれない。JavaScriptの設計者はアップデートした結果、古いプログラムが壊れないように気を付けている。だから新しいブラウザでも古いプログラムは動作する。この本では、2017年版のJavaScriptを使う。</p>
+
+<p><a class="p_ident" id="p_A4OUKB+0DJ" href="#p_A4OUKB+0DJ" tabindex="-1" role="presentation"></a>ウェブブラウザはJavaScriptが使われる唯一のプラットフォームではない。MongoDBやCouchDBはJavaScriptをスクリプトとクエリに使う。デスクトップやサーバーのためのプラットフォームでは(特に<a href="20_node.html">Chapter 20</a>で扱うNode.jsが重要だ)、JavaScriptのプログラミングをブラウザの外でできる。</p>
+
+<h2><a class="h_ident" id="h_myqQm+ql/9" href="#h_myqQm+ql/9" tabindex="-1" role="presentation"></a>コードにどう取り組むか</h2>
+
+<p><em>コード</em> とはプログラムを作り上げているテキストのことだ。この本のたいていの章にはたくさんのコードが載っている。僕はコードを読むのも書くのもプログラミング学習では欠かせないと信じている。ただ例をざっと眺めるんじゃなくて、しっかり注意を払って読んで理解してほしい。始めのうちは時間がかかるし混乱するかもしれない。でもすぐにコツがつかめると約束する。エクササイズについても同じことがいえる。実際に機能する回答が書けるまでは理解したつもりになってはいけない。</p>
+
+<p>エクササイズの答えを実際のJavaScript環境で動かしてみることをオススメする。そうすれば自分のやっていることが上手く行くがどうかすぐにフィードバックが得られる。さらに実験したくなってエクササイズのその先まで行ってほしい。</p>
+
+<p>この本をブラウザで読んでいるなら、プログラム例をクリックすると、編集したり実行したりできるようになる。</p>
+
+<p><a class="p_ident" id="p_fEpsshhrvN" href="#p_fEpsshhrvN" tabindex="-1" role="presentation"></a>この本のプログラムを、このウェブサイト以外で実行したいなら、少し注意が必要だ。だいたいの例は独立したもので、どんなJavaScript環境でも動く。でも後の方の章の例は特定の環境(ブラウザーかNode.js)に向けて書かれていて、そこでしか動かない。さらに、多くの章では大きいプログラムを扱っていて、コードの部分部分がお互いに依存していたり、外部のファイルを必要としていたりする。このサイトの<a href="https://eloquentjavascript.net/code">sandbox</a>に、スクリプトやデータを含んだZipファイルが置いてある。</p>
+
+<h2><a class="h_ident" id="h_YaPKOtiENn" href="#h_YaPKOtiENn" tabindex="-1" role="presentation"></a>この本の概要</h2>
+
+<p><a class="p_ident" id="p_4k4RNyE0ep" href="#p_4k4RNyE0ep" tabindex="-1" role="presentation"></a>この本は、おおむね3つの部分でできている。始めの12章はJavaScript言語そのものについてだ。続く7章はウェブブラウザとそれをJavaScriptで動かす方法についてだ。最後に2の章をNode.jsにさいた。これはJavaScriptを動かすもうひとつの環境だ。</p>
+
+<p><a class="p_ident" id="p_rDR41po8gf" href="#p_rDR41po8gf" tabindex="-1" role="presentation"></a>この本では5つの <em>プロジェクトの章</em> がある。ここでは実際のプログラミングの感じを掴むために大きいプログラムの例を扱っている。出現の順で、<a href="07_robot.html">配達ロボット</a>、<a href="12_language.html">プログラミング言語</a>、<a href="16_game.html">プラットフォームゲーム</a>、<a href="19_paint.html">ピクセルペイントプログラム</a>、<a href="21_skillsharing.html">動的なウェブサイト</a>だ。</p>
+
+<p><a class="p_ident" id="p_JYbRHywdg2" href="#p_JYbRHywdg2" tabindex="-1" role="presentation"></a>言語自体について扱う12章はJavaScriptの基本的な構造について扱う4章から始まる。そこでは<a href="02_program_structure.html">制御構文</a>(先に出た<code>while</code>のようなもの)や<a href="03_functions.html">関数</a>(自分だけの部品)や<a href="04_data.html">データ構造</a>を紹介する。これで、君は基本的なプログラムを書けるようになる。次に<a href="05_higher_order.html">5章</a>と<a href="06_object.html">6章</a>では、関数とオブジェクトを使ってもっと <em>抽象的な</em> コードを書いて、複雑さをコントロールするワザを紹介する。</p>
+
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>初めての<a href="07_robot.html">プロジェクトの章</a>の後、言語自体についての章は、<a href="08_error.html">エラー処理とバグ修正</a>、<a href="09_regexp.html">正規表現</a>(テキストを扱うための大事なツールだ)、<a href="10_modules.html">モジュール性</a>(これも複雑性からの防御)、<a href="11_async.html">非同期プログラミング</a>(時間がかかるイベントの処理)と続く。<a href="12_language.html">2つ目のプロジェクトの章</a>でこの本の第一部は終わりだ。</p>
+
+<p><a class="p_ident" id="p_qEK82lpY3H" href="#p_qEK82lpY3H" tabindex="-1" role="presentation"></a>第二部の、<a href="13_browser.html">13</a>章から<a href="19_paint.html">19</a>章ではブラウザのJavaScriptがアクセスできるツールについて扱う。君はスクリーンに表示したり(<a href="14_dom.html">14</a>章と<a href="17_canvas.html">17</a>章)、ユーザーの入力に反応したり(<a href="15_event.html">15</a>章)、ネットワーク上でやりとりしたり(<a href="18_http.html">18</a>章)することを学ぶ。第二部にも2つプロジェクトの章が含まれる。</p>
+
+<p><a class="p_ident" id="p_Kzh6PibMf8" href="#p_Kzh6PibMf8" tabindex="-1" role="presentation"></a>最後に、<a href="20_node.html">20</a>章ではNode.jsについて説明して、<a href="21_skillsharing.html">21</a>章ではその応用でちょっとしたウェブサイトを組み立てる。</p>
+
+<h2><a class="h_ident" id="h_TnbaEWkz3G" href="#h_TnbaEWkz3G" tabindex="-1" role="presentation"></a>タイポグラフィーの慣習</h2>
+
+<p>この本では<code>monospaced</code>フォントで書かれたテキストはプログラムの一部を意味する。それだけで完結したものかもしれないし、近くのプログラムの一部を示しているだけかもしれない。プログラムは以下のように書かれる(すでにいくつか見たきたけど)。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_5GjN2pXyt/" href="#c_5GjN2pXyt/" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">factorial</span>(<span class="cm-def">n</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">n</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+    <span class="cm-keyword">return</span> <span class="cm-number">1</span>;
+  } <span class="cm-keyword">else</span> {
+    <span class="cm-keyword">return</span> <span class="cm-variable">factorial</span>(<span class="cm-variable-2">n</span> <span class="cm-operator">-</span> <span class="cm-number">1</span>) <span class="cm-operator">*</span> <span class="cm-variable-2">n</span>;
+  }
+}</pre>
+
+<p>プログラムの結果を表示するために、予想される出力を続けて書いておくこともある。2つのスラッシュとその前に矢印を付けて表示する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_jUF93Xlrf8" href="#c_jUF93Xlrf8" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">factorial</span>(<span class="cm-number">8</span>));
+<span class="cm-comment">// → 40320</span></pre>
+
+<p>グッドラック!</p><nav><a href="index.html" title="cover">◆</a> <a href="01_values.html" title="next chapter">▶</a></nav>
+</article>
