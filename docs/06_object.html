@@ -1,0 +1,665 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>オブジェクトの未知なる生命 :: Eloquent JavaScript</title>
+  <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
+  <script src="js/acorn_codemirror.js"></script>
+  <link rel=stylesheet href="css/ejs.css">
+  <script src="js/sandbox.js"></script>
+  <script src="js/ejs.js"></script><script>var chapNum = 6;var sandboxLoadFiles = ["code/chapter/06_object.js"];</script></head>
+
+<article>
+<nav><a href="05_higher_order.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="07_robot.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 6</span>オブジェクトの未知なる生命</h1>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>抽象データ型は特殊な種類のプログラムを書くことで実現できる。そうしたプログラムでは、そこに実行される操作の観点から型が定義される。</p>
+
+<footer>Barbara Liskov, <cite>Programming with Abstract Data Types</cite></footer>
+
+</blockquote><figure class="chapter framed"><img src="img/chapter_picture_6.jpg" alt="Picture of a rabbit with its proto-rabbit"></figure>
+
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a><a href="04_data.html">4</a>章ではJavaScriptのオブジェクトを紹介した。プログラミング文化の中には、 <em>オブジェクト指向プログラミング</em> というものがある。これは、プログラムを構成する中心原理としてオブジェクト(と関連する概念)を使うものだ。</p>
+
+<p><a class="p_ident" id="p_78aDwuALBZ" href="#p_78aDwuALBZ" tabindex="-1" role="presentation"></a>厳密な定義が合意されているわけではないけど、オブジェクト指向プログラミングはJavaScriptを含むたくさんのプログラミング言語のデザインを形作ってきた。この章では、この概念がJavaScriptにどのように適用できるか見ていく。</p>
+
+<h2><a class="h_ident" id="h_zXRzmuooKQ" href="#h_zXRzmuooKQ" tabindex="-1" role="presentation"></a>カプセル化(Encapsulation)</h2>
+
+<p>オブジェクト指向プログラミングの核になるアイデアは、プログラムを小さい部分に分けて、それぞれの部分に自分の状態の管理について責任をもたせることだ。</p>
+
+<p>こうすれば、プログラムのある部分がどのやって動くかという知識は、その部分の <em>ローカル</em> に限定しておけるんだ。プログラムの他の部分に取り組む人は、その知識について覚えておく必要も気にする必要もない。このローカルな細部に変更がある場合には、それに直に接するコードだけアップデートすればいい。</p>
+
+<p id="interface">こうしたプログラムでは、それぞれの部分がお互いに <em>インターフェース</em> を介してやりとりをする。このインターフェースは限られた関数やバインディングによって、より抽象的なレベルで便利な機能を提供して、実装の詳細については隠してくれる。</p>
+
+<p>こうしたプログラムの部分部分はオブジェクトによってモデル化できる。これらのインターフェイスは、特定のメソッドやプロパティのセットによって構成される。インターフェイスの一部になっているプロパティは <em>パブリック</em> と呼ばれる。その他の外部のコードが触るべきではない部分は <em>プライベート</em> と呼ばれる。</p>
+
+<p>多くの言語にはパブリックとプライベートを区別する方法があって、外部のコードがプライベートな部分にアクセスするのを防いでくれる。JavaScriptはここでも、ミニマリストのアプローチを採用していて、そういう仕組みを持っていない、少なくとも今のところは。JavaScriptにこの仕組みを加える仕事は現在進行中だ。</p>
+
+<p>言語自身にはこの区別が組み込まれていないけど、JavaScript <em>プログラマーは</em> この概念を上手く使っている。典型的には、外部から使ってもいいインターフェイスはドキュメントやコメントに書かれる。アンダースコア( <code>_</code> )文字をプロパティ名の頭に付けることで、そのプロパティがプライベートだと示すことも一般的だ。</p>
+
+<p>インターフェイスを実装から分離することは素晴らしいアイデアだ。これはたいてい <em>カプセル化</em> と呼ばれる。</p>
+
+<h2 id="obj_methods"><a class="h_ident" id="h_syCsSSJkTH" href="#h_syCsSSJkTH" tabindex="-1" role="presentation"></a>メソッド(Methods)</h2>
+
+<p>メソッドとは単に関数値を保持しているプロパティのことだ。以下はシンプルなメソッドだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_SpsawmO1By" href="#c_SpsawmO1By" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">rabbit</span> <span class="cm-operator">=</span> {};
+<span class="cm-variable">rabbit</span>.<span class="cm-property">speak</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">line</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`The rabbit says '${</span><span class="cm-variable-2">line</span><span class="cm-string-2">}</span><span class="cm-string-2">'`</span>);
+};
+
+<span class="cm-variable">rabbit</span>.<span class="cm-property">speak</span>(<span class="cm-string">&quot;I'm alive.&quot;</span>);
+<span class="cm-comment">// → The rabbit says 'I'm alive.'</span>
+<span class="cm-comment">// (うさぎは言いました。「俺は生きてるぜ。」)</span></pre>
+
+<p>たいてい、メソッドは呼び出し元のオブジェクトと一緒に何かをする必要がある。ある関数がメソッドとして呼び出された時( <code>object.method()</code> のように)、プロパティとして探されてすぐ呼び出されて、関数の本体では <code>this</code> というバインディングが呼び出し元のオブジェクトを指すようになる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_cXuIwPt+3C" href="#c_cXuIwPt+3C" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">speak</span>(<span class="cm-def">line</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`The ${</span><span class="cm-keyword">this</span>.<span class="cm-property">type</span><span class="cm-string-2">}</span> <span class="cm-string-2">rabbit says '${</span><span class="cm-variable-2">line</span><span class="cm-string-2">}</span><span class="cm-string-2">'`</span>);
+}
+<span class="cm-keyword">let</span> <span class="cm-def">whiteRabbit</span> <span class="cm-operator">=</span> {<span class="cm-property">type</span>: <span class="cm-string">&quot;white&quot;</span>, <span class="cm-property">speak</span>};
+<span class="cm-keyword">let</span> <span class="cm-def">hungryRabbit</span> <span class="cm-operator">=</span> {<span class="cm-property">type</span>: <span class="cm-string">&quot;hungry&quot;</span>, <span class="cm-property">speak</span>};
+
+<span class="cm-variable">whiteRabbit</span>.<span class="cm-property">speak</span>(<span class="cm-string">&quot;Oh my ears and whiskers, &quot;</span> <span class="cm-operator">+</span>
+                  <span class="cm-string">&quot;how late it's getting!&quot;</span>);
+<span class="cm-comment">// → The white rabbit says 'Oh my ears and whiskers, how</span>
+<span class="cm-comment">//   late it's getting!'</span>
+<span class="cm-variable">hungryRabbit</span>.<span class="cm-property">speak</span>(<span class="cm-string">&quot;I could use a carrot right now.&quot;</span>);
+<span class="cm-comment">// → The hungry rabbit says 'I could use a carrot right now.'</span></pre>
+
+<p id="call_method"><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a><code>this</code> とは違った方法で渡される追加の引数だ、と考えてもいい。明示的に <code>this</code> を渡したければ、関数の <code>call</code> メソッドを使えばいい。 <code>call</code> は <code>this</code> にする値を1つ目の引数にとって、残りの引数を通常のパラメーターとして扱う。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_9lDr0S2nEw" href="#c_9lDr0S2nEw" tabindex="-1" role="presentation"></a><span class="cm-variable">speak</span>.<span class="cm-property">call</span>(<span class="cm-variable">hungryRabbit</span>, <span class="cm-string">&quot;Burp!&quot;</span>);
+<span class="cm-comment">// → The hungry rabbit says 'Burp!'</span></pre>
+
+<p>それぞれの関数は独自に <code>this</code> バインディングを持っていて、その値は呼び出し方によって決まるから、 <code>function</code> キーワードで定義された通常の関数では、外側のスコープの <code>this</code> を参照することはできない。</p>
+
+<p>アロー関数はふるまいが違っていて、自身の <code>this</code> バインディングを持たないで、外側のスコープの <code>this</code> を視ることができる。というわけで、次のコードのように、ローカル関数の内から <code>this</code> を参照することができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_wg++tcauWw" href="#c_wg++tcauWw" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">normalize</span>() {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">this</span>.<span class="cm-property">coords</span>.<span class="cm-property">map</span>(<span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">/</span> <span class="cm-keyword">this</span>.<span class="cm-property">length</span>));
+}
+<span class="cm-variable">normalize</span>.<span class="cm-property">call</span>({<span class="cm-property">coords</span>: [<span class="cm-number">0</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>], <span class="cm-property">length</span>: <span class="cm-number">5</span>});
+<span class="cm-comment">// → [0, 0.4, 0.6]</span></pre>
+
+<p><code>map</code> の引数(の関数)を <code>function</code> キーワードで書いていたら、このコードは上手く動かない。</p>
+
+<h2 id="prototypes"><a class="h_ident" id="h_y80NuWjX5h" href="#h_y80NuWjX5h" tabindex="-1" role="presentation"></a>Prototypes(プロトタイプ)</h2>
+
+<p>よく見てほしい。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_P0GVdA5c8J" href="#c_P0GVdA5c8J" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">empty</span> <span class="cm-operator">=</span> {};
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">empty</span>.<span class="cm-property">toString</span>);
+<span class="cm-comment">// → function toString(){…}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">empty</span>.<span class="cm-property">toString</span>());
+<span class="cm-comment">// → [object Object]</span></pre>
+
+<p>空っぽのオブジェクトからプロパティが引き出せた。マジック!</p>
+
+<p><a class="p_ident" id="p_jB9mHjaVcQ" href="#p_jB9mHjaVcQ" tabindex="-1" role="presentation"></a>まあ、実はそうでもない。ただJavaScriptのオブジェクトのふるまいについて、情報を保留していただけだ。オブジェクトはプロパティのセットの他にも、 <em>プロトタイプ(prototype)</em> を持つ。プロトタイプとは、プロパティのバックアップ元として使われる、もう1つのオブジェクトだ。あるオブジェクトが、持っていないプロパティへのリクエストを受けたときには、プロトタイプからそのプロパティが探されることになるんだ。それはさらにプロトタイプのプロトタイプへ、というようにどんどん続いていく。</p>
+
+<p>では上の例の空オブジェクトのプロトタイプは誰だったのか?それは大いなる祖先プロトタイプで、ほとんど全てのオブジェクトの背後に存在している、 <code>Object.prototype</code> だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_7Q/HaNra3M" href="#c_7Q/HaNra3M" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">getPrototypeOf</span>({}) <span class="cm-operator">==</span>
+            <span class="cm-variable">Object</span>.<span class="cm-property">prototype</span>);
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">getPrototypeOf</span>(<span class="cm-variable">Object</span>.<span class="cm-property">prototype</span>));
+<span class="cm-comment">// → null</span></pre>
+
+<p>君が推測した通り、 <code>Object.<wbr>getPrototypeOf</code> はオブジェクトのプロトタイプを返す。</p>
+
+<p><a class="p_ident" id="p_r9XU5+S8JS" href="#p_r9XU5+S8JS" tabindex="-1" role="presentation"></a>JavaScriptオブジェクトのプロトタイプの関係はツリー型の構造をしていて、根っ子の部分には <code>Object.prototype</code> が構えている。 <code>Object.prototype</code> は、全てのオブジェクトに表れるいくつかのメソッドを提供する。例えば、その内の1つ <code>toString</code> はオブジェクトを文字列表現に変換する。</p>
+
+<p>たいていのオブジェクトは、直接のプロトタイプとしては <code>Object.prototype</code> ではなくそれ以外のオブジェクトを持っていて、いろいろなデフォルトプロパティを提供されている。関数は <code>Function.<wbr>prototype</code> から、配列は <code>Array.prototype</code> から、それぞれ派生している。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_NgntUaXZ1S" href="#c_NgntUaXZ1S" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">getPrototypeOf</span>(<span class="cm-variable">Math</span>.<span class="cm-property">max</span>) <span class="cm-operator">==</span>
+            <span class="cm-variable">Function</span>.<span class="cm-property">prototype</span>);
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">getPrototypeOf</span>([]) <span class="cm-operator">==</span>
+            <span class="cm-variable">Array</span>.<span class="cm-property">prototype</span>);
+<span class="cm-comment">// → true</span></pre>
+
+<p>こうしたプロトタイプオブジェクト自身にもプロトタイプがあって、たいていは <code>Object.prototype</code> だから、直接ではなくても、 <code>toString</code> のようなメソッドを提供されている。</p>
+
+<p><code>Object.create</code> を使えば、プロトタイプを指定してオブジェクトを作ることもできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_gSGrvGTpkW" href="#c_gSGrvGTpkW" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">protoRabbit</span> <span class="cm-operator">=</span> {
+  <span class="cm-property">speak</span>(<span class="cm-def">line</span>) {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`The ${</span><span class="cm-keyword">this</span>.<span class="cm-property">type</span><span class="cm-string-2">}</span> <span class="cm-string-2">rabbit says '${</span><span class="cm-variable-2">line</span><span class="cm-string-2">}</span><span class="cm-string-2">'`</span>);
+  }
+};
+<span class="cm-keyword">let</span> <span class="cm-def">killerRabbit</span> <span class="cm-operator">=</span> <span class="cm-variable">Object</span>.<span class="cm-property">create</span>(<span class="cm-variable">protoRabbit</span>);
+<span class="cm-variable">killerRabbit</span>.<span class="cm-property">type</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;killer&quot;</span>;
+<span class="cm-variable">killerRabbit</span>.<span class="cm-property">speak</span>(<span class="cm-string">&quot;SKREEEE!&quot;</span>);
+<span class="cm-comment">// → The killer rabbit says 'SKREEEE!'</span></pre>
+
+<p>オブジェクト式の <code>speak(line)</code> のようなプロパティは、メソッド定義の短縮形だ。これで <code>speak</code> というプロパティを作って、関数をその値にすることができる。</p>
+
+<p><a class="p_ident" id="p_ak22pJHie8" href="#p_ak22pJHie8" tabindex="-1" role="presentation"></a>“proto”ラビットは、他のラビットが共有するプロパティの容れ物として機能している。個々のラビットオブジェクトは(killerラビットのように)、自分自身だけに適用されるプロパティを持ちつつ(この場合はtype)、シェアするプロパティをプロトタイプから持ってくる。</p>
+
+<h2 id="classes"><a class="h_ident" id="h_tVFKBzb7Tk" href="#h_tVFKBzb7Tk" tabindex="-1" role="presentation"></a>クラス(Classes)</h2>
+
+<p><a class="p_ident" id="p_xvPu8BN7rQ" href="#p_xvPu8BN7rQ" tabindex="-1" role="presentation"></a>JavaScriptのプロトタイプシステムは、 <em>クラス</em> と呼ばれるオブジェクト指向の概念を、略式に取り込んでいると解釈することもできる。クラスとは、あるタイプのオブジェクトが持つ形(どんなメソッドやプロパティを持つか)を定義するものだ。このオブジェクトはそのクラスの <em>インスタンス(instance)</em> と呼ばれる。</p>
+
+<p>メソッドのようにそのクラスの全てのインスタンスが共有するようなプロパティを定義するときに、プロトタイプは役に立つ。ラビットの <code>type</code> のようにインスタンスごとにばらばらのプロパティは、オブジェクト自身で直接保持しないといけない。</p>
+
+<p id="constructors"><a class="p_ident" id="p_ihwTOYAWhu" href="#p_ihwTOYAWhu" tabindex="-1" role="presentation"></a>あるクラスのインスタンスを作るには、正しいプロトタイプから派生したオブジェクトを作らないといけない。 <em>それだけでなく</em> 、クラスのインスタンスが持つべきプロパティは、そのインスタンス自身が確実に持つようにしないといけない。これが <em>コンストラクター(constructor)</em> 関数の役目だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_oOKUeIzSVa" href="#c_oOKUeIzSVa" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">makeRabbit</span>(<span class="cm-def">type</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">rabbit</span> <span class="cm-operator">=</span> <span class="cm-variable">Object</span>.<span class="cm-property">create</span>(<span class="cm-variable">protoRabbit</span>);
+  <span class="cm-variable-2">rabbit</span>.<span class="cm-property">type</span> <span class="cm-operator">=</span> <span class="cm-variable-2">type</span>;
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">rabbit</span>;
+}</pre>
+
+<p>JavaScriptにはこの種の関数を簡単に定義する仕組みが備わっている。 <code>new</code> キーワードを関数呼び出しの前に置くと、その関数はコンストラクターとして扱われる。これは、正しいプロトタイプのオブジェクトが自動的に作られた上に、関数の <code>this</code> にバインドされて、関数の最後では返り値になるということだ。</p>
+
+<p>オブジェクトの組み立てに使われたプロトタイプオブジェクトは、コンストラクター関数の <code>prototype</code> プロパティを調べれば分かる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_p+u3OtMv8K" href="#c_p+u3OtMv8K" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">Rabbit</span>(<span class="cm-def">type</span>) {
+  <span class="cm-keyword">this</span>.<span class="cm-property">type</span> <span class="cm-operator">=</span> <span class="cm-variable-2">type</span>;
+}
+<span class="cm-variable">Rabbit</span>.<span class="cm-property">prototype</span>.<span class="cm-property">speak</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">line</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`The ${</span><span class="cm-keyword">this</span>.<span class="cm-property">type</span><span class="cm-string-2">}</span> <span class="cm-string-2">rabbit says '${</span><span class="cm-variable-2">line</span><span class="cm-string-2">}</span><span class="cm-string-2">'`</span>);
+};
+
+<span class="cm-keyword">let</span> <span class="cm-def">weirdRabbit</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Rabbit</span>(<span class="cm-string">&quot;weird&quot;</span>);</pre>
+
+<p>コンストラクターは(実際のところ全ての関数は)、自動的に <code>prototype</code> という名前のプロパティを持つ。これはデフォルトでは <code>Object.prototype</code> から作られる空のオブジェクトになっている。新しいオブジェクトで上書きしたければ、そうしてもいい。または、上の例のように、既に存在しているオブジェクトにプロパティを追加することもできる。</p>
+
+<p>習慣として、コンストラクターの名前は頭を大文字にする。こうすれば他の関数から見分けやすくなるんだ。</p>
+
+<p>プロトタイプのコンストラクターとの関連付けられ方( <code>prototype</code> プロパティを通じて)と、オブジェクトの <code>prototype</code> の <em>持ち</em> 方( <code>Object.<wbr>getPrototypeOf</code> で見つけられる)の違いを理解することは大事だ。コンストラクターの本当のプロトタイプは <code>Function.<wbr>prototype</code> だ。なぜならコンストラクターは関数だからだ。 <code>prototype</code> <em>プロパティ</em> はインスタンスを作るのに使われたプロトタイプを保持しているんだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_KDYP9dCWfS" href="#c_KDYP9dCWfS" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">getPrototypeOf</span>(<span class="cm-variable">Rabbit</span>) <span class="cm-operator">==</span>
+            <span class="cm-variable">Function</span>.<span class="cm-property">prototype</span>);
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">getPrototypeOf</span>(<span class="cm-variable">weirdRabbit</span>) <span class="cm-operator">==</span>
+            <span class="cm-variable">Rabbit</span>.<span class="cm-property">prototype</span>);
+<span class="cm-comment">// → true</span></pre>
+
+<h2><a class="h_ident" id="h_HBOk0vD/he" href="#h_HBOk0vD/he" tabindex="-1" role="presentation"></a>Class記法</h2>
+
+<p><a class="p_ident" id="p_QSirfHwhVC" href="#p_QSirfHwhVC" tabindex="-1" role="presentation"></a>というわけでJavaScriptのクラスとは <code>prototype</code> プロパティを持ったコンストラクター関数のことだ。今でもその仕組みは同じで、2015年まではその通りに書くしかなかった。今では、もう少し自然な書き方ができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_kqKA+SZ6vS" href="#c_kqKA+SZ6vS" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">Rabbit</span> {
+  <span class="cm-property">constructor</span>(<span class="cm-def">type</span>) {
+    <span class="cm-keyword">this</span>.<span class="cm-property">type</span> <span class="cm-operator">=</span> <span class="cm-variable-2">type</span>;
+  }
+  <span class="cm-property">speak</span>(<span class="cm-def">line</span>) {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`The ${</span><span class="cm-keyword">this</span>.<span class="cm-property">type</span><span class="cm-string-2">}</span> <span class="cm-string-2">rabbit says '${</span><span class="cm-variable-2">line</span><span class="cm-string-2">}</span><span class="cm-string-2">'`</span>);
+  }
+}
+
+<span class="cm-keyword">let</span> <span class="cm-def">killerRabbit</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Rabbit</span>(<span class="cm-string">&quot;killer&quot;</span>);
+<span class="cm-keyword">let</span> <span class="cm-def">blackRabbit</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Rabbit</span>(<span class="cm-string">&quot;black&quot;</span>);</pre>
+
+<p><code>class</code> キーワードはクラス宣言を始める。この宣言では、コンストラクターと一連のメソッドがまとめて定義できる。宣言の波カッコの中には好きなだけのメソッド宣言が書ける。 <code>constructor</code> というの名前のメソッドは特別に扱われる。これが本当のコンストラクター関数になって、 <code>Rabbit</code> という名前にバインドされる。他のメソッドはコンストラクターのプロトタイプにパッケージされる。というわけで、このクラス宣言は、前のセクションで見てきたコンストラクターの定義と等価のものなんだ、ただ見た目がいい感じなだけで。</p>
+
+<p>クラス宣言では今の所、 <em>メソッド</em> だけ(つまり関数を保持するプロパティだけ)しか含めることができない。これは、関数以外の値を保存したいような場合には少し不便だ。次のヴァージョンのJavaScriptでは、たぶん改善されるだろう。今のところはクラスを宣言した後に直接プロトタイプをいじって、プロパティを付け加えるしかない。</p>
+
+<p><code>function</code> と同じように <code>class</code> も、宣言としても式としても使うことができる。式として使った場合には、バインディングを定義せずにコンストラクターを値として返す。クラス式ではクラス名を省くこともできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_79re+GWcTJ" href="#c_79re+GWcTJ" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">object</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-keyword">class</span> { <span class="cm-property">getWord</span>() { <span class="cm-keyword">return</span> <span class="cm-string">&quot;hello&quot;</span>; } };
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">object</span>.<span class="cm-property">getWord</span>());
+<span class="cm-comment">// → hello</span></pre>
+
+<h2><a class="h_ident" id="h_tfBpieaT81" href="#h_tfBpieaT81" tabindex="-1" role="presentation"></a>派生したプロパティの上書き</h2>
+
+<p>オブジェクトにプロパティを追加すると、プロトタイプにそのプロパティがあってもなくても、それはオブジェクト <em>自身</em> に加えられることになる。同じ名前のプロパティがプロトタイプにあったとしても、それはもうオブジェクトに影響しなくなる。オブジェクト自身のプロパティの背後に隠れてしまうんだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_vja6JbO0si" href="#c_vja6JbO0si" tabindex="-1" role="presentation"></a><span class="cm-variable">Rabbit</span>.<span class="cm-property">prototype</span>.<span class="cm-property">teeth</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;small&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">killerRabbit</span>.<span class="cm-property">teeth</span>);
+<span class="cm-comment">// → small</span>
+<span class="cm-variable">killerRabbit</span>.<span class="cm-property">teeth</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;long, sharp, and bloody&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">killerRabbit</span>.<span class="cm-property">teeth</span>);
+<span class="cm-comment">// → long, sharp, and bloody</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">blackRabbit</span>.<span class="cm-property">teeth</span>);
+<span class="cm-comment">// → small</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Rabbit</span>.<span class="cm-property">prototype</span>.<span class="cm-property">teeth</span>);
+<span class="cm-comment">// → small</span></pre>
+
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>以下の図はこのコードが実行されるときの状況を説明している。 <code>Rabbit</code> と <code>Object</code> という2つのプロトタイプが、 <code>killerRabbit</code>のオブジェクト自身に見つからないプロパティを探しにいくバックアップのようなものとして存在している。</p><figure><img src="img/rabbits.svg" alt="Rabbit object prototype schema"></figure>
+
+<p>プロトタイプが持つプロパティの上書きは便利なときもある。ラビットの歯の例で見たように、汎用的なクラスのインスタンスに上書きによって例外的な値を持たせることができる。普通のオブジェクトにはプロトタイプから標準的な値を持たせたままにできるんだ。</p>
+
+<p><a class="p_ident" id="p_x4BJdoUSgB" href="#p_x4BJdoUSgB" tabindex="-1" role="presentation"></a>上書きは、標準の関数と配列のプロトタイプとに、基本のObject.prototypeとは違う <code>toString</code> メソッドを持たせるためにも使われている。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_DrIRvUgeOD" href="#c_DrIRvUgeOD" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Array</span>.<span class="cm-property">prototype</span>.<span class="cm-property">toString</span> <span class="cm-operator">==</span>
+            <span class="cm-variable">Object</span>.<span class="cm-property">prototype</span>.<span class="cm-property">toString</span>);
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>].<span class="cm-property">toString</span>());
+<span class="cm-comment">// → 1,2</span></pre>
+
+<p><a class="p_ident" id="p_FhUwfMRSPx" href="#p_FhUwfMRSPx" tabindex="-1" role="presentation"></a><code>toString</code> を配列に適用すると、 <code>.<wbr>join(&quot;,&quot;)</code> と同じような結果が得られる。つまり配列の値の間にコンマが置かれるんだ。直接、 <code>Object.<wbr>prototype.<wbr>toString</code> を配列に適用すると違った文字列が返ってくる。この関数は配列については知らないから、単に角カッコの間に <em>object</em> という言葉とタイプ名を置いて返してくる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_XpqFUrDFJE" href="#c_XpqFUrDFJE" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">prototype</span>.<span class="cm-property">toString</span>.<span class="cm-property">call</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>]));
+<span class="cm-comment">// → [object Array]</span></pre>
+
+<h2><a class="h_ident" id="h_0yEySin1LF" href="#h_0yEySin1LF" tabindex="-1" role="presentation"></a>マップ(Maps)</h2>
+
+<p><a class="p_ident" id="p_N3Re16DwBf" href="#p_N3Re16DwBf" tabindex="-1" role="presentation"></a><a href="05_higher_order.html#map">前の章</a>では <em>マップ(map)</em> という言葉が、関数を適用してデータ構造を変化させる操作を指して使われることを見てきた。紛らわしいことだけど、プログラミングでは同じマップという言葉が、関連はしているものの違うものに対して使われる。</p>
+
+<p><em>マップ</em> (名詞としての)はキーになる値と他の値を関連づけるデータ構造だ。例えば、名前と年齢を関連付けたいとして、オブジェクトを使えば以下のように書ける。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Wu6a8ObZI0" href="#c_Wu6a8ObZI0" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">ages</span> <span class="cm-operator">=</span> {
+  <span class="cm-property">Boris</span>: <span class="cm-number">39</span>,
+  <span class="cm-property">Liang</span>: <span class="cm-number">22</span>,
+  <span class="cm-property">Júlia</span>: <span class="cm-number">62</span>
+};
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`Júlia is ${</span><span class="cm-variable">ages</span>[<span class="cm-string">&quot;Júlia&quot;</span>]<span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
+<span class="cm-comment">// → Júlia is 62</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Is Jack's age known?&quot;</span>, <span class="cm-string">&quot;Jack&quot;</span> <span class="cm-keyword">in</span> <span class="cm-variable">ages</span>);
+<span class="cm-comment">// → Is Jack's age known? false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Is toString's age known?&quot;</span>, <span class="cm-string">&quot;toString&quot;</span> <span class="cm-keyword">in</span> <span class="cm-variable">ages</span>);
+<span class="cm-comment">// → Is toString's age known? true</span></pre>
+
+<p>ここではオブジェクトのプロパティ名を人名に、その値を年齢にしている。でも、このマップには <code>toString</code> という名前の人なんかいないはずだ。それでも、素のオブジェクトは <code>Object.prototype</code> から派生しているから、 <code>toString</code> プロパティがあるように見えてしまう。</p>
+
+<p>というわけで素のオブジェクトをマップとして使うのは危険だ。これを避ける方法がいくつかある。1つ目はプロトタイプを <em>持たない</em> オブジェクトを作ることだ。 <code>Object.create</code> に <code>null</code> を渡せば、出来上がるオブジェクトは <code>Object.prototype</code> の派生物ではなくなるから、安心してマップとして使える。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_AkRQLQc4AG" href="#c_AkRQLQc4AG" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;toString&quot;</span> <span class="cm-keyword">in</span> <span class="cm-variable">Object</span>.<span class="cm-property">create</span>(<span class="cm-atom">null</span>));
+<span class="cm-comment">// → false</span></pre>
+
+<p>オブジェクトのプロパティ名は文字列でないといけない。もし、オブジェクトのように文字列に変換するのが難しいものをキーにしたマップがほしいなら、オブジェクトをマップとして使うことはできない。</p>
+
+<p>幸い、JavaScriptには <code>Map</code> というクラスがあって、まさにこの目的のために書かれている。これを使えばマップ構造を保持することができるし、どんなタイプのキーも許されるんだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_dd6KsGgAGP" href="#c_dd6KsGgAGP" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">ages</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Map</span>();
+<span class="cm-variable">ages</span>.<span class="cm-property">set</span>(<span class="cm-string">&quot;Boris&quot;</span>, <span class="cm-number">39</span>);
+<span class="cm-variable">ages</span>.<span class="cm-property">set</span>(<span class="cm-string">&quot;Liang&quot;</span>, <span class="cm-number">22</span>);
+<span class="cm-variable">ages</span>.<span class="cm-property">set</span>(<span class="cm-string">&quot;Júlia&quot;</span>, <span class="cm-number">62</span>);
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`Júlia is ${</span><span class="cm-variable">ages</span>.<span class="cm-property">get</span>(<span class="cm-string">&quot;Júlia&quot;</span>)<span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
+<span class="cm-comment">// → Júlia is 62</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Is Jack's age known?&quot;</span>, <span class="cm-variable">ages</span>.<span class="cm-property">has</span>(<span class="cm-string">&quot;Jack&quot;</span>));
+<span class="cm-comment">// → Is Jack's age known? false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">ages</span>.<span class="cm-property">has</span>(<span class="cm-string">&quot;toString&quot;</span>));
+<span class="cm-comment">// → false</span></pre>
+
+<p><code>set</code> , <code>get</code> , <code>has</code> メソッドは <code>Map</code> オブジェクトのインターフェイスの一部だ。たくさんの値のセットから、アップデートや検索を速くできるデータ構造を書くのは簡単ではない。でも、心配しなくてもいい。誰かが代わりにやってくれていて、その仕事の成果を使うにはシンプルなインターフェイスだけ押さえておけばいいからだ。</p>
+
+<p>素のオブジェクトをマップとして使いたいなら、 <code>Object.keys</code> はプロトタイプのキーを見ずにオブジェクト <em>そのもの</em> のキーだけ返すことを知っておくといい。 <code>in</code> 演算子の代わりとして <code>hasOwnProperty</code> メソッドを使えば、これも同じくオブジェクトのプロトタイプを無視する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_qBrd35Qiln" href="#c_qBrd35Qiln" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>({<span class="cm-property">x</span>: <span class="cm-number">1</span>}.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;x&quot;</span>));
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>({<span class="cm-property">x</span>: <span class="cm-number">1</span>}.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;toString&quot;</span>));
+<span class="cm-comment">// → false</span></pre>
+
+<h2><a class="h_ident" id="h_8OMmwO8l5/" href="#h_8OMmwO8l5/" tabindex="-1" role="presentation"></a>ポリモーフィズム(Polymorphism)</h2>
+
+<p><a class="p_ident" id="p_54UPPzVEfT" href="#p_54UPPzVEfT" tabindex="-1" role="presentation"></a>値を文字列に変換する <code>String</code> 関数にオブジェクトを渡すと、オブジェクトの <code>toString</code> メソッドが呼び出されて、何かしら意味のある文字列を作ろうとする。JavaScriptの標準に含まれるプロトタイプのいくつかには、自分用の <code>toString</code> 関数が定義されていて、 <code>&quot;[object Object]&quot;</code> よりは有意義な情報を含んだ文字列が返される。自分で同じようにtoStringメソッドを定義することもできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_V+CBn0VJnW" href="#c_V+CBn0VJnW" tabindex="-1" role="presentation"></a><span class="cm-variable">Rabbit</span>.<span class="cm-property">prototype</span>.<span class="cm-property">toString</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {
+  <span class="cm-keyword">return</span> <span class="cm-string-2">`a ${</span><span class="cm-keyword">this</span>.<span class="cm-property">type</span><span class="cm-string-2">}</span> <span class="cm-string-2">rabbit`</span>;
+};
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">String</span>(<span class="cm-variable">blackRabbit</span>));
+<span class="cm-comment">// → a black rabbit</span></pre>
+
+<p>これは強力なアイデアのシンプルな例だ。あるコードが、特定のインターフェイス(この場合は <code>toString</code> メソッド)を持つオブジェクトと協調するように書かれているとき、同じインターフェイスを持つオブジェクトなら何でも、そのコードに当てはめて機能させられるんだ。</p>
+
+<p>このテクニックは <em>ポリモーフィズム</em> と呼ばれる。ポリモーフィックなコードは、その値が期待するインターフェイスさえ備えているなら、形がバラバラの値と協調できるんだ。</p>
+
+<p><a href="04_data.html#for_of_loop">4</a>章では <code>for</code> / <code>of</code> ループはいろいろなデータ構造をループできると書いた。これもポリモーフィズムの1つ例だ。このループはデータ構造が特定のインターフェイスを持っていることを期待していて、配列と文字列は両方ともそのインターフェイスを備えている。そして、自分のオブジェクトに同じようなインターフェイスを持たせることもできるんだ!でも、そのためにはまず、シンボルとは何かを知らないといけない。</p>
+
+<h2><a class="h_ident" id="h_JYYrVi7YIk" href="#h_JYYrVi7YIk" tabindex="-1" role="presentation"></a>シンボル(Symbols)</h2>
+
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a>複数のインターフェイスに同じプロパティ名を持たせて別々の事をさせることもできる。例えば、 <code>toString</code> メソッドでオブジェクトを1つの長い文字列に変換させるようなインターフェイスを定義することもできる。1つのオブジェクトがそのインターフェイスと標準の <code>toString</code> を両立することはできないだろう。</p>
+
+<p>それはバッドアイデアだし、この問題は一般的でもない。たいていのJavaScriptプログラマーは、単純にそんなことを考えもしない。だけど、JavaScriptのデザイナーはそんなことを考えるのが <em>仕事</em> で、とにかく解決策を与えてくれている。</p>
+
+<p><a class="p_ident" id="p_TOOKLGVpLi" href="#p_TOOKLGVpLi" tabindex="-1" role="presentation"></a>プロパティ名は文字列だと主張したけど、これは完全に正確なわけではない。たいていはそうなんだけど、 <em>シンボル(symbol)</em> の場合もあり得るんだ。シンボルとは <code>Symbol</code> 関数で作られる値だ。文字列と違って、新しく作られたシンボルはユニークだ。つまり、同じシンボルを2度作ることはできない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/KAipM77Y+" href="#c_/KAipM77Y+" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">sym</span> <span class="cm-operator">=</span> <span class="cm-variable">Symbol</span>(<span class="cm-string">&quot;name&quot;</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sym</span> <span class="cm-operator">==</span> <span class="cm-variable">Symbol</span>(<span class="cm-string">&quot;name&quot;</span>));
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">Rabbit</span>.<span class="cm-property">prototype</span>[<span class="cm-variable">sym</span>] <span class="cm-operator">=</span> <span class="cm-number">55</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">blackRabbit</span>[<span class="cm-variable">sym</span>]);
+<span class="cm-comment">// → 55</span></pre>
+
+<p><a class="p_ident" id="p_P4TvUx+duZ" href="#p_P4TvUx+duZ" tabindex="-1" role="presentation"></a>Symbol関数に渡された文字列は、シンボルを文字列に変換したときにも含まれるから、例えばコンソールに表示したときに、簡単に識別できるようになっている。ただ、それ以上の意味はなくて、複数のシンボルが同じ名前を持てるんだ。</p>
+
+<p>ユニークである上に、プロパティ名として使えるから、シンボルなら名前に関係なく(同名でも)、他のプロパティと共存するインターフェイスが定義できる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_I6uO/ojWit" href="#c_I6uO/ojWit" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">toStringSymbol</span> <span class="cm-operator">=</span> <span class="cm-variable">Symbol</span>(<span class="cm-string">&quot;toString&quot;</span>);
+<span class="cm-variable">Array</span>.<span class="cm-property">prototype</span>[<span class="cm-variable">toStringSymbol</span>] <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {
+  <span class="cm-keyword">return</span> <span class="cm-string-2">`${</span><span class="cm-keyword">this</span>.<span class="cm-property">length</span><span class="cm-string-2">}</span> <span class="cm-string-2">cm of blue yarn`</span>;
+};
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>].<span class="cm-property">toString</span>());
+<span class="cm-comment">// → 1,2</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>][<span class="cm-variable">toStringSymbol</span>]());
+<span class="cm-comment">// → 2 cm of blue yarn</span></pre>
+
+<p>プロパティ名を角カッコで囲う表記を使って、シンボルプロパティをオブジェクト式やクラスに含めることもできる。こうするとプロパティに角カッコでアクセスするのと同じように、プロパティ名が評価されるようになるから、シンボルを保持するバインディングを参照できるんだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_aZAdJfdSRz" href="#c_aZAdJfdSRz" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">stringObject</span> <span class="cm-operator">=</span> {
+  [<span class="cm-variable">toStringSymbol</span>]() { <span class="cm-keyword">return</span> <span class="cm-string">&quot;a jute rope&quot;</span>; }
+};
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">stringObject</span>[<span class="cm-variable">toStringSymbol</span>]());
+<span class="cm-comment">// → a jute rope</span></pre>
+
+<h2><a class="h_ident" id="h_YkC2BXhO69" href="#h_YkC2BXhO69" tabindex="-1" role="presentation"></a>イテレータインターフェイス(The iterator interface)</h2>
+
+<p><a class="p_ident" id="p_QHr22iP+ty" href="#p_QHr22iP+ty" tabindex="-1" role="presentation"></a><code>for</code> / <code>of</code> ループに渡されるオブジェクトは <em>イテラブル(繰返し可能)</em> であることが期待される。これは、そのオブジェクトが <code>Symbol.iterator</code> シンボルが名前になっているメソッドを持ってるということだ。ここでSymbol.iteratorは、JavaScriptの標準で定義されているシンボル値で、Symbol関数のプロパティとして保存されている。</p>
+
+<p><a class="p_ident" id="p_vNju46Bi/b" href="#p_vNju46Bi/b" tabindex="-1" role="presentation"></a>そのメソッドを呼び出すと、2つ目のインターフェイス、 <em>イテレータ(iterator)</em> を提供するオブジェクトが返される。これが実際にイテレートされるものなんだ。これは <code>next</code> メソッドを持っていて、これで次の(next)結果を返す。この結果は、 <code>value</code> プロパティと <code>done</code> プロパティを持ったオブジェクトでないといけない。 <code>value</code> は次の値のことで、 <code>done</code> はこれ以上値がなければtrueでそれ以外はfalseになる。</p>
+
+<p>ここで、 <code>next</code> , <code>value</code> , <code>done</code> プロパティは普通の文字列で、シンボルではないことに注意してほしい。ここでは <code>Symbol.iterator</code> だけが、実際にシンボルなんだ。 <code>Symbol.iterator</code> は <em>たくさんの</em> オブジェクトに追加されそうだ。</p>
+
+<p><code>Symbol.iterator</code> インターフェイスを自分で使うこともできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_CKTaBW3WjJ" href="#c_CKTaBW3WjJ" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">okIterator</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;OK&quot;</span>[<span class="cm-variable">Symbol</span>.<span class="cm-property">iterator</span>]();
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">okIterator</span>.<span class="cm-property">next</span>());
+<span class="cm-comment">// → {value: &quot;O&quot;, done: false}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">okIterator</span>.<span class="cm-property">next</span>());
+<span class="cm-comment">// → {value: &quot;K&quot;, done: false}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">okIterator</span>.<span class="cm-property">next</span>());
+<span class="cm-comment">// → {value: undefined, done: true}</span></pre>
+
+<p id="matrix"><a class="p_ident" id="p_s+hO0aSbdO" href="#p_s+hO0aSbdO" tabindex="-1" role="presentation"></a>イテラブルなデータ構造を実装してみよう。2次元配列のように振る舞う <em>行列(matrix)</em> クラスを作る。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Q128qlROKi" href="#c_Q128qlROKi" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">Matrix</span> {
+  <span class="cm-property">constructor</span>(<span class="cm-def">width</span>, <span class="cm-def">height</span>, <span class="cm-def">element</span> <span class="cm-operator">=</span> (<span class="cm-def">x</span>, <span class="cm-def">y</span>) <span class="cm-operator">=&gt;</span> <span class="cm-atom">undefined</span>) {
+    <span class="cm-keyword">this</span>.<span class="cm-property">width</span> <span class="cm-operator">=</span> <span class="cm-variable-2">width</span>;
+    <span class="cm-keyword">this</span>.<span class="cm-property">height</span> <span class="cm-operator">=</span> <span class="cm-variable-2">height</span>;
+    <span class="cm-keyword">this</span>.<span class="cm-property">content</span> <span class="cm-operator">=</span> [];
+
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">y</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">y</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">height</span>; <span class="cm-variable-2">y</span><span class="cm-operator">++</span>) {
+      <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">x</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">width</span>; <span class="cm-variable-2">x</span><span class="cm-operator">++</span>) {
+        <span class="cm-keyword">this</span>.<span class="cm-property">content</span>[<span class="cm-variable-2">y</span> <span class="cm-operator">*</span> <span class="cm-variable-2">width</span> <span class="cm-operator">+</span> <span class="cm-variable-2">x</span>] <span class="cm-operator">=</span> <span class="cm-variable-2">element</span>(<span class="cm-variable-2">x</span>, <span class="cm-variable-2">y</span>);
+      }
+    }
+  }
+
+  <span class="cm-property">get</span>(<span class="cm-def">x</span>, <span class="cm-def">y</span>) {
+    <span class="cm-keyword">return</span> <span class="cm-keyword">this</span>.<span class="cm-property">content</span>[<span class="cm-variable-2">y</span> <span class="cm-operator">*</span> <span class="cm-keyword">this</span>.<span class="cm-property">width</span> <span class="cm-operator">+</span> <span class="cm-variable-2">x</span>];
+  }
+  <span class="cm-property">set</span>(<span class="cm-def">x</span>, <span class="cm-def">y</span>, <span class="cm-def">value</span>) {
+    <span class="cm-keyword">this</span>.<span class="cm-property">content</span>[<span class="cm-variable-2">y</span> <span class="cm-operator">*</span> <span class="cm-keyword">this</span>.<span class="cm-property">width</span> <span class="cm-operator">+</span> <span class="cm-variable-2">x</span>] <span class="cm-operator">=</span> <span class="cm-variable-2">value</span>;
+  }
+}</pre>
+
+<p><a class="p_ident" id="p_2rj6cC44iY" href="#p_2rj6cC44iY" tabindex="-1" role="presentation"></a>このクラスは、要素数が <em>width(幅)</em> × <em>height(高さ)</em> の1次元配列で中身を保存する。要素は1列に保存されていくから、例えば、5行目の3番目の要素は(0ベースの数え方で)、 4 × <em>width</em> + 2 の位置に保存されている。</p>
+
+<p><a class="p_ident" id="p_A9KBhkb8tz" href="#p_A9KBhkb8tz" tabindex="-1" role="presentation"></a>コンストラクター関数は、width、heightと、オプションの <code>element</code> 関数を受け取る。この関数は初期値で埋めるために使われるんだ。それからデータの取り出しとアップデートのために <code>get</code> , <code>set</code> メソッドもある。</p>
+
+<p>行列にループをかける場合、たいていは要素自体とポジションの両方に興味がある。だから、ぼくらのイテレータは <code>x</code> , <code>y</code> , <code>value</code> プロパティを持つオブジェクトを返すようにしよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_LtbqF2pl4c" href="#c_LtbqF2pl4c" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">MatrixIterator</span> {
+  <span class="cm-property">constructor</span>(<span class="cm-def">matrix</span>) {
+    <span class="cm-keyword">this</span>.<span class="cm-property">x</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+    <span class="cm-keyword">this</span>.<span class="cm-property">y</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+    <span class="cm-keyword">this</span>.<span class="cm-property">matrix</span> <span class="cm-operator">=</span> <span class="cm-variable-2">matrix</span>;
+  }
+
+  <span class="cm-property">next</span>() {
+    <span class="cm-keyword">if</span> (<span class="cm-keyword">this</span>.<span class="cm-property">y</span> <span class="cm-operator">==</span> <span class="cm-keyword">this</span>.<span class="cm-property">matrix</span>.<span class="cm-property">height</span>) <span class="cm-keyword">return</span> {<span class="cm-property">done</span>: <span class="cm-atom">true</span>};
+
+    <span class="cm-keyword">let</span> <span class="cm-def">value</span> <span class="cm-operator">=</span> {<span class="cm-property">x</span>: <span class="cm-keyword">this</span>.<span class="cm-property">x</span>,
+                 <span class="cm-property">y</span>: <span class="cm-keyword">this</span>.<span class="cm-property">y</span>,
+                 <span class="cm-property">value</span>: <span class="cm-keyword">this</span>.<span class="cm-property">matrix</span>.<span class="cm-property">get</span>(<span class="cm-keyword">this</span>.<span class="cm-property">x</span>, <span class="cm-keyword">this</span>.<span class="cm-property">y</span>)};
+    <span class="cm-keyword">this</span>.<span class="cm-property">x</span><span class="cm-operator">++</span>;
+    <span class="cm-keyword">if</span> (<span class="cm-keyword">this</span>.<span class="cm-property">x</span> <span class="cm-operator">==</span> <span class="cm-keyword">this</span>.<span class="cm-property">matrix</span>.<span class="cm-property">width</span>) {
+      <span class="cm-keyword">this</span>.<span class="cm-property">x</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+      <span class="cm-keyword">this</span>.<span class="cm-property">y</span><span class="cm-operator">++</span>;
+    }
+    <span class="cm-keyword">return</span> {<span class="cm-property">value</span>, <span class="cm-property">done</span>: <span class="cm-atom">false</span>};
+  }
+}</pre>
+
+<p>このクラスでは行列にイテレートをかける作業の進捗を <code>x</code> , <code>y</code> プロパティで追いかけていく。 <code>next</code> メソッドでは、まず行列の底まで達したかチェックする。底に達してなければ、まず現在値を保持するオブジェクトを作って、 <em>その後で</em> 位置をアップデートする(必要があれば次の行に移る)。</p>
+
+<p><code>Matrix</code> クラスをイテラブルに変更しよう。この本では、個々のコード例を短く自己完結するようにしたいから、後からプロトタイプを操作してクラスにメソッドを追加することがある。普通のプログラムでは、コードを細かい断片に分ける必要はないから、クラスメソッドとして直接宣言すればいい。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_BmOLk4O5HN" href="#c_BmOLk4O5HN" tabindex="-1" role="presentation"></a><span class="cm-variable">Matrix</span>.<span class="cm-property">prototype</span>[<span class="cm-variable">Symbol</span>.<span class="cm-property">iterator</span>] <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {
+  <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">MatrixIterator</span>(<span class="cm-keyword">this</span>);
+};</pre>
+
+<p><a class="p_ident" id="p_vy90noDJcP" href="#p_vy90noDJcP" tabindex="-1" role="presentation"></a>これで <code>for</code> / <code>of</code> でmatrixにループをかけられるようになった。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ek9pXBwNMJ" href="#c_ek9pXBwNMJ" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">matrix</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Matrix</span>(<span class="cm-number">2</span>, <span class="cm-number">2</span>, (<span class="cm-def">x</span>, <span class="cm-def">y</span>) <span class="cm-operator">=&gt;</span> <span class="cm-string-2">`value ${</span><span class="cm-variable-2">x</span><span class="cm-string-2">}</span><span class="cm-string-2">,${</span><span class="cm-variable-2">y</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
+<span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> {<span class="cm-def">x</span>, <span class="cm-def">y</span>, <span class="cm-def">value</span>} <span class="cm-keyword">of</span> <span class="cm-variable">matrix</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">x</span>, <span class="cm-variable">y</span>, <span class="cm-variable">value</span>);
+}
+<span class="cm-comment">// → 0 0 value 0,0</span>
+<span class="cm-comment">// → 1 0 value 1,0</span>
+<span class="cm-comment">// → 0 1 value 0,1</span>
+<span class="cm-comment">// → 1 1 value 1,1</span></pre>
+
+<h2><a class="h_ident" id="h_3vwredi8nD" href="#h_3vwredi8nD" tabindex="-1" role="presentation"></a>Getters, setters, and statics</h2>
+
+<p>インターフェイスはたいていメソッドで構成されているけど、関数以外の値を保持するプロパティがあっても問題ない。例えば、 <code>Map</code> オブジェクトには <code>size</code> プロパティがあって、いくつキーを保存しているか教えてくれる。</p>
+
+<p><a class="p_ident" id="p_n5FiB3PTJz" href="#p_n5FiB3PTJz" tabindex="-1" role="presentation"></a>こういうオブジェクトのインスタンスは、 <code>size</code> のようなプロパティを計算して保存しておく必要はない。直接アクセスできるプロパティにも、メソッド呼び出しが隠れているかもしれないんだ。こうしたメソッドを <em>ゲッター(getter)</em> と呼ぶ。オブジェクト式やクラス宣言で <code>get</code> をメソッド名の前につければ定義できる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Np05mJ4GVO" href="#c_Np05mJ4GVO" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">varyingSize</span> <span class="cm-operator">=</span> {
+  <span class="cm-property">get</span> <span class="cm-property">size</span>() {
+    <span class="cm-keyword">return</span> <span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">100</span>);
+  }
+};
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">varyingSize</span>.<span class="cm-property">size</span>);
+<span class="cm-comment">// → 73</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">varyingSize</span>.<span class="cm-property">size</span>);
+<span class="cm-comment">// → 49</span></pre>
+
+<p><a class="p_ident" id="p_AqxkiQamgo" href="#p_AqxkiQamgo" tabindex="-1" role="presentation"></a>誰かがこのオブジェクトから <code>size</code> プロパティを読もうとすれば、対応するメソッドが呼び出される。プロパティを書き込むときには <em>セッター(setter)</em> を使えば似たようなことができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_7LQG88c1BA" href="#c_7LQG88c1BA" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">Temperature</span> {
+  <span class="cm-property">constructor</span>(<span class="cm-def">celsius</span>) {
+    <span class="cm-keyword">this</span>.<span class="cm-property">celsius</span> <span class="cm-operator">=</span> <span class="cm-variable-2">celsius</span>;
+  }
+  <span class="cm-keyword">get</span> <span class="cm-property">fahrenheit</span>() {
+    <span class="cm-keyword">return</span> <span class="cm-keyword">this</span>.<span class="cm-property">celsius</span> <span class="cm-operator">*</span> <span class="cm-number">1.8</span> <span class="cm-operator">+</span> <span class="cm-number">32</span>;
+  }
+  <span class="cm-keyword">set</span> <span class="cm-property">fahrenheit</span>(<span class="cm-def">value</span>) {
+    <span class="cm-keyword">this</span>.<span class="cm-property">celsius</span> <span class="cm-operator">=</span> (<span class="cm-variable-2">value</span> <span class="cm-operator">-</span> <span class="cm-number">32</span>) <span class="cm-operator">/</span> <span class="cm-number">1.8</span>;
+  }
+
+  <span class="cm-keyword">static</span> <span class="cm-property">fromFahrenheit</span>(<span class="cm-def">value</span>) {
+    <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">Temperature</span>((<span class="cm-variable-2">value</span> <span class="cm-operator">-</span> <span class="cm-number">32</span>) <span class="cm-operator">/</span> <span class="cm-number">1.8</span>);
+  }
+}
+
+<span class="cm-keyword">let</span> <span class="cm-def">temp</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Temperature</span>(<span class="cm-number">22</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">temp</span>.<span class="cm-property">fahrenheit</span>);
+<span class="cm-comment">// → 71.6</span>
+<span class="cm-variable">temp</span>.<span class="cm-property">fahrenheit</span> <span class="cm-operator">=</span> <span class="cm-number">86</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">temp</span>.<span class="cm-property">celsius</span>);
+<span class="cm-comment">// → 30</span></pre>
+
+<p><a class="p_ident" id="p_LIvGWr+/bz" href="#p_LIvGWr+/bz" tabindex="-1" role="presentation"></a><code>Temperature</code> (気温)クラスでは摂氏(celsius)と華氏(fahrenheit)のどちらでも温度を読み書きできる。でも内部では摂氏だけを保存していて、 <code>fahrenheit</code> のゲッターとセッターでは自動的に摂氏温度への(からの)変換が行われる。</p>
+
+<p>コンストラクター関数にプロパティを直接付け加えたい場合もある(プロトタイプにではなく)。このメソッドはクラスのインスタンスにはアクセスできないけど、例えば、違う方法でインスタンスを作るために使われる。</p>
+
+<p>クラス宣言内で、 <code>static</code> が名前の前に書かれたメソッドはコンストラクターに保存される。だから、 <code>Temperature</code> クラスでは <code>Temperature.<wbr>fromFahrenheit(100)</code> と書けば、華氏温度から <code>Temperature</code> のインスタンスが作れるんだ。</p>
+
+<h2><a class="h_ident" id="h_VPvtUkdCjy" href="#h_VPvtUkdCjy" tabindex="-1" role="presentation"></a>継承(Inheritance)</h2>
+
+<p><a class="p_ident" id="p_NLw6nfy+Lw" href="#p_NLw6nfy+Lw" tabindex="-1" role="presentation"></a>行列の中には <em>対称</em> のものがある。左上と右下をつなぐ斜めの線で鏡写しにしても変わらないものが、対称な行列だ。言い換えれば、 <em>x</em> , <em>y</em> の位置の値が <em>y</em> , <em>x</em> の値と常に同じになるということだ。</p>
+
+<p><a class="p_ident" id="p_tlifxqsNyC" href="#p_tlifxqsNyC" tabindex="-1" role="presentation"></a><code>Matrix</code> と似ていながら、対称であることを強制するようなデータ構造が必要だとしよう。0から書いていくこともできるけど、これまでに書いたものと似たようなコードを繰返すことになるだろう。</p>
+
+<p><a class="p_ident" id="p_kRtvgxF67W" href="#p_kRtvgxF67W" tabindex="-1" role="presentation"></a>JavaScript’s prototype system makes it possible to create a <em>new</em> class, much like the old class, but with new definitions for some of its properties. The prototype for the new class derives from the old prototype but adds a new definition for, say, the <code>set</code> method.</p>
+
+<p><a class="p_ident" id="p_/GdZyJTogs" href="#p_/GdZyJTogs" tabindex="-1" role="presentation"></a>オブジェクト指向プログラミングの用語で、これを <em>継承(inheritande)</em> という。新しいクラスは古いクラスからプロパティとふるまいを継承する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_uuBcsDdS7D" href="#c_uuBcsDdS7D" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">SymmetricMatrix</span> <span class="cm-keyword">extends</span> <span class="cm-variable">Matrix</span> {
+  <span class="cm-property">constructor</span>(<span class="cm-def">size</span>, <span class="cm-def">element</span> <span class="cm-operator">=</span> (<span class="cm-def">x</span>, <span class="cm-def">y</span>) <span class="cm-operator">=&gt;</span> <span class="cm-atom">undefined</span>) {
+    <span class="cm-keyword">super</span>(<span class="cm-variable-2">size</span>, <span class="cm-variable-2">size</span>, (<span class="cm-def">x</span>, <span class="cm-def">y</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-keyword">if</span> (<span class="cm-variable-2">x</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">y</span>) <span class="cm-keyword">return</span> <span class="cm-variable-2">element</span>(<span class="cm-variable-2">y</span>, <span class="cm-variable-2">x</span>);
+      <span class="cm-keyword">else</span> <span class="cm-keyword">return</span> <span class="cm-variable-2">element</span>(<span class="cm-variable-2">x</span>, <span class="cm-variable-2">y</span>);
+    });
+  }
+
+  <span class="cm-property">set</span>(<span class="cm-def">x</span>, <span class="cm-def">y</span>, <span class="cm-def">value</span>) {
+    <span class="cm-keyword">super</span>.<span class="cm-property">set</span>(<span class="cm-variable-2">x</span>, <span class="cm-variable-2">y</span>, <span class="cm-variable-2">value</span>);
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">x</span> <span class="cm-operator">!=</span> <span class="cm-variable-2">y</span>) {
+      <span class="cm-keyword">super</span>.<span class="cm-property">set</span>(<span class="cm-variable-2">y</span>, <span class="cm-variable-2">x</span>, <span class="cm-variable-2">value</span>);
+    }
+  }
+}
+
+<span class="cm-keyword">let</span> <span class="cm-def">matrix</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">SymmetricMatrix</span>(<span class="cm-number">5</span>, (<span class="cm-def">x</span>, <span class="cm-def">y</span>) <span class="cm-operator">=&gt;</span> <span class="cm-string-2">`${</span><span class="cm-variable-2">x</span><span class="cm-string-2">}</span><span class="cm-string-2">,${</span><span class="cm-variable-2">y</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">matrix</span>.<span class="cm-property">get</span>(<span class="cm-number">2</span>, <span class="cm-number">3</span>));
+<span class="cm-comment">// → 3,2</span></pre>
+
+<p><a class="p_ident" id="p_cvzacSUGlF" href="#p_cvzacSUGlF" tabindex="-1" role="presentation"></a><code>extends</code> という言葉を使えば、このクラスはデフォルトの <code>Object</code> プロトタイプではなくて、他のクラスをベースにしていることが分かる。このベースにしているクラスを <em>スーパークラス(superclass)</em> と呼び、派生したクラスを <em>サブクラス(subclass)</em> と呼ぶ。</p>
+
+<p><code>SymmetricMatrix</code> のインスタンスを初期化するために、コンストラクターはスーパークラスのコンストラクターを、 <code>super</code> キーワードによって呼び出す。なぜこの <code>super</code> の呼び出しをするかというと、この新しいオブジェクトが(おおむね) <code>Matrix</code> のようにふるまうなら <code>Matrix</code> と同じようなインスタンスプロパティが必要だからだ。行列が確実に対称になるようにするために、コンストラクターが <code>element</code> 関数をラッピングしていて、対角線で対称に値を割り当てる。</p>
+
+<p><code>set</code> メソッドもまた <code>super</code> を使っているけど、コンストラクターを呼び出すためではなくて、スーパークラスから特定のメソッドを呼び出すためだ。 <code>set</code> を再定義しているけど、オリジナルのふるまいも使いたい。 <code>this.set</code> では <em>新しい</em> <code>set</code> メソッドを参照してしまうから、これでは上手くいかないんだ。クラスメソッドの中では、 <code>super</code> によってスーパークラスで定義されたままのメソッドを呼び出すことができる。</p>
+
+<p>継承を使えば、今あるデータ型から少し違ったデータ型を比較的少ない作業で手に入れられる。これは、カプセル化やポリモーフィズムと並んで、オブジェクト指向プログラミングの基本的なパーツだ。ただ、カプセル化やポリモーフィズムが一般的に素晴らしいアイデアと見なされるのに比べると継承には賛否両論ある。</p>
+
+<p>カプセル化やポリモーフィズはコードの部分同士を <em>分離する</em> から、全体的なもつれ合いを減らすけど、継承は原理的にクラス同士をつなぎ合わせるものだから、もつれ合いを <em>より大きく</em> する。あるクラスから継承しようとするときには、単に使うだけの時よりも、もっとよくそのクラスについて知らなくてはいけなくなる。継承は便利なツールになり得るし、ぼくは自分のプログラムでもちょくちょく使っているけど、一番に手を伸ばすツールにすべきではないし、クラスのヒエラルキー(クラスの家系図)をあえて組み上げるのはやめた方がいい。</p>
+
+<h2><a class="h_ident" id="h_N5t+OAQJ39" href="#h_N5t+OAQJ39" tabindex="-1" role="presentation"></a>instanceof演算子</h2>
+
+<p><a class="p_ident" id="p_qEK82lpY3H" href="#p_qEK82lpY3H" tabindex="-1" role="presentation"></a>あるオブジェクトが特定のクラスから派生しているかどうか分かると便利な場合がある。そのために、JavaScriptには <code>instanceof</code> という2項演算子がある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_1/4hH+dV3k" href="#c_1/4hH+dV3k" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(
+  <span class="cm-keyword">new</span> <span class="cm-variable">SymmetricMatrix</span>(<span class="cm-number">2</span>) <span class="cm-keyword">instanceof</span> <span class="cm-variable">SymmetricMatrix</span>);
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">SymmetricMatrix</span>(<span class="cm-number">2</span>) <span class="cm-keyword">instanceof</span> <span class="cm-variable">Matrix</span>);
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Matrix</span>(<span class="cm-number">2</span>, <span class="cm-number">2</span>) <span class="cm-keyword">instanceof</span> <span class="cm-variable">SymmetricMatrix</span>);
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">1</span>] <span class="cm-keyword">instanceof</span> <span class="cm-variable">Array</span>);
+<span class="cm-comment">// → true</span></pre>
+
+<p>この演算子は継承された型を全て見ていくから、ある <code>SymmetricMatrix</code> は <code>Matrix</code> のインスタンスになるんだ。また <code>instanceof</code> は、 <code>Array</code> のような標準のコンストラクターにも適用することができる。ほとんど全てのオブジェクトは <code>Object</code> のインスタンスだ。</p>
+
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
+
+<p>オブジェクトは自分自身のプロパティを持っているだけではない。プロトタイプという、さらに他のオブジェクトを持つ。あるオブジェクトが持っていないプロパティを持っているかのようにふるまうのは、プロトタイプがそのプロパティを持っているからだ。単純なオブジェクトは <code>Object.prototype</code> をプロトタイプとして持つ。</p>
+
+<p>コンストラクターとは、たいてい大文字で名前が始まる関数で、 <code>new</code> 演算子で呼び出すと新しいオブジェクトを作る。出来上った新しいオブジェクトのプロトタイプは、コンストラクターの <code>prototype</code> プロパティでアクセスできるオブジェクトになる。だから、コンストラクターから作られる値がシェアするべきプロパティを全てプロトタイプに放り込んでおくと便利だ。 <code>class</code> キーワードを使う書き方を使えば、コンストラクターとプロトタイプを分かりやすく定義できる。</p>
+
+<p><a class="p_ident" id="p_iUDsehK2Bq" href="#p_iUDsehK2Bq" tabindex="-1" role="presentation"></a>getterとsetterを定義しておけば、オブジェクトの特定のプロパティへアクセスがあた時に、ひっそりと呼び出される。静的なメソッドはあるクラスの、プロトタイプではなく、コンストラクターが持つメソッドだ。</p>
+
+<p><code>instanceof</code> 演算子は、オブジェクトとコンストラクターを与えられれば、そのオブジェクトがそのコンストラクターのインスタンスかどうか教えてくれる。</p>
+
+<p>オブジェクトの便利な使い方の1つに、特定のインターフェイスを作って、他からはそのインターフェイスでしかアクセスしないようにするということがある。こうすればインターフェイス以外の詳細は、 <em>カプセル化</em> されて背後に隠れるようになる。</p>
+
+<p>いろいろな型に同じインターフェイスを実装することもできる。そうすれば、そのインターフェイスを使うように書かれたコードは、いろいろなオブジェクトと協調する方法が自動的に分かる。これを <em>ポリモーフィズム</em> と呼ぶ。</p>
+
+<p>少しだけ細部に違いがあるクラスを複数実装する場合には、既に存在するクラスからいくつかのふるまいを <em>継承</em> して <em>サブクラス</em> として新しいクラスを書くことが助けになるかもしれない。</p>
+
+<h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
+
+<h3 id="exercise_vector"><a class="i_ident" id="i_zO8FRQBMAy" href="#i_zO8FRQBMAy" tabindex="-1" role="presentation"></a>A vector type</h3>
+
+<p>ベクトル型</p>
+
+<p>2次元空間のベクトルを表現する <code>Vec</code>　クラスを書いてみよう。 <code>x</code> と <code>y</code> という(数字の)パラメータを受け取って、同じ名前のプロパティとして保存しておく。</p>
+
+<p><a class="p_ident" id="p_AnM5QYLjfQ" href="#p_AnM5QYLjfQ" tabindex="-1" role="presentation"></a><code>Vec</code> プロトタイプには2つのメソッドを与える。 <code>plus</code> と <code>minus</code> で、他のベクトルを引数に受け取って、2つのベクトル( <code>this</code> と引数のベクトル)の <em>x</em> や <em>y</em> の和や差を計算した結果の新しいベクトルを返す。</p>
+
+<p><a class="p_ident" id="p_vfRsHZY+P3" href="#p_vfRsHZY+P3" tabindex="-1" role="presentation"></a>プロトタイプに、ゲッタープロパティとして、 <code>length</code> を与えて、ベクトルの長さを計算するようにしよう。これはある点( <em>x</em> , <em>y</em> )の原点(0, 0)からの距離のことだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_f3P62tUJWH" href="#c_f3P62tUJWH" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Vec</span>(<span class="cm-number">1</span>, <span class="cm-number">2</span>).<span class="cm-property">plus</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Vec</span>(<span class="cm-number">2</span>, <span class="cm-number">3</span>)));
+<span class="cm-comment">// → Vec{x: 3, y: 5}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Vec</span>(<span class="cm-number">1</span>, <span class="cm-number">2</span>).<span class="cm-property">minus</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Vec</span>(<span class="cm-number">2</span>, <span class="cm-number">3</span>)));
+<span class="cm-comment">// → Vec{x: -1, y: -1}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Vec</span>(<span class="cm-number">3</span>, <span class="cm-number">4</span>).<span class="cm-property">length</span>);
+<span class="cm-comment">// → 5</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><code>class</code> 宣言をどうすればいいか分からなければ、 <code>Rabbit</code> クラスの例を見返してみよう。</p>
+
+<p><a class="p_ident" id="p_thuu4MinA1" href="#p_thuu4MinA1" tabindex="-1" role="presentation"></a>ゲッタープロパティをコンストラクターに追加するには <code>get</code> という言葉をメソッド名の前に置けばいい。(0, 0) から (x, y) への距離を計算するには、ピタゴラスの定理を使おう。求める距離の2乗は、x座標の2乗プラスy座標の2乗というものだ。だから求める数字は √(x<sup>2</sup> +　y<sup>2</sup>) になる。そして <code>Math.sqrt</code> が、JavaScriptで平方根を計算する方法だ。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_rpYp9Ou4LG" href="#i_rpYp9Ou4LG" tabindex="-1" role="presentation"></a>Groups</h3>
+
+<p>グループ</p>
+
+<p id="groups"><a class="p_ident" id="p_+lWq3iyHGD" href="#p_+lWq3iyHGD" tabindex="-1" role="presentation"></a>標準のJavaScript環境にはもう1つ <code>Set</code> というデータ構造がある。 <code>Map</code> と同じように、セットも値のコレクションを保持するものだ。 <code>Map</code> と違うのは、その値を他の値と関連付けたりはしないということだ。単にどの値がセットの一部が追跡するだけなんだ。ある値は1回だけしかセットの一部になれない。つまり、もう1回セットに追加しようとしても、何も効果がないんだ。</p>
+
+<p><code>Group</code> という名前のクラスを書いてみよう( <code>Set</code> はもう使われているから)。 <code>Set</code> と同じように、 <code>add</code> 、 <code>delete</code> 、 <code>has</code> というメソッドを持たせよう。コンストラクターは空のグループを作るようにして、 <code>add</code> は値を追加して(その値が含まれていないときだけ)、 <code>delete</code> は引数に取る値をグループから削除して(もし含まれていれば)、 <code>has</code> は引数の値が含まれているかどうかの真偽値を返す。</p>
+
+<p>2つ値が同じかどうか確かめるには、 <code>===</code> や <code>indexOf</code> のような同等のものを使おう。</p>
+
+<p>さらに静的なメソッドとして <code>from</code> を追加しよう。これはイテラブルなオブジェクトを引数に取って、イテレートすることによって生まれた値を全て含んだグループを作る。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_dNauaecKx+" href="#c_dNauaecKx+" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">Group</span> {
+  <span class="cm-comment">// Your code here.</span>
+}
+
+<span class="cm-keyword">let</span> <span class="cm-def">group</span> <span class="cm-operator">=</span> <span class="cm-variable">Group</span>.<span class="cm-property">from</span>([<span class="cm-number">10</span>, <span class="cm-number">20</span>]);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">group</span>.<span class="cm-property">has</span>(<span class="cm-number">10</span>));
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">group</span>.<span class="cm-property">has</span>(<span class="cm-number">30</span>));
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">group</span>.<span class="cm-property">add</span>(<span class="cm-number">10</span>);
+<span class="cm-variable">group</span>.<span class="cm-property">delete</span>(<span class="cm-number">10</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">group</span>.<span class="cm-property">has</span>(<span class="cm-number">10</span>));
+<span class="cm-comment">// → false</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>これを実現する一番簡単な方法は、インスタンスのプロパティとして、グループのメンバーの配列を持っておくことだ。 <code>includes</code> や <code>indexOf</code> メソッドを使えば、配列の中に引数の値があるかどうかチェックできる。</p>
+
+<p>クラスのコンストラクターでは、メンバーのコレクションを空の配列にしておけばいい。 <code>add</code> が呼びだされたら、引数の値が配列に存在するかチェックして、なければ追加する(例えば <code>push</code> メソッドで)。</p>
+
+<p>配列から <code>delete</code> を使って要素を削除するのは、もう少し複雑だ。 <code>filter</code> を使えば、その値を除いた配列を作ることができる。メンバーの配列を保持しているプロパティを、フィルターしたバージョンの新しい配列で上書きするのを忘れないように。</p>
+
+<p><code>from</code> メソッドでは、 <code>for</code> / <code>of</code> ループを使って、イテラブルなオブジェクトから値を取り出して、 <code>add</code> を呼び出して新しいグループに追加していけばいい。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_djD3XDJ27V" href="#i_djD3XDJ27V" tabindex="-1" role="presentation"></a>Iterable groups</h3>
+
+<p id="group_iterator"><a class="p_ident" id="p_azaOoj0ezw" href="#p_azaOoj0ezw" tabindex="-1" role="presentation"></a>Make the <code>Group</code> class from the previous exercise iterable. Refer to the section about the iterator interface earlier in the chapter if you aren’t clear on the exact form of the interface anymore.</p>
+
+<p><a class="p_ident" id="p_SoL9V7zUCt" href="#p_SoL9V7zUCt" tabindex="-1" role="presentation"></a>If you used an array to represent the group’s members, don’t just return the iterator created by calling the <code>Symbol.iterator</code> method on the array. That would work, but it defeats the purpose of this exercise.</p>
+
+<p><a class="p_ident" id="p_rLyKomI6vw" href="#p_rLyKomI6vw" tabindex="-1" role="presentation"></a>It is okay if your iterator behaves strangely when the group is modified during iteration.</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_n6ZNn/zRLj" href="#c_n6ZNn/zRLj" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here (and the code from the previous exercise)</span>
+
+<span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">value</span> <span class="cm-keyword">of</span> <span class="cm-variable">Group</span>.<span class="cm-property">from</span>([<span class="cm-string">&quot;a&quot;</span>, <span class="cm-string">&quot;b&quot;</span>, <span class="cm-string">&quot;c&quot;</span>])) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">value</span>);
+}
+<span class="cm-comment">// → a</span>
+<span class="cm-comment">// → b</span>
+<span class="cm-comment">// → c</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><a class="p_ident" id="p_URAzFlYuQP" href="#p_URAzFlYuQP" tabindex="-1" role="presentation"></a>It is probably worthwhile to define a new class <code>GroupIterator</code>. Iterator instances should have a property that tracks the current position in the group. Every time <code>next</code> is called, it checks whether it is done and, if not, moves past the current value and returns it.</p>
+
+<p><a class="p_ident" id="p_il9bvEkyQT" href="#p_il9bvEkyQT" tabindex="-1" role="presentation"></a>The <code>Group</code> class itself gets a method named by <code>Symbol.iterator</code> that, when called, returns a new instance of the iterator class for that group.</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_wcWSnr9zHV" href="#i_wcWSnr9zHV" tabindex="-1" role="presentation"></a>Borrowing a method</h3>
+
+<p><a class="p_ident" id="p_HxMI3VGcht" href="#p_HxMI3VGcht" tabindex="-1" role="presentation"></a>Earlier in the chapter I mentioned that an object’s <code>hasOwnProperty</code> can be used as a more robust alternative to the <code>in</code> operator when you want to ignore the prototype’s properties. But what if your map needs to include the word <code>&quot;hasOwnProperty&quot;</code>? You won’t be able to call that method anymore because the object’s own property hides the method value.</p>
+
+<p><a class="p_ident" id="p_nxOrPKy+Ky" href="#p_nxOrPKy+Ky" tabindex="-1" role="presentation"></a>Can you think of a way to call <code>hasOwnProperty</code> on an object that has its own property by that name?</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_LtMKqqkY0Q" href="#c_LtMKqqkY0Q" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">map</span> <span class="cm-operator">=</span> {<span class="cm-property">one</span>: <span class="cm-atom">true</span>, <span class="cm-property">two</span>: <span class="cm-atom">true</span>, <span class="cm-property">hasOwnProperty</span>: <span class="cm-atom">true</span>};
+
+<span class="cm-comment">// Fix this call</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">map</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;one&quot;</span>));
+<span class="cm-comment">// → true</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><a class="p_ident" id="p_Pg/cWjUrKm" href="#p_Pg/cWjUrKm" tabindex="-1" role="presentation"></a>Remember that methods that exist on plain objects come from <code>Object.prototype</code>.</p>
+
+<p><a class="p_ident" id="p_wCf1aBfcJA" href="#p_wCf1aBfcJA" tabindex="-1" role="presentation"></a>Also remember that you can call a function with a specific <code>this</code> binding by using its <code>call</code> method.</p>
+
+</div></div><nav><a href="05_higher_order.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="07_robot.html" title="next chapter">▶</a></nav>
+</article>

@@ -1,0 +1,803 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>データ構造: オブジェクトと配列 :: Eloquent JavaScript</title>
+  <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
+  <script src="js/acorn_codemirror.js"></script>
+  <link rel=stylesheet href="css/ejs.css">
+  <script src="js/sandbox.js"></script>
+  <script src="js/ejs.js"></script><script>var chapNum = 4;var sandboxLoadFiles = ["code/journal.js","code/chapter/04_data.js"];</script></head>
+
+<article>
+<nav><a href="03_functions.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_higher_order.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 4</span>データ構造: オブジェクトと配列</h1>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>これまでに2度聞かれたことがある。「バベッジさん、マシーンに間違った数字を入力したら、正しい答えは出てきますでしょうか?」(中略)こんな疑問を呼び起こすような考えの混乱は、私にはどうしても理解できなかった。</p>
+
+<footer>Charles Babbage, <cite>Passages from the Life of a Philosopher (1864)</cite></footer>
+
+</blockquote><figure class="chapter framed"><img src="img/chapter_picture_4.jpg" alt="Picture of a weresquirrel"></figure>
+
+<p><a class="p_ident" id="p_LSUxFiq2pv" href="#p_LSUxFiq2pv" tabindex="-1" role="presentation"></a>数値や真偽値や文字列はデータ構造を組み立てる原子のようなものだ。多くのタイプの情報では、1つより多くの原子が必要になる。 <em>オブジェクト(ojbect)</em> を使えば、値をまとめて(値はさらに他のオブジェクトでもいい)もっと複雑な構造をつくれる。</p>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>これまで組んできたプログラムは、単純なデータ型の操作だけに制限されていた。この章では基本的なデータ構造を紹介する。読み終わるころには、実用的なプログラムを書き始めるための知識がついているだろう。</p>
+
+<p>この章では、多かれ少なかれ現実的なプログラミングの例を扱いつつ、その時々の問題に適用できるコンセプトを紹介していく。例示するコードは、章の前の方で紹介した関数やバインディングを使って組み立てている場合が多い。</p>
+
+<h2><a class="h_ident" id="h_sQh2ihn+4n" href="#h_sQh2ihn+4n" tabindex="-1" role="presentation"></a>リス男(The weresquirrel)</h2>
+
+<p><a class="p_ident" id="p_6vapRj8jPA" href="#p_6vapRj8jPA" tabindex="-1" role="presentation"></a>ときおり、たいていは午後8時から10時の間だけど、ジャックは自分がふさふさしっぽの小さいげっ歯類に変身していることに気づく。</p>
+
+<p>一方では、ジャックは狼男ではなかったことを喜んでいる。リスに変身しても狼に変身するほどの問題はない。お隣さんを食べてしまう(これが最悪のパターンだ)心配をする代わりに、お隣さんの猫に食べられる心配をしている。ブナの木の上の方の不安定な細い枝の上で裸で混乱しながら起きる、ということが2度あってから、夜には部屋のドアと窓を閉めて、床にはどこかに行かないようにクルミを撒いておくようにしている。</p>
+
+<p>これで猫と木に関しては問題ない。でもジャックはできれば彼の症状を完全に克服したいと思っている。変身が不規則に起きるのは、何かが引き金を引いているからかもしれないと考えている。しばらくの間はブナの木の近くで過ごした日にだけ起こると考えていた。だけどブナの木を避けてみても問題は解決しなかった。</p>
+
+<p>より科学的なアプローチに切り替えて、ジャックは毎日の行動と変身したかどうかを記録し始めた。彼はこのデータを使って、変身のきっかけになる条件を絞り込むつもりだ。</p>
+
+<p>まず彼が必要としているのは、そんな情報を保存するためのデータ構造だ。</p>
+
+<h2><a class="h_ident" id="h_AxdBEp+lzL" href="#h_AxdBEp+lzL" tabindex="-1" role="presentation"></a>データセット</h2>
+
+<p><a class="p_ident" id="p_oZVqgDTFVc" href="#p_oZVqgDTFVc" tabindex="-1" role="presentation"></a>デジタルデータのかたまりを扱うためには、まずはマシーンのメモリ上での表現方法を見つけないといけない。例えば、2,3,5,7,11という数字の集まりを表現したいとしよう。</p>
+
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a>文字列で独創性を発揮することもできるだろう。結局のところは文字列はどんな長さでも持つことができるから、たくさんのデータを詰め込める。<code>&quot;2 3 5 7 11&quot;</code>という表現を使ってみよう。でもこの方法はひどい。それぞれにアクセスするには、どうにかして1桁ずつ取り出して、数値に変換しないといけない。</p>
+
+<p><a class="p_ident" id="p_hI5sSbGPJD" href="#p_hI5sSbGPJD" tabindex="-1" role="presentation"></a>幸いにも、JavaScriptには値の集合を保存するのに特化したデータ型がある。これは <em>配列(Array)</em> と呼ばれる。配列は角カッコ(<code>[]</code>)の中に、コンマ(<code>,</code>)で分けた値のリストで書かれる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_05cIH1hy/D" href="#c_05cIH1hy/D" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">listOfNumbers</span> <span class="cm-operator">=</span> [<span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">5</span>, <span class="cm-number">7</span>, <span class="cm-number">11</span>];
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">listOfNumbers</span>[<span class="cm-number">2</span>]);
+<span class="cm-comment">// → 5</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">listOfNumbers</span>[<span class="cm-number">0</span>]);
+<span class="cm-comment">// → 2</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">listOfNumbers</span>[<span class="cm-number">2</span> <span class="cm-operator">-</span> <span class="cm-number">1</span>]);
+<span class="cm-comment">// → 3</span></pre>
+
+<p>配列の要素にアクセスするための記法にも角カッコが使われる。ある式の後ろに角カッコがあってその間に式があれば、角カッコの中の式の値が <em>インデックス</em> になって、左の式から対応する要素が探される。</p>
+
+<p id="array_indexing"><a class="p_ident" id="p_M8U377keTq" href="#p_M8U377keTq" tabindex="-1" role="presentation"></a>配列の最初のインデックスは0であって、1ではない。だから最初の要素は <code>listOfNumbers[0]</code> で得られる。0から始める数え方はテクノロジーの伝統で、いろいろな意味で納得できるものだけど、慣れるのに少し時間がかかるかもしれない。インデックスを、配列の頭から数えたときにスキップする要素の数だと考えてみよう。</p>
+
+<h2 id="properties"><a class="h_ident" id="h_xVLqzyxhRk" href="#h_xVLqzyxhRk" tabindex="-1" role="presentation"></a>プロパティ</h2>
+
+<p><a class="p_ident" id="p_Jp/jcz0XEI" href="#p_Jp/jcz0XEI" tabindex="-1" role="presentation"></a>これまでの章で、 <code>myString.length</code> (文字列の長さを得る)とか <code>Math.max</code> (最大値を得る)のような、なんだが怪しい見た目の式を見てきた。これらはある値の <em>プロパティ(property)</em> にアクセスする式だ。 <code>myString.length</code> では、 <code>myString</code> の <code>length</code> プロパティにアクセスできる。 <code>Math.max</code> では <code>Math</code> オブジェクトの <code>max</code> というプロパティにアクセスしている( <code>Math</code> オブジェクトは、数学に関連する定数や関数の集まりだ)。</p>
+
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>JavaScriptでは、ほとんど全ての値がプロパティを持っている。例外は <code>null</code> と <code>undefined</code> だ。これらの値ではないものたちのプロパティにアクセスしようとすれば、エラーが返ってくる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_FNR95AymUx" href="#c_FNR95AymUx" tabindex="-1" role="presentation"></a><span class="cm-atom">null</span>.<span class="cm-property">length</span>;
+<span class="cm-comment">// → TypeError: null has no properties</span></pre>
+
+<p><a class="p_ident" id="p_hwbJtpIV6L" href="#p_hwbJtpIV6L" tabindex="-1" role="presentation"></a>JavaScriptでプロパティにアクセスする方法は主に2つあって、ドット(.)を使うものと角カッコ([])を使うものだ。 <code>value.x</code> と <code>value[x]</code> はどちらも <code>value</code> のプロパティにアクセスするけど、同じプロパティとは限らない。違いはどのように <code>x</code> が解釈されるかだ。ドットを使うと、ドットの次の単語が文字通りにプロパティ名として解釈される。角カッコを使うとカッコの間の式が <em>評価されて</em> 、プロパティ名前になる。 <code>value.x</code> は <code>value</code> から“x”という名前のプロパティを得るのに対して、 <code>value[x]</code> は <code>x</code> という式を評価した結果を文字列に変換してプロパティ名として使う。</p>
+
+<p><a class="p_ident" id="p_6/I9FI5SCH" href="#p_6/I9FI5SCH" tabindex="-1" role="presentation"></a>もし興味を持っているプロパティの名前が <em>color</em> だと分かっていれば <code>value.color</code> とすればいい。バインディング <code>i</code> の値がプロパティ名になっているプロパティを取り出したいなら、 <code>value[i]</code> とする。プロパティ名は文字列だ。どんな文字列でもいいけど、ドット表記では有効なバインディング名しか受け付けない。 <em>2</em> や <em>John Doe</em> というプロパティ名にアクセスしたい場合は、角カッコを使うしかない。 <code>value[2]</code> や <code>value[&quot;John Doe&quot;]</code> のようにだ。</p>
+
+<p>配列の要素は配列のプロパティとして保持される。ここではインデックスの数字がプロパティ名として使われる。数字にはドット表記は使えないから、(どちらにしてもたいていはインデックスを保持するバインディングを使いたいから)角カッコ記法を使わないといけない。</p>
+
+<p><code>length</code> プロパティは、配列がいくつ要素を持っているか教えてくれる。このプロパティ名は有効なバインディングで、事前にこの名前を知っているわけだから、配列の名前を知るにはたいてい <code>array.length</code> の表記を使う。 <code>array[&quot;length&quot;]</code> よりも書きやすいということもある。</p>
+
+<h2 id="methods"><a class="h_ident" id="h_syCsSSJkTH" href="#h_syCsSSJkTH" tabindex="-1" role="presentation"></a>メソッド(Methods)</h2>
+
+<p>文字列も配列も、 <code>length</code> の他に関数を保持する色々なプロパティを持っている。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_prRDc5amqh" href="#c_prRDc5amqh" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">doh</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;Doh&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">typeof</span> <span class="cm-variable">doh</span>.<span class="cm-property">toUpperCase</span>);
+<span class="cm-comment">// → function</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">doh</span>.<span class="cm-property">toUpperCase</span>());
+<span class="cm-comment">// → DOH</span></pre>
+
+<p>どの文字列も <code>toUpperCase</code> プロパティを持っている。 <code>toUpperCase</code> を呼び出すと、全ての文字が大文字に変換されたコピーが返される。 <code>toLowerCase</code> もあって、これは逆の働きをする。</p>
+
+<p><a class="p_ident" id="p_wd/ZbuqMwr" href="#p_wd/ZbuqMwr" tabindex="-1" role="presentation"></a>面白いのは、 <code>toUpperCase</code> の呼び出しには引数が渡されていないのに <code>&quot;Doh&quot;</code> という文字列(呼び出したプロパティの持ち主)にアクセスができることだ。<a href="06_object.html#obj_methods">6</a>章でこの働きについて説明する。</p>
+
+<p><a class="p_ident" id="p_v7r4stHN+S" href="#p_v7r4stHN+S" tabindex="-1" role="presentation"></a>関数を保持しているプロパティは一般的に、関数の持ち主である値の <em>メソッド(method)</em> と呼ばれる。「 <code>toUpperCase</code> は文字列のメソッドだ」というように。</p>
+
+<p id="array_methods">以下の例では配列を操作するために使える2つのメソッドを紹介する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_RiFZUNk6gr" href="#c_RiFZUNk6gr" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">sequence</span> <span class="cm-operator">=</span> [<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>];
+<span class="cm-variable">sequence</span>.<span class="cm-property">push</span>(<span class="cm-number">4</span>);
+<span class="cm-variable">sequence</span>.<span class="cm-property">push</span>(<span class="cm-number">5</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sequence</span>);
+<span class="cm-comment">// → [1, 2, 3, 4, 5]</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sequence</span>.<span class="cm-property">pop</span>());
+<span class="cm-comment">// → 5</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sequence</span>);
+<span class="cm-comment">// → [1, 2, 3, 4]</span></pre>
+
+<p><code>push</code> メソッドは配列の最後に値を加える。 <code>pop</code> メソッドはその反対に最後の値を取り除き、返り値にする。</p>
+
+<p><a class="p_ident" id="p_83kEOeck/v" href="#p_83kEOeck/v" tabindex="-1" role="presentation"></a>このちょっとバカみたいな名前は <em>スタック</em> の操作についての伝統的な用語だ。スタックとは、プログラミングの用語では、値を押しこんだり(push)、逆の順番で飛び出させたり(pop out)するデータ構造だ。スタックでは、最後に加わった値は最初に取り除かれる。スタックはプログラミングではありふれている。<a href="03_functions.html#stack">前の章</a>での関数のコールスタックを覚えていると思うけど、これも同じ考えの例だ。</p>
+
+<h2><a class="h_ident" id="h_IDZxb7RIlL" href="#h_IDZxb7RIlL" tabindex="-1" role="presentation"></a>オブジェクト</h2>
+
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a>リス人間に戻ろう。毎日のログのエントリーはまとめて配列として表現できる。ただ、1つのエントリーは数字や文字列だけでできているわけではない。各エントリーは、行動のリストやジャックがリスに変わったかどうかの真偽値を保存しないといけない。できれば、各エントリーを1つの値にしてから、ログのエントリーの配列に押し込んでいきたい。 (訳注: エントリーは日記の一日分の記事のこと)</p>
+
+<p><a class="p_ident" id="p_f1NsHC39FG" href="#p_f1NsHC39FG" tabindex="-1" role="presentation"></a><em>オブジェクト(object)</em>　型の値は任意のプロパティが集まったものだ。オブジェクトの作り方の1つは、波カッコを式として使うことだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Y37a9WsXpl" href="#c_Y37a9WsXpl" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">day1</span> <span class="cm-operator">=</span> {
+  <span class="cm-property">squirrel</span>: <span class="cm-atom">false</span>,
+  <span class="cm-property">events</span>: [<span class="cm-string">&quot;work&quot;</span>, <span class="cm-string">&quot;touched tree&quot;</span>, <span class="cm-string">&quot;pizza&quot;</span>, <span class="cm-string">&quot;running&quot;</span>]
+};
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">day1</span>.<span class="cm-property">squirrel</span>);
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">day1</span>.<span class="cm-property">wolf</span>);
+<span class="cm-comment">// → undefined</span>
+<span class="cm-variable">day1</span>.<span class="cm-property">wolf</span> <span class="cm-operator">=</span> <span class="cm-atom">false</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">day1</span>.<span class="cm-property">wolf</span>);
+<span class="cm-comment">// → false</span></pre>
+
+<p>波カッコの内側には、コンマで分けてプロパティリストを書く。各プロパティには名前があって、コロン(:)と値が続く。オブジェクトが複数行で書かれる場合は、上の例のようにインデントすると読みやすくなる。バインディングの名前として有効ではない名前や数字を、プロパティ名にするならクオートで囲まないといけない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_n8ErtKNPW/" href="#c_n8ErtKNPW/" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">descriptions</span> <span class="cm-operator">=</span> {
+  <span class="cm-property">work</span>: <span class="cm-string">&quot;Went to work&quot;</span>,
+  <span class="cm-string cm-property">&quot;touched tree&quot;</span>: <span class="cm-string">&quot;Touched a tree&quot;</span>
+};</pre>
+
+<p><a class="p_ident" id="p_gG3FdVheK0" href="#p_gG3FdVheK0" tabindex="-1" role="presentation"></a>これは、JavaScriptでは波カッコに <em>2つの</em> 意味があるということだ。文の始まりでは、ブロックの開始という意味になる。それ以外だったら、オブジェクトを表す。幸いにして波カッコのオブジェクトで文を始めるのが役に立つことはあまりない。だからこの2つのあいまいさはあまり問題にならない。</p>
+
+<p>存在しないプロパティを読もうとすれば <code>undefined</code> が返ってくる。</p>
+
+<p>プロパティ式に <code>=</code> 演算子で値を代入することもできる。この場合、既にそのプロパティの値があれば置き換えられるし、なければ新しいプロパティが作られる。</p>
+
+<p><a class="p_ident" id="p_mz/DqAhcts" href="#p_mz/DqAhcts" tabindex="-1" role="presentation"></a>バインディングの触手モデルを少し振り返ってみよう。プロパティバインディングも同じようなものだ。プロパティも値を <em>捕まえる(grasp)</em> けど、その他のバインディングやプロパティが同じ値を保持しているかもしれない。オブジェクトをタコだと思ってみよう。好きな数の触手があって、各触手には名前のタトゥーがある。</p>
+
+<p><code>delete</code> 演算子はそのタコの触手を切り落とす。 <code>delete</code> はオブジェクトのプロパティに適用すると、指定されたプロパティをオブジェクトから取り除く、単項演算子だ。これはあまり使われないけど、とにかくこういうこともできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_66M3B1wG98" href="#c_66M3B1wG98" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">anObject</span> <span class="cm-operator">=</span> {<span class="cm-property">left</span>: <span class="cm-number">1</span>, <span class="cm-property">right</span>: <span class="cm-number">2</span>};
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">anObject</span>.<span class="cm-property">left</span>);
+<span class="cm-comment">// → 1</span>
+<span class="cm-keyword">delete</span> <span class="cm-variable">anObject</span>.<span class="cm-property">left</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">anObject</span>.<span class="cm-property">left</span>);
+<span class="cm-comment">// → undefined</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;left&quot;</span> <span class="cm-keyword">in</span> <span class="cm-variable">anObject</span>);
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;right&quot;</span> <span class="cm-keyword">in</span> <span class="cm-variable">anObject</span>);
+<span class="cm-comment">// → true</span></pre>
+
+<p>二項演算子の <code>in</code> を文字列とオブジェクトに対して適用すれば、その文字列と同じ名前のプロパティがオブジェクトにあるかどうか教えてくれる。プロパティの値を <code>undefined</code> にセットすることと <code>delete</code> することの違いは、前者ではオブジェクトはプロパティを持ち続けていて(単に意味のある値を持っていないだけ)、後者ではプロパティが存在しなくなって <code>in</code> は <code>false</code> を返すようになる。</p>
+
+<p>あるオブジェクトが持っているプロパティを知るには、 <code>Object.keys</code> 関数を使えばいい。この関数にオブジェクトを渡せば、オブジェクトのプロパティ名が文字列の配列になって返ってくる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_0oaalmpqn6" href="#c_0oaalmpqn6" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Object</span>.<span class="cm-property">keys</span>({<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>, <span class="cm-property">z</span>: <span class="cm-number">2</span>}));
+<span class="cm-comment">// → [&quot;x&quot;, &quot;y&quot;, &quot;z&quot;]</span></pre>
+
+<p>他にも <code>Object.assign</code> 関数はあるオブジェクトの全てのプロパティをもう一方のオブジェクトにコピーする。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ngXKayzwiT" href="#c_ngXKayzwiT" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">objectA</span> <span class="cm-operator">=</span> {<span class="cm-property">a</span>: <span class="cm-number">1</span>, <span class="cm-property">b</span>: <span class="cm-number">2</span>};
+<span class="cm-variable">Object</span>.<span class="cm-property">assign</span>(<span class="cm-variable">objectA</span>, {<span class="cm-property">b</span>: <span class="cm-number">3</span>, <span class="cm-property">c</span>: <span class="cm-number">4</span>});
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">objectA</span>);
+<span class="cm-comment">// → {a: 1, b: 3, c: 4}</span></pre>
+
+<p>配列は、シーケンスになった物を保存することに特化しているけど、単にオブジェクトの1種だ。 <code>typeof []</code> を評価すれば、 <code>&quot;object&quot;</code> が返ってくる。配列は、長くて薄っぺらいタコで、触手がきっちりした列になっていて、数字のタトゥーがあると思えばいい。</p>
+
+<p>ジャックの日誌を各要素がオブジェクトの配列として表現する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_H7Np/tieSQ" href="#c_H7Np/tieSQ" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">journal</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">events</span>: [<span class="cm-string">&quot;work&quot;</span>, <span class="cm-string">&quot;touched tree&quot;</span>, <span class="cm-string">&quot;pizza&quot;</span>,
+            <span class="cm-string">&quot;running&quot;</span>, <span class="cm-string">&quot;television&quot;</span>],
+   <span class="cm-property">squirrel</span>: <span class="cm-atom">false</span>},
+  {<span class="cm-property">events</span>: [<span class="cm-string">&quot;work&quot;</span>, <span class="cm-string">&quot;ice cream&quot;</span>, <span class="cm-string">&quot;cauliflower&quot;</span>,
+            <span class="cm-string">&quot;lasagna&quot;</span>, <span class="cm-string">&quot;touched tree&quot;</span>, <span class="cm-string">&quot;brushed teeth&quot;</span>],
+   <span class="cm-property">squirrel</span>: <span class="cm-atom">false</span>},
+  {<span class="cm-property">events</span>: [<span class="cm-string">&quot;weekend&quot;</span>, <span class="cm-string">&quot;cycling&quot;</span>, <span class="cm-string">&quot;break&quot;</span>, <span class="cm-string">&quot;peanuts&quot;</span>,
+            <span class="cm-string">&quot;beer&quot;</span>],
+   <span class="cm-property">squirrel</span>: <span class="cm-atom">true</span>},
+  <span class="cm-comment">/* and so on... */</span>
+];</pre>
+
+<h2><a class="h_ident" id="h_4WAxhrm5NU" href="#h_4WAxhrm5NU" tabindex="-1" role="presentation"></a>可変性(Mutability)</h2>
+
+<p>実際のプログラミングに <em>本当に</em> もうすぐとりかかる。でもまずはもう1つ理解しておくべき理論がある。</p>
+
+<p><a class="p_ident" id="p_muRRlg3Y3f" href="#p_muRRlg3Y3f" tabindex="-1" role="presentation"></a>これまでオブジェクトが持つ値は変更できることを見てきた。これまでの章で見てきた数値や文字列や真偽値は全て <em>変更不能(immutable)</em> だ。こういう型の値に変更を加えることはできないんだ。値同士を組み合わせたりして新しい値を得ることはできる。でも、ある1つの文字列を見れば、値そのものは変わらないままだ。文字列を作るテキストは変わらない。 <code>cat</code> という文字列を他のコードがいじって <code>rat</code> に変更することはできないんだ。</p>
+
+<p>オブジェクトは違うふるまいをする。プロパティを変更することができるから、1つのオブジェクトがときによって違う内容を持つことがある。</p>
+
+<p><a class="p_ident" id="p_ukwEmFAszZ" href="#p_ukwEmFAszZ" tabindex="-1" role="presentation"></a>120と120という2つの数字があるとして、これらは全く同じ数字と考えていい。物理的に同じビットを参照しているかに関係なく。でも、オブジェクトの場合は、同じオブジェクトを2ヶ所から参照する場合と、別々のオブジェクトが同じプロパティを持っている場合とで違いがある。次のコードを見てみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_I1Dv6D46/p" href="#c_I1Dv6D46/p" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">object1</span> <span class="cm-operator">=</span> {<span class="cm-property">value</span>: <span class="cm-number">10</span>};
+<span class="cm-keyword">let</span> <span class="cm-def">object2</span> <span class="cm-operator">=</span> <span class="cm-variable">object1</span>;
+<span class="cm-keyword">let</span> <span class="cm-def">object3</span> <span class="cm-operator">=</span> {<span class="cm-property">value</span>: <span class="cm-number">10</span>};
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">object1</span> <span class="cm-operator">==</span> <span class="cm-variable">object2</span>);
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">object1</span> <span class="cm-operator">==</span> <span class="cm-variable">object3</span>);
+<span class="cm-comment">// → false</span>
+
+<span class="cm-variable">object1</span>.<span class="cm-property">value</span> <span class="cm-operator">=</span> <span class="cm-number">15</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">object2</span>.<span class="cm-property">value</span>);
+<span class="cm-comment">// → 15</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">object3</span>.<span class="cm-property">value</span>);
+<span class="cm-comment">// → 10</span></pre>
+
+<p><a class="p_ident" id="p_HbCJqfhOFO" href="#p_HbCJqfhOFO" tabindex="-1" role="presentation"></a><code>object1</code> 、 <code>object2</code> バインディングは <em>同じ</em> オブジェクトをつかんでいる。だから <code>object1</code> へ変更を加えたのに、 <code>object2</code> の値まで変わっている。これを同じ <em>アイデンティティ(identity)</em> をもつというという。 <code>object3</code> バインディングは違うオブジェクトを指している。このオブジェクトは元々 <code>object1</code> と同じプロパティを持っていたけど、別々の人生を送っているんだ。</p>
+
+<p><a class="p_ident" id="p_SnVsoH6Uh/" href="#p_SnVsoH6Uh/" tabindex="-1" role="presentation"></a>バインディングは、変更可能にも固定にもどちらにもなり得る。だけどこれはバインディングのつかむ値のふるまいとは関係がない。数値自体は変更不能でも、 <code>let</code> で宣言したバインディングなら、バインディングが指す値を変更すれば、変化する数字を追いかけることができる。同じように <code>const</code> で宣言したオブジェクトを指すバインディングは、変化しないで同じオブジェクトを指し続けるけど、そのオブジェクトの <em>中身(contents)</em> は変化するかもしれない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_eOXMRndYxO" href="#c_eOXMRndYxO" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">score</span> <span class="cm-operator">=</span> {<span class="cm-property">visitors</span>: <span class="cm-number">0</span>, <span class="cm-property">home</span>: <span class="cm-number">0</span>};
+<span class="cm-comment">// This is okay</span>
+<span class="cm-variable">score</span>.<span class="cm-property">visitors</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+<span class="cm-comment">// This isn't allowed</span>
+<span class="cm-variable">score</span> <span class="cm-operator">=</span> {<span class="cm-property">visitors</span>: <span class="cm-number">1</span>, <span class="cm-property">home</span>: <span class="cm-number">1</span>};</pre>
+
+<p><a class="p_ident" id="p_GImLi1HvBr" href="#p_GImLi1HvBr" tabindex="-1" role="presentation"></a>JavaScriptの <code>==</code> 演算子でオブジェクトを比較すると、アイデンティティでの比較が行われる。このとき両側の値が同じオブジェクトを指しているときだけ、 <code>true</code> が返る。別々のオブジェクトの比較は、お互いのプロパティが完全に同じだったとしても、 <code>false</code> になる。標準のJavaScriptでは、&quot;ディープな(deep)”比較の演算子でオブジェトを中身で比べることができない。でも、自分でディープな比較の演算子を書くことはできるから、これを章の終わりの<a href="04_data.html#exercise_deep_compare">エクササイズ</a>にする。</p>
+
+<h2><a class="h_ident" id="h_bDCfz9OThV" href="#h_bDCfz9OThV" tabindex="-1" role="presentation"></a>狼人間のログ(The lycanthrope’s log)</h2>
+
+<p>というわけで、ジャックはJavaScriptのインタプリタを立ち上げて、日誌をつけるための環境をセットアップした。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_CI+dtzXW/x" href="#c_CI+dtzXW/x" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">journal</span> <span class="cm-operator">=</span> [];
+
+<span class="cm-keyword">function</span> <span class="cm-def">addEntry</span>(<span class="cm-def">events</span>, <span class="cm-def">squirrel</span>) {
+  <span class="cm-variable">journal</span>.<span class="cm-property">push</span>({<span class="cm-property">events</span>, <span class="cm-property">squirrel</span>});
+}</pre>
+
+<p>ここで日誌に追加されるオブジェクトは少し変な見た目をしていることに注意してほしい。 <code>events: events</code> のようにプロパティを宣言する代わりに、単にプロパティ名だけを渡している。これは、同じことを表す省略記法なんだ。つまり波カッコ内のプロパティ名の後に値が続かなければ、プロパティ名と同じバインディングから値が取られる。</p>
+
+<p><a class="p_ident" id="p_C9mp4xxEGU" href="#p_C9mp4xxEGU" tabindex="-1" role="presentation"></a>というわけで毎夜10時に(時々は翌朝本棚の一番上の棚から降りた後で)、ジャックは1日の記録をつける。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_S+F+R2oIfR" href="#c_S+F+R2oIfR" tabindex="-1" role="presentation"></a><span class="cm-variable">addEntry</span>([<span class="cm-string">&quot;work&quot;</span>, <span class="cm-string">&quot;touched tree&quot;</span>, <span class="cm-string">&quot;pizza&quot;</span>, <span class="cm-string">&quot;running&quot;</span>,
+          <span class="cm-string">&quot;television&quot;</span>], <span class="cm-atom">false</span>);
+<span class="cm-variable">addEntry</span>([<span class="cm-string">&quot;work&quot;</span>, <span class="cm-string">&quot;ice cream&quot;</span>, <span class="cm-string">&quot;cauliflower&quot;</span>, <span class="cm-string">&quot;lasagna&quot;</span>,
+          <span class="cm-string">&quot;touched tree&quot;</span>, <span class="cm-string">&quot;brushed teeth&quot;</span>], <span class="cm-atom">false</span>);
+<span class="cm-variable">addEntry</span>([<span class="cm-string">&quot;weekend&quot;</span>, <span class="cm-string">&quot;cycling&quot;</span>, <span class="cm-string">&quot;break&quot;</span>, <span class="cm-string">&quot;peanuts&quot;</span>,
+          <span class="cm-string">&quot;beer&quot;</span>], <span class="cm-atom">true</span>);</pre>
+
+<p>十分なデータ点が集まったら、彼はどのイベントがリス化に関連しているか統計から調べるつもりだ。</p>
+
+<p><a class="p_ident" id="p_62UlG7w1Pg" href="#p_62UlG7w1Pg" tabindex="-1" role="presentation"></a><em>相関(Correlation)</em> は統計量同士の依存の尺度だ。統計量(statistical variable)はプログラミングでいう変数(programming variable)とは違うものだ。統計学では1セットの <em>計測</em> をして、それぞれの変数が計測ごとに記録される。変数同士の相関は-1から1までの値で表現される。相関が0だったら変数には関連性がないということだ。相関が1だったら完全に関連していて、片方の値を知ればもう片方も分かるということになる。-1もまた完全に関連していることを示すけど、この場合は方向が逆だ。片方が真なら片方は偽、というように。</p>
+
+<p><a class="p_ident" id="p_VJjg733KUk" href="#p_VJjg733KUk" tabindex="-1" role="presentation"></a>2つの真偽値値の間の相関を計算するには、ファイ係数( <em>ϕ</em> )を使えばいい。この式は入力が(条件の組み合わせごとの)頻度表で、出力は相関を表す-1から1までの数字になる。</p>
+
+<p>以下の図ように、ピザを食べるというイベントを取り上げて頻度の表を作ることができる。表中の数字は条件の組み合わせが現れた回数を示す。</p><figure><img src="img/pizza-squirrel.svg" alt="Eating pizza versus turning into a squirrel"></figure>
+
+<p><a class="p_ident" id="p_0YVMrokex7" href="#p_0YVMrokex7" tabindex="-1" role="presentation"></a>表を <em>n</em> と呼ぶなら、 <em>ϕ</em> は以下の式で計算できる。</p><div>
+<table style="border-collapse: collapse; margin-left: 1em;"><tr>
+  <td style="vertical-align: middle"><em>ϕ</em> =</td>
+  <td style="padding-left: .5em">
+    <div style="border-bottom: 1px solid black; padding: 0 7px;"><em>n</em><sub>11</sub><em>n</em><sub>00</sub> −
+      <em>n</em><sub>10</sub><em>n</em><sub>01</sub></div>
+    <div style="padding: 0 7px;">√<span style="border-top: 1px solid black; position: relative; top: 2px;">
+      <span style="position: relative; top: -4px"><em>n</em><sub>1•</sub><em>n</em><sub>0•</sub><em>n</em><sub>•1</sub><em>n</em><sub>•0</sub></span>
+    </span></div>
+  </td>
+</tr></table>
+</div>
+
+
+<p><a class="p_ident" id="p_0hDNfTtQRd" href="#p_0hDNfTtQRd" tabindex="-1" role="presentation"></a>(高校生のころのひどいトラウマが襲ってきて、読むのをやめそうになっても、待ってほしい!暗号みたいな記号をいつまでも並べて拷問するつもりはない。式はこの1つだけだし、これもJavaScriptに変換するだけだ。)</p>
+
+<p><a class="p_ident" id="p_9TVnt+KYj/" href="#p_9TVnt+KYj/" tabindex="-1" role="presentation"></a><em>n</em><sub>01</sub>　の表記で、1つ目の添字はリスに変身したかどうか(ここではfalseの0)、2つ目はピザを食べたかどうか(trueは1)を表す。この組み合わせが計測された回数は表では9回なので、 <em>n</em><sub>01</sub> になる。</p>
+
+<p><a class="p_ident" id="p_1i3dhTk+NL" href="#p_1i3dhTk+NL" tabindex="-1" role="presentation"></a><em>n</em><sub>1•</sub> は、1つ目の添字が真になった(リスに変身した)計測の合計だ。この例では、5になる。<em>n</em><sub>•0</sub> は2つ目の添字がfalse(ピザを食べていない)の場合の合計だ。</p>
+
+<p><a class="p_ident" id="p_OFx+eKKJ8r" href="#p_OFx+eKKJ8r" tabindex="-1" role="presentation"></a>というわけで、ピザの表で<code>ϕ</code>を計算すると、分子は1×76−4×9 = 40、分母は5×85×10×80の平方根(もしくは √340000 )となる。結果は <em>ϕ</em> ≈ 0.069 と小さい数字だ。ピザを食べるのは、リスへの変身とは関係がないようだ。</p>
+
+<h2><a class="h_ident" id="h_ZRcG0ihhax" href="#h_ZRcG0ihhax" tabindex="-1" role="presentation"></a>相関の計算(Computing correlation)</h2>
+
+<p><a class="p_ident" id="p_pdh3QvbaoS" href="#p_pdh3QvbaoS" tabindex="-1" role="presentation"></a>JavaScriptでは2×2の表を4要素の配列で表現できる( <code>[76, 9, 4, 1]</code> )。他にも、2要素の配列を2つ入れ子にした配列で表現することもできる( <code>[[76, 9], [4, 1]]</code> )。あるいは、 <code>&quot;11&quot;</code> や <code>&quot;02&quot;</code> をプロパティ名にしたオブジェクトでもいい。でも、入れ子のないフラットな配列だったらシンプルだし、表にアクセスするための式が短いのもうれしい。配列のインデックスは2ビットの2進数で表すことにする。左側のビットはリス化(したかどうか)を、右側はイベント(があったかどうか)を表す。例えば、 <code>10</code> という2進数は、ジャックがリスに変身したけど、イベント(ピザとか)は起こらなかった場合だ。この組み合わせは4回起こった。そして2進数の <code>10</code> は10進数では2だから、4回という数字を配列のインデックス2の位置に入れる。</p>
+
+<p id="phi_function">以下は、上のような配列から <em>ϕ</em> 係数を計算する関数だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_AnoNjFldkv" href="#c_AnoNjFldkv" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">phi</span>(<span class="cm-def">table</span>) {
+  <span class="cm-keyword">return</span> (<span class="cm-variable-2">table</span>[<span class="cm-number">3</span>] <span class="cm-operator">*</span> <span class="cm-variable-2">table</span>[<span class="cm-number">0</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">table</span>[<span class="cm-number">2</span>] <span class="cm-operator">*</span> <span class="cm-variable-2">table</span>[<span class="cm-number">1</span>]) <span class="cm-operator">/</span>
+    <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>((<span class="cm-variable-2">table</span>[<span class="cm-number">2</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">3</span>]) <span class="cm-operator">*</span>
+              (<span class="cm-variable-2">table</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">1</span>]) <span class="cm-operator">*</span>
+              (<span class="cm-variable-2">table</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">3</span>]) <span class="cm-operator">*</span>
+              (<span class="cm-variable-2">table</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">2</span>]));
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">phi</span>([<span class="cm-number">76</span>, <span class="cm-number">9</span>, <span class="cm-number">4</span>, <span class="cm-number">1</span>]));
+<span class="cm-comment">// → 0.068599434</span></pre>
+
+<p><a class="p_ident" id="p_/hdQ/In97G" href="#p_/hdQ/In97G" tabindex="-1" role="presentation"></a>上のコードは <em>ϕ</em> の公式をそのままJavaScriptに翻訳したものだ。 <code>Math.sqrt</code> は平方根の関数だ。 <code>Math</code> オブジェクトは標準JavaScript環境に用意されている。 n<sub>1•</sub>　のような値を得るには、行や列の和がぼくらのデータにはないから、2つの値を足さないといけない。</p>
+
+<p><a class="p_ident" id="p_d95o2uzYI7" href="#p_d95o2uzYI7" tabindex="-1" role="presentation"></a>ジャックは3ヶ月に渡って日誌をつけた。結果のデータセットはこの章の<a href="https://eloquentjavascript.net/code#4">コードサンドボックス</a>から参照できて、 <code>JOURNAL</code> バインディングに保存してある。また、ファイルで<a href="https://eloquentjavascript.net/code/journal.js">ダウンロード</a>もできる。</p>
+
+<p><a class="p_ident" id="p_wwW0b1Mdqm" href="#p_wwW0b1Mdqm" tabindex="-1" role="presentation"></a>あるイベントについての2×2の表を作るためには、日誌の全エントリーをループして、リス化と関連付けつつイベントが何回起こったか集計しないといけない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_rfea+FwMb5" href="#c_rfea+FwMb5" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">tableFor</span>(<span class="cm-def">event</span>, <span class="cm-def">journal</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">table</span> <span class="cm-operator">=</span> [<span class="cm-number">0</span>, <span class="cm-number">0</span>, <span class="cm-number">0</span>, <span class="cm-number">0</span>];
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">journal</span>.<span class="cm-property">length</span>; <span class="cm-variable-2">i</span><span class="cm-operator">++</span>) {
+    <span class="cm-keyword">let</span> <span class="cm-def">entry</span> <span class="cm-operator">=</span> <span class="cm-variable-2">journal</span>[<span class="cm-variable-2">i</span>], <span class="cm-def">index</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">entry</span>.<span class="cm-property">events</span>.<span class="cm-property">includes</span>(<span class="cm-variable-2">event</span>)) <span class="cm-variable-2">index</span> <span class="cm-operator">+=</span> <span class="cm-number">1</span>;
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">entry</span>.<span class="cm-property">squirrel</span>) <span class="cm-variable-2">index</span> <span class="cm-operator">+=</span> <span class="cm-number">2</span>;
+    <span class="cm-variable-2">table</span>[<span class="cm-variable-2">index</span>] <span class="cm-operator">+=</span> <span class="cm-number">1</span>;
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">table</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">tableFor</span>(<span class="cm-string">&quot;pizza&quot;</span>, <span class="cm-variable">JOURNAL</span>));
+<span class="cm-comment">// → [76, 9, 4, 1]</span></pre>
+
+<p>配列には <code>includes</code> メソッドがあり、引数の値が配列に含まれているかチェックする。 <code>tableFor</code> 関数では、注目しているイベントがある日のイベントリストに含まれるか調べるために、 <code>includes</code> メソッドを使っている。</p>
+
+<p><code>tableFor</code> 関数のループの中では、表のどの欄に日誌のエントリーを算入していくか調べている。エントリーにその時に調べているイベントが含まれるか調べ、そのイベントがリス化と一緒に起こるかを調べる。そのループの1周で表の正しい欄に1を加える。</p>
+
+<p>これで、個々のイベントの相関係数を計算するためのツールがそろった。残るは全てのイベントについて相関を計算する方法と、その結果目立つイベントがあるかどうかだ。</p>
+
+<h2 id="for_of_loop"><a class="h_ident" id="h_fdEkdFChyS" href="#h_fdEkdFChyS" tabindex="-1" role="presentation"></a>配列のループ(Array loops)</h2>
+
+<p><code>tableFor</code> 関数には下のようなループがあった。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_pE7VRrRQir" href="#c_pE7VRrRQir" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable">JOURNAL</span>.<span class="cm-property">length</span>; <span class="cm-variable">i</span><span class="cm-operator">++</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">entry</span> <span class="cm-operator">=</span> <span class="cm-variable">JOURNAL</span>[<span class="cm-variable">i</span>];
+  <span class="cm-comment">// Do something with entry</span>
+}</pre>
+
+<p><a class="p_ident" id="p_r9XU5+S8JS" href="#p_r9XU5+S8JS" tabindex="-1" role="presentation"></a>この手のループはクラシックなJavaScriptによく見られる。配列の要素1つずつ見ていくのはよくあることだ。そのために、カウンターを配列の長さ分回して、各要素を順番に取り出していく。</p>
+
+<p>モダンなJavaScriptではそういうループによりシンプルな方法がある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_OXsCQPvDE1" href="#c_OXsCQPvDE1" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">entry</span> <span class="cm-keyword">of</span> <span class="cm-variable">JOURNAL</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable">entry</span>.<span class="cm-property">events</span>.<span class="cm-property">length</span><span class="cm-string-2">}</span> <span class="cm-string-2">events.`</span>);
+}</pre>
+
+<p><code>for</code> ループがこういう見た目のとき(変数定義の後に <code>of</code> がくる)、 <code>of</code> の右側の値の要素をループする。これは配列だけではなく文字列やその他のデータ構造にも使える。<a href="06_object.html">6</a>章ではこの仕組みを見ていく。</p>
+
+<h2 id="analysis"><a class="h_ident" id="h_uvsIAMUwDv" href="#h_uvsIAMUwDv" tabindex="-1" role="presentation"></a>最終的な解析</h2>
+
+<p>データセットに現れるあらゆる種類のイベントについて相関を計算しないといけない。そのために、まずは全てのイベントを <em>見つけ</em> ないといけない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_P6cqJZBL1M" href="#c_P6cqJZBL1M" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">journalEvents</span>(<span class="cm-def">journal</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">events</span> <span class="cm-operator">=</span> [];
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">entry</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">journal</span>) {
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">event</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">entry</span>.<span class="cm-property">events</span>) {
+      <span class="cm-keyword">if</span> (<span class="cm-operator">!</span><span class="cm-variable-2">events</span>.<span class="cm-property">includes</span>(<span class="cm-variable-2">event</span>)) {
+        <span class="cm-variable-2">events</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">event</span>);
+      }
+    }
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">events</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">journalEvents</span>(<span class="cm-variable">JOURNAL</span>));
+<span class="cm-comment">// → [&quot;carrot&quot;, &quot;exercise&quot;, &quot;weekend&quot;, &quot;bread&quot;, …]</span></pre>
+
+<p>全てのイベントを見ていって、 <code>events</code> 配列にまだなかったものを加えていくことで、 <code>journalEvents</code> 関数は全てのタイプのイベントを集める。</p>
+
+<p>この関数を使えば、全ての相関係数を集められる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_7ws9oWaneM" href="#c_7ws9oWaneM" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">event</span> <span class="cm-keyword">of</span> <span class="cm-variable">journalEvents</span>(<span class="cm-variable">JOURNAL</span>)) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">event</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;:&quot;</span>, <span class="cm-variable">phi</span>(<span class="cm-variable">tableFor</span>(<span class="cm-variable">event</span>, <span class="cm-variable">JOURNAL</span>)));
+}
+<span class="cm-comment">// → carrot:   0.0140970969</span>
+<span class="cm-comment">// → exercise: 0.0685994341</span>
+<span class="cm-comment">// → weekend:  0.1371988681</span>
+<span class="cm-comment">// → bread:   -0.0757554019</span>
+<span class="cm-comment">// → pudding: -0.0648203724</span>
+<span class="cm-comment">// and so on...</span></pre>
+
+<p><a class="p_ident" id="p_ZXHa9ITl9k" href="#p_ZXHa9ITl9k" tabindex="-1" role="presentation"></a>たいていの相関係数は0に近いようだ。ニンジン、パン、プディングを食べるのは、どうやらリス人間化のトリガーではないらしい。そしてリス人間化は週末にいくらか頻繁に起こるようだ。結果にフィルターをかけて、相関係数が0.1より大きいか-0.1より小さいものだけを表示しよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_hBXzmb7hPU" href="#c_hBXzmb7hPU" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">event</span> <span class="cm-keyword">of</span> <span class="cm-variable">journalEvents</span>(<span class="cm-variable">JOURNAL</span>)) {
+  <span class="cm-keyword">let</span> <span class="cm-def">correlation</span> <span class="cm-operator">=</span> <span class="cm-variable">phi</span>(<span class="cm-variable">tableFor</span>(<span class="cm-variable">event</span>, <span class="cm-variable">JOURNAL</span>));
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">correlation</span> <span class="cm-operator">&gt;</span> <span class="cm-number">0.1</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">correlation</span> <span class="cm-operator">&lt;</span> <span class="cm-operator">-</span><span class="cm-number">0.1</span>) {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">event</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;:&quot;</span>, <span class="cm-variable-2">correlation</span>);
+  }
+}
+<span class="cm-comment">// → weekend:        0.1371988681</span>
+<span class="cm-comment">// → brushed teeth: -0.3805211953</span>
+<span class="cm-comment">// → candy:          0.1296407447</span>
+<span class="cm-comment">// → work:          -0.1371988681</span>
+<span class="cm-comment">// → spaghetti:      0.2425356250</span>
+<span class="cm-comment">// → reading:        0.1106828054</span>
+<span class="cm-comment">// → peanuts:        0.5902679812</span></pre>
+
+<p>おお!明らかに相関が強い要素が2つある。ピーナッツを食べるのはリス化に強い正の影響が、歯磨きにははっきりと負の影響がある。</p>
+
+<p>面白い。ちょっと試してみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_x7WUJStSIp" href="#c_x7WUJStSIp" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">entry</span> <span class="cm-keyword">of</span> <span class="cm-variable">JOURNAL</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-variable">entry</span>.<span class="cm-property">events</span>.<span class="cm-property">includes</span>(<span class="cm-string">&quot;peanuts&quot;</span>) <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span>
+     <span class="cm-operator">!</span><span class="cm-variable">entry</span>.<span class="cm-property">events</span>.<span class="cm-property">includes</span>(<span class="cm-string">&quot;brushed teeth&quot;</span>)) {
+    <span class="cm-variable">entry</span>.<span class="cm-property">events</span>.<span class="cm-property">push</span>(<span class="cm-string">&quot;peanut teeth&quot;</span>);
+  }
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">phi</span>(<span class="cm-variable">tableFor</span>(<span class="cm-string">&quot;peanut teeth&quot;</span>, <span class="cm-variable">JOURNAL</span>)));
+<span class="cm-comment">// → 1</span></pre>
+
+<p>これは強力な結果だ。リス化現象は、ジャックがピーナッツを食べて歯を磨き損ねた場合に正確に起こる。彼が歯の衛生についてそんなにだらしなくなければ、自分の不幸のタネに気づきもしなかっただろう。</p>
+
+<p>これを知って、ジャックはピーナッツを食べることを完全に止め、もう変身することはなくなった。</p>
+
+<p>数年の間はジャックにとって順調だった。だけど、そのうち彼は仕事を失った。仕事がなければ医療サービスを受けられないひどい国に住んでいるからサーカスで働くしかなくなった。彼は <em>脅威のリス人間</em> を演じた。毎回のショーの前には口いっぱいにピーナッツバターを詰めて。</p>
+
+<p>ある日ジャックは、みじめな存在であることにうんざりして、人間の姿に戻れなくなった。そしてサーカスのテントの隙間から外に飛び出て、森の中に消えた。彼は二度と人前に現れなかった。</p>
+
+<h2><a class="h_ident" id="h_3cF4Di9y5+" href="#h_3cF4Di9y5+" tabindex="-1" role="presentation"></a>さらなる配列学</h2>
+
+<p>この章を終える前に、オブジェクトに関するコンセプトをいくつか紹介したい。まずは一般に便利な配列のメソッドから始める。</p>
+
+<p><code>push</code> 、 <code>pop</code>　というメソッドについては、この章の<a href="04_data.html#array_methods">前の方</a>ですでに見てきた。それぞれ配列の最後に要素を加えたり削除したりするものだ。反対に配列の最初に要素を加えたり削除したりするメソッドが、 <code>unshift</code> と <code>shift</code> だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Vq1IBpy+hP" href="#c_Vq1IBpy+hP" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">todoList</span> <span class="cm-operator">=</span> [];
+<span class="cm-keyword">function</span> <span class="cm-def">remember</span>(<span class="cm-def">task</span>) {
+  <span class="cm-variable">todoList</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">task</span>);
+}
+<span class="cm-keyword">function</span> <span class="cm-def">getTask</span>() {
+  <span class="cm-keyword">return</span> <span class="cm-variable">todoList</span>.<span class="cm-property">shift</span>();
+}
+<span class="cm-keyword">function</span> <span class="cm-def">rememberUrgently</span>(<span class="cm-def">task</span>) {
+  <span class="cm-variable">todoList</span>.<span class="cm-property">unshift</span>(<span class="cm-variable-2">task</span>);
+}</pre>
+
+<p>上のプログラムは並んだタスクを管理する。 <code>remember(&quot;groceries&quot;)</code> を呼び出すと、タスクの並びの最後に新しく追加できる。タスクをこなす準備ができたら <code>getTask()</code> を呼べば、タスクの並びの前の方から1つ取り出せる(消去もされる)。 <code>rememberUrgently</code> 関数もタスクを追加するけど、一番後ろではなく一番前に追加する。</p>
+
+<p>配列から特定の値を探すには、 <code>indexOf</code> メソッドがある。このメソッドは配列を始めから終わりまで探して、指定した値が見つかったインデックスを返す。見つからなければ-1を返す。前からではなく後ろから探すなら、似たメソッドの <code>lastIndexOf</code> がある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_N+G0EtTfto" href="#c_N+G0EtTfto" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">2</span>, <span class="cm-number">1</span>].<span class="cm-property">indexOf</span>(<span class="cm-number">2</span>));
+<span class="cm-comment">// → 1</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">2</span>, <span class="cm-number">1</span>].<span class="cm-property">lastIndexOf</span>(<span class="cm-number">2</span>));
+<span class="cm-comment">// → 3</span></pre>
+
+<p><code>indexOf</code> も <code>lastIndexOf</code> もオプションで2番目の引数を渡せる。その値でサーチを始めるインデックスを指定できる。</p>
+
+<p>もう1つ、基本的な配列のメソッドでとして <code>slice</code> がある。 <code>slice</code> は始めと終わりのインデックスを引数にとって、そのインデックスの間の要素で作った配列を返す。始まりのインデックスはその値を含むけど、終わりのインデックスはその値を含まない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_zCBzPnMpIk" href="#c_zCBzPnMpIk" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">0</span>, <span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>].<span class="cm-property">slice</span>(<span class="cm-number">2</span>, <span class="cm-number">4</span>));
+<span class="cm-comment">// → [2, 3]</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">0</span>, <span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>].<span class="cm-property">slice</span>(<span class="cm-number">2</span>));
+<span class="cm-comment">// → [2, 3, 4]</span></pre>
+
+<p>終わりのインデックスが渡されなければ、 <code>slice</code> は開始インデックスの後の全部の要素を取り出す。配列の全てをコピーするなら開始インデックスを省いてもいい。</p>
+
+<p><code>concat</code> メソッドは、配列同士をくっつけて新しい配列を作る。 <code>+</code> 演算子の文字列への作用に似ている。</p>
+
+<p>次の例では <code>concat</code> と <code>slice</code> の動作を示している。 <code>remove</code> 関数は、配列とインデックスが渡されると、元の配列から指定されたインデックスの要素が取り除かれたコピーを返す。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_q+NBMNgFFy" href="#c_q+NBMNgFFy" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">remove</span>(<span class="cm-def">array</span>, <span class="cm-def">index</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">array</span>.<span class="cm-property">slice</span>(<span class="cm-number">0</span>, <span class="cm-variable-2">index</span>)
+    .<span class="cm-property">concat</span>(<span class="cm-variable-2">array</span>.<span class="cm-property">slice</span>(<span class="cm-variable-2">index</span> <span class="cm-operator">+</span> <span class="cm-number">1</span>));
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">remove</span>([<span class="cm-string">&quot;a&quot;</span>, <span class="cm-string">&quot;b&quot;</span>, <span class="cm-string">&quot;c&quot;</span>, <span class="cm-string">&quot;d&quot;</span>, <span class="cm-string">&quot;e&quot;</span>], <span class="cm-number">2</span>));
+<span class="cm-comment">// → [&quot;a&quot;, &quot;b&quot;, &quot;d&quot;, &quot;e&quot;]</span></pre>
+
+<p><code>concat</code> に配列ではない引数を渡すと、その値が1要素の配列のように扱われて新しい配列に加えられる。</p>
+
+<h2><a class="h_ident" id="h_mh9fpnztDK" href="#h_mh9fpnztDK" tabindex="-1" role="presentation"></a>文字列とそのプロパティ</h2>
+
+<p>文字列から <code>length</code> や <code>toUpperCase</code> といったプロパティを読み取ることもできる。だけど、新しいプロパティを加えようとしても、上手くくっつかない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_xvzL9wErq7" href="#c_xvzL9wErq7" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">kim</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;Kim&quot;</span>;
+<span class="cm-variable">kim</span>.<span class="cm-property">age</span> <span class="cm-operator">=</span> <span class="cm-number">88</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">kim</span>.<span class="cm-property">age</span>);
+<span class="cm-comment">// → undefined</span></pre>
+
+<p>文字列や数値、真偽値型の値はオブジェクトではない。JavaScriptは、それらの値にプロパティをセットしようとしたら文句を言いはしないけど、値を保存することもしない。前にも出てきたように、こういう値は変更不能だから、変えることはできない。</p>
+
+<p>だけどこういう型にも、組込みのプロパティがある。全ての文字列型の値に、いろいろなメソッドが備わっている。特に便利なのは <code>slice</code> と <code>indexOf</code> だ。これらは、同じ名前の配列用のメソッドに似ている。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/Tmq1doYeG" href="#c_/Tmq1doYeG" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;coconuts&quot;</span>.<span class="cm-property">slice</span>(<span class="cm-number">4</span>, <span class="cm-number">7</span>));
+<span class="cm-comment">// → nut</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;coconut&quot;</span>.<span class="cm-property">indexOf</span>(<span class="cm-string">&quot;u&quot;</span>));
+<span class="cm-comment">// → 5</span></pre>
+
+<p><a class="p_ident" id="p_YgRrxpy3S2" href="#p_YgRrxpy3S2" tabindex="-1" role="presentation"></a>配列との違いが1つあって、文字列の <code>indexOf</code> は2文字以上の文字列を探せる。配列のメソッドでは要素1つしか探せない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_xM5/GBnZVG" href="#c_xM5/GBnZVG" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;one two three&quot;</span>.<span class="cm-property">indexOf</span>(<span class="cm-string">&quot;ee&quot;</span>));
+<span class="cm-comment">// → 11</span></pre>
+
+<p><code>trim</code> メソッドは文字列の始まりと終わりからホワイトスペース(スペース、改行、タブなど)を取り除く。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_0AfLRWyjq0" href="#c_0AfLRWyjq0" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;  okay \n &quot;</span>.<span class="cm-property">trim</span>());
+<span class="cm-comment">// → okay</span></pre>
+
+<p><a href="03_functions.html">前の章</a>でみた <code>zeroPad</code> 関数もメソッドとして存在する。そのメソッドとは <code>padStart</code> で、引数には求める長さとパディングに使う文字を渡す。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_SJbD9MiYu+" href="#c_SJbD9MiYu+" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">String</span>(<span class="cm-number">6</span>).<span class="cm-property">padStart</span>(<span class="cm-number">3</span>, <span class="cm-string">&quot;0&quot;</span>));
+<span class="cm-comment">// → 006</span></pre>
+
+<p id="split"><code>split</code> メソッドでは、引数に指定した文字列で、文字列を分割することができる。さらにそれを <code>join</code> メソッドで結合することもできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/rV2Ed5e8V" href="#c_/rV2Ed5e8V" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">sentence</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;Secretarybirds specialize in stomping&quot;</span>;
+<span class="cm-keyword">let</span> <span class="cm-def">words</span> <span class="cm-operator">=</span> <span class="cm-variable">sentence</span>.<span class="cm-property">split</span>(<span class="cm-string">&quot; &quot;</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">words</span>);
+<span class="cm-comment">// → [&quot;Secretarybirds&quot;, &quot;specialize&quot;, &quot;in&quot;, &quot;stomping&quot;]</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">words</span>.<span class="cm-property">join</span>(<span class="cm-string">&quot;. &quot;</span>));
+<span class="cm-comment">// → Secretarybirds. specialize. in. stomping</span></pre>
+
+<p>文字列は <code>repeat</code> メソッドで繰り返すことができる。これは、元の文字列を繰り返しコピーしてから接着した文字列を作る。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_70WotkNADb" href="#c_70WotkNADb" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;LA&quot;</span>.<span class="cm-property">repeat</span>(<span class="cm-number">3</span>));
+<span class="cm-comment">// → LALALA</span></pre>
+
+<p><a class="p_ident" id="p_rDR41po8gf" href="#p_rDR41po8gf" tabindex="-1" role="presentation"></a>これまでにも文字列の <code>length</code> プロパティは見てきた。文字列の個々の文字にアクセスするのは、配列の要素にアクセスするのに似ている(<a href="05_higher_order.html#code_units">5</a>章で注意事項に触れる)。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Aeop9AuKAb" href="#c_Aeop9AuKAb" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">string</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;abc&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">string</span>.<span class="cm-property">length</span>);
+<span class="cm-comment">// → 3</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">string</span>[<span class="cm-number">1</span>]);
+<span class="cm-comment">// → b</span></pre>
+
+<h2 id="rest_parameters"><a class="h_ident" id="h_pA10J9uRUC" href="#h_pA10J9uRUC" tabindex="-1" role="presentation"></a>残余引数(Rest parameters)]</h2>
+
+<p>好きなだけ引数を受け付けられる関数があると便利な場合もある。例えば、<code>Math.max</code> は渡された引数 <em>全て</em> の最大値を計算する。</p>
+
+<p>こういう関数を書くためには、関数の最後のパラメーターに3つのドットを付ければいい。以下のようにだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_UXPbyGFVIB" href="#c_UXPbyGFVIB" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">max</span>(<span class="cm-meta">...</span><span class="cm-def">numbers</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-operator">-</span><span class="cm-atom">Infinity</span>;
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">number</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">numbers</span>) {
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">number</span> <span class="cm-operator">&gt;</span> <span class="cm-variable-2">result</span>) <span class="cm-variable-2">result</span> <span class="cm-operator">=</span> <span class="cm-variable-2">number</span>;
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">result</span>;
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">max</span>(<span class="cm-number">4</span>, <span class="cm-number">1</span>, <span class="cm-number">9</span>, <span class="cm-operator">-</span><span class="cm-number">2</span>));
+<span class="cm-comment">// → 9</span></pre>
+
+<p><a class="p_ident" id="p_H/lvsIbvj7" href="#p_H/lvsIbvj7" tabindex="-1" role="presentation"></a>こういう関数が呼び出されると <em>残余引数(rest parameter)</em> は、余った引数を全て収める配列にバインドされる。その前に他のパラメーターがあった場合には、その値は配列の一部にならない。 <code>max</code> のように唯一のパラメーターだったら、全ての引数を保持することになる。</p>
+
+<p>同じ3ドットの記法を、引数の配列から関数を <em>呼び出す</em> 場合にも使える。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_h9hmTe3vix" href="#c_h9hmTe3vix" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">numbers</span> <span class="cm-operator">=</span> [<span class="cm-number">5</span>, <span class="cm-number">1</span>, <span class="cm-number">7</span>];
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">max</span>(<span class="cm-meta">...</span><span class="cm-variable">numbers</span>));
+<span class="cm-comment">// → 7</span></pre>
+
+<p><a class="p_ident" id="p_6hGBWNtBIk" href="#p_6hGBWNtBIk" tabindex="-1" role="presentation"></a>ここでは配列を&quot;展開し(spread)”て、各要素をバラバラの引数にして関数を呼び出している。こういう配列を他の引数と混ぜて使うこともできる。 <code>max(9, .<wbr>.<wbr>.<wbr>numbers, 2)</code> というように。</p>
+
+<p>角カッコの配列記法では、3ドット演算子を使って、配列を新しい配列の中に展開することもできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_4t+LJt3Kyo" href="#c_4t+LJt3Kyo" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">words</span> <span class="cm-operator">=</span> [<span class="cm-string">&quot;never&quot;</span>, <span class="cm-string">&quot;fully&quot;</span>];
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-string">&quot;will&quot;</span>, <span class="cm-meta">...</span><span class="cm-variable">words</span>, <span class="cm-string">&quot;understand&quot;</span>]);
+<span class="cm-comment">// → [&quot;will&quot;, &quot;never&quot;, &quot;fully&quot;, &quot;understand&quot;]</span></pre>
+
+<h2><a class="h_ident" id="h_RY+TAkJbuG" href="#h_RY+TAkJbuG" tabindex="-1" role="presentation"></a>Mathオブジェクト</h2>
+
+<p>これまでに見てきた通り <code>Math</code> は数字に関係する便利な関数が詰まった福袋みたいなものだ。例えば、 <code>Math.max</code> (最大値)や、 <code>Math.min</code> (最小値)、 <code>Math.sqrt</code> (平方根)などがある。</p>
+
+<p id="namespace_pollution"><a class="p_ident" id="p_+b5fsWEJj7" href="#p_+b5fsWEJj7" tabindex="-1" role="presentation"></a><code>Math</code>　オブジェクトは関連した機能をまとめるコンテナとして使われる。 <code>Math</code> オブジェクトはたった1つだけ存在していて、そのものを値として使うことはない。むしろ <em>名前空間(namespace)</em> を作ることで、上で見た関数やその他の値がグローバルバインディングにならずに済むようにしている。</p>
+
+<p><a class="p_ident" id="p_P+/or/uPNJ" href="#p_P+/or/uPNJ" tabindex="-1" role="presentation"></a>グローバルバインディングを作りすぎると名前空間が <em>汚染(pollute)</em> される。たくさん名前が付けられるほど、すでに存在するバインディングの値を上書きする危険が高まるんだ。例えば、何かに <code>max</code> という名前を付けるのは、よくありそうなことだ。それでもJavaScript組込みの <code>max</code> 関数は <code>Math</code> オブジェクトに安全にしまってあるから、上書きする心配をしなくていい。</p>
+
+<p>すでに存在する名前のバインディングを定義しようとすれば、止められたり、少なくとも警告されたりする言語は多い。JavaScriptでも <code>let</code> や <code>const</code> で宣言したバインディングについてはそうしてくれる。逆に、標準のバインディングや、 <code>var</code> や <code>function</code> については警告してくれない。</p>
+
+<p><code>Math</code> オブジェクトに戻ろう。三角関数を計算したいとき、 <code>Math</code> が助けてくれる。 <code>cos</code> (コサイン)、 <code>sin</code> (サイン)、 <code>tan</code> (タンジェント)関数があって、逆関数もある(それぞれ <code>acos</code> 、 <code>asin</code> 、 <code>atan</code> )。 <code>π</code> 、(というかJavaScript数値での近似値)は <code>Math.PI</code> で得られる。定数値を全て大文字の名前で書くのは古くからのプログラミングの習慣だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_54zxf+2nsU" href="#c_54zxf+2nsU" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">randomPointOnCircle</span>(<span class="cm-def">radius</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">angle</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">2</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>;
+  <span class="cm-keyword">return</span> {<span class="cm-property">x</span>: <span class="cm-variable-2">radius</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">cos</span>(<span class="cm-variable-2">angle</span>),
+          <span class="cm-property">y</span>: <span class="cm-variable-2">radius</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">sin</span>(<span class="cm-variable-2">angle</span>)};
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">randomPointOnCircle</span>(<span class="cm-number">2</span>));
+<span class="cm-comment">// → {x: 0.3667, y: 1.966}</span></pre>
+
+<p><a class="p_ident" id="p_+jXhkhIeq/" href="#p_+jXhkhIeq/" tabindex="-1" role="presentation"></a>もしサインとコサインに慣れていなくても心配しなくていい。<a href="14_dom.html#sin_cos">14</a>章で扱うときに説明する。</p>
+
+<p><a class="p_ident" id="p_pW/4kAKVWO" href="#p_pW/4kAKVWO" tabindex="-1" role="presentation"></a>上の例では <code>Math.random</code> を使った。 <code>Math.random</code> は呼び出されるたびに、0(0を含む)から1(1を含まない)の間の擬似乱数を返す関数だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_+gqW4B1qk1" href="#c_+gqW4B1qk1" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">random</span>());
+<span class="cm-comment">// → 0.36993729369714856</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">random</span>());
+<span class="cm-comment">// → 0.727367032552138</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">random</span>());
+<span class="cm-comment">// → 0.40180766698904335</span></pre>
+
+<p>コンピュータは(同じインプットに対して同じ反応をする)決定論的なマシーンだけど、ランダムなように見える数字を生み出すことはできる。そのために、コンピュータは隠された値を持っておいて、新しい乱数を求められるたびに、その隠し値に複雑な計算をして新しい値を作り出す。それから、新しい値を保存しておいて、そこから得られた値を返す。こうすることで、毎回新しい予測不能な数値ができるから、一見ランダムなように <em>見える</em> 。</p>
+
+<p>小数ではなく整数で乱数を作りたいなら、 <code>Math.random</code> の結果に <code>Math.floor</code> を使えばいい。 <code>Math.floor</code> は整数へ切り捨てる関数だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_LlfOX4tbSH" href="#c_LlfOX4tbSH" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">10</span>));
+<span class="cm-comment">// → 2</span></pre>
+
+<p><a class="p_ident" id="p_qeS+PbyE0t" href="#p_qeS+PbyE0t" tabindex="-1" role="presentation"></a>上の例で、乱数に10をかけると0以上で10より小さい数字が得られる。 <code>Math.floor</code> が切り捨てをするから、この式からは0から9までの整数が同じ確率で得られる。</p>
+
+<p><a class="p_ident" id="p_uqzuChQNrf" href="#p_uqzuChQNrf" tabindex="-1" role="presentation"></a>同じように <code>Math.ceil</code> (&quot;天井(ceiling)”、つまり整数への切り上げ)や <code>Math.round</code> (四捨五入)などもある。また <code>Math.abs</code> は絶対値を返す。つまり、負の数は符号を逆転させ、正の数はそのままにする。</p>
+
+<h2><a class="h_ident" id="h_ySfN67TJFW" href="#h_ySfN67TJFW" tabindex="-1" role="presentation"></a>分割代入(Destructuring)</h2>
+
+<p>今しばらく <code>phi</code> 関数に戻ってみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_8p90ivE8ZI" href="#c_8p90ivE8ZI" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">phi</span>(<span class="cm-def">table</span>) {
+  <span class="cm-keyword">return</span> (<span class="cm-variable-2">table</span>[<span class="cm-number">3</span>] <span class="cm-operator">*</span> <span class="cm-variable-2">table</span>[<span class="cm-number">0</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">table</span>[<span class="cm-number">2</span>] <span class="cm-operator">*</span> <span class="cm-variable-2">table</span>[<span class="cm-number">1</span>]) <span class="cm-operator">/</span>
+    <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>((<span class="cm-variable-2">table</span>[<span class="cm-number">2</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">3</span>]) <span class="cm-operator">*</span>
+              (<span class="cm-variable-2">table</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">1</span>]) <span class="cm-operator">*</span>
+              (<span class="cm-variable-2">table</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">3</span>]) <span class="cm-operator">*</span>
+              (<span class="cm-variable-2">table</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">table</span>[<span class="cm-number">2</span>]));
+}</pre>
+
+<p>上の関数が読みづらい理由は、配列を指すバインディングを使っていることだ。 <code>let n00 = table[0]</code> のように、配列の <em>要素ごとに</em> バインディングがあれば分かりやすい。幸いにも、JavaScriptではこれを簡潔に書く方法がある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_z2cboTL/zX" href="#c_z2cboTL/zX" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">phi</span>([<span class="cm-def">n00</span>, <span class="cm-def">n01</span>, <span class="cm-def">n10</span>, <span class="cm-def">n11</span>]) {
+  <span class="cm-keyword">return</span> (<span class="cm-variable-2">n11</span> <span class="cm-operator">*</span> <span class="cm-variable-2">n00</span> <span class="cm-operator">-</span> <span class="cm-variable-2">n10</span> <span class="cm-operator">*</span> <span class="cm-variable-2">n01</span>) <span class="cm-operator">/</span>
+    <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>((<span class="cm-variable-2">n10</span> <span class="cm-operator">+</span> <span class="cm-variable-2">n11</span>) <span class="cm-operator">*</span> (<span class="cm-variable-2">n00</span> <span class="cm-operator">+</span> <span class="cm-variable-2">n01</span>) <span class="cm-operator">*</span>
+              (<span class="cm-variable-2">n01</span> <span class="cm-operator">+</span> <span class="cm-variable-2">n11</span>) <span class="cm-operator">*</span> (<span class="cm-variable-2">n00</span> <span class="cm-operator">+</span> <span class="cm-variable-2">n10</span>));
+}</pre>
+
+<p><a class="p_ident" id="p_cNzo9k5xF/" href="#p_cNzo9k5xF/" tabindex="-1" role="presentation"></a>こういう分割代入は <code>let</code> , <code>var</code> , <code>const</code> で作られるバインディングでも機能する。バインドする値が配列だと分かっていれば角カッコを使って、値をバインドしている配列を &quot;覗きこむ(look inside)” ことができる。</p>
+
+<p>同じワザがオブジェクトにも使える。角カッコではなく、波カッコを使う。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ZXEdn9Xbfc" href="#c_ZXEdn9Xbfc" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> {<span class="cm-def">name</span>} <span class="cm-operator">=</span> {<span class="cm-property">name</span>: <span class="cm-string">&quot;Faraji&quot;</span>, <span class="cm-property">age</span>: <span class="cm-number">23</span>};
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">name</span>);
+<span class="cm-comment">// → Faraji</span></pre>
+
+<p><code>null</code> や <code>undefined</code> から分割代入しようとすると、エラーが返ってくる。これらのプロパティにアクセスしようとすると、エラーになるのと同じようなものだ。</p>
+
+<h2><a class="h_ident" id="h_AxpOdvCznQ" href="#h_AxpOdvCznQ" tabindex="-1" role="presentation"></a>JSON</h2>
+
+<p><a class="p_ident" id="p_PCjQN+Ms0w" href="#p_PCjQN+Ms0w" tabindex="-1" role="presentation"></a>プロパティは値をつかまえている(参照している)だけで、そこに持っているわけではない。オブジェクトや配列は、コンピュータメモリ上では <em>アドレス</em> を表すビットのシーケンスとして保持されているんだ(このアドレスは、プロパティの指す中身があるメモリ上の場所だ)。入れ子になった配列は、内側の配列のために少なくとも1つのメモリ領域があって、外側の配列のためには内側の配列がある場所を表す2進数のメモリ領域がある(他の値と一緒に)。</p>
+
+<p>もし、データをファイルに保存しておいて、ネットワークを通じて他のコンピュータに送りたいなら、このメモリのアドレスがゴチャゴチャになったものを、保存したり送ったりできる形式に変換しないといけない。送りたい値のアドレスも含めてコンピュータのメモリ全てを送ることも <em>できるかもしれない</em> けど、それがあまりいいアプローチだとは僕には思えない。</p>
+
+<p><a class="p_ident" id="p_DRaVPA5KwJ" href="#p_DRaVPA5KwJ" tabindex="-1" role="presentation"></a>データを <em>シリアライズ</em> するにはどうしたらいいだろうか。これは、データがフラットな形式に変換されるということだ。ポピュラーなフォーマットにJSON(ジェイソンと発音される)がある。JSONはJavaScriptオブジェクト記法(JavaScript Object Notation)という意味だ。データの保存や交換のフォーマットとしてWebで広く使われている。JavaScript以外の言語でも、だ。</p>
+
+<p><a class="p_ident" id="p_wIsX+ZGHXj" href="#p_wIsX+ZGHXj" tabindex="-1" role="presentation"></a>JSONはJavaScriptでの配列やオブジェクトの記法に似ているけど、少し制限がある。全てのプロパティ名はダブルクオート(&quot;)で囲まないといけないし、シンプルなデータ表現だけが許可される。関数の呼び出しやバインディング、実際の計算が必要なものは全てダメだ。コメントもJSONには書き込めない。</p>
+
+<p><a class="p_ident" id="p_AxpOdvCznQ" href="#p_AxpOdvCznQ" tabindex="-1" role="presentation"></a>リス化の日誌はJSONデータなら以下のようになるだろう。</p>
+
+<pre class="snippet cm-s-default" data-language="application/json" ><a class="c_ident" id="c_A3jdCqz1Q6" href="#c_A3jdCqz1Q6" tabindex="-1" role="presentation"></a>{
+  <span class="cm-string cm-property">&quot;squirrel&quot;</span>: <span class="cm-atom">false</span>,
+  <span class="cm-string cm-property">&quot;events&quot;</span>: [<span class="cm-string">&quot;work&quot;</span>, <span class="cm-string">&quot;touched tree&quot;</span>, <span class="cm-string">&quot;pizza&quot;</span>, <span class="cm-string">&quot;running&quot;</span>]
+}</pre>
+
+<p><a class="p_ident" id="p_mwZJmg0qZA" href="#p_mwZJmg0qZA" tabindex="-1" role="presentation"></a>JavaScriptには <code>JSON.stringify</code> と <code>JSON.parse</code> という関数があって、データからJSONへ、JSONからデータへという変換ができる。前者は、JavaScriptの値を引数に取って、JSON形式の文字列を返す。後者はJSON文字列を、それがエンコードしている値へ変換する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_HYCgCsK7z1" href="#c_HYCgCsK7z1" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">string</span> <span class="cm-operator">=</span> <span class="cm-variable">JSON</span>.<span class="cm-property">stringify</span>({<span class="cm-property">squirrel</span>: <span class="cm-atom">false</span>,
+                             <span class="cm-property">events</span>: [<span class="cm-string">&quot;weekend&quot;</span>]});
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">string</span>);
+<span class="cm-comment">// → {&quot;squirrel&quot;:false,&quot;events&quot;:[&quot;weekend&quot;]}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">JSON</span>.<span class="cm-property">parse</span>(<span class="cm-variable">string</span>).<span class="cm-property">events</span>);
+<span class="cm-comment">// → [&quot;weekend&quot;]</span></pre>
+
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
+
+<p>オブジェクトと配列(これもオブジェクトの一種)はいろいろな値を1つの値にまとめるものだ。イメージとしては、バラバラの物を腕に抱えているのではなく、関連する物をいろいろカバンに詰めて、カバンごと持ち歩くようなものだ。</p>
+
+<p><a class="p_ident" id="p_NdBF/Wc/ei" href="#p_NdBF/Wc/ei" tabindex="-1" role="presentation"></a>JavaScriptのたいていの値にはプロパティがある。例外は <code>null</code> と <code>undefined</code> だ。プロパティには <code>value.prop</code> か <code>value[&quot;prop&quot;]</code> の記法でアクセスできる。オブジェクトにはプロパティに名前を使う場合が多い。また、数には大小あるけど、決まったセットのプロパティを持っている傾向がある。一方で配列は、(型が同じだったり)意味的に同じ値を、変動する個数で持つ傾向がある。プロパティ名には0から始まる数字を使う。</p>
+
+<p><code>length</code>　メソッドやその他いろいろのように、配列には名前の付いたプロパティもある。メソッドはプロパティに住み着いている関数で、たいていは自分がそのプロパティになっている値に対して作用する。</p>
+
+<p>配列は特別な種類の <code>for</code> ループで繰り返し操作ができる。 <code>for (let element of array)</code> のようにだ。</p>
+
+<h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
+
+<p>(エクササイズ)</p>
+
+<h3><a class="i_ident" id="i_8ZspxiCEC/" href="#i_8ZspxiCEC/" tabindex="-1" role="presentation"></a>The sum of a range</h3>
+
+<p>(範囲の和)</p>
+
+<p><a href="00_intro.html">導入</a>で、ある範囲の数字の和を計算するには、下のような方法が良いという話をした。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_KTbQMmMCli" href="#c_KTbQMmMCli" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sum</span>(<span class="cm-variable">range</span>(<span class="cm-number">1</span>, <span class="cm-number">10</span>)));</pre>
+
+<p>2つの引数、 <code>start</code> と <code>end</code> を受け取って、 <code>start</code> から <code>end</code> までの数字を含む配列を返す <code>range</code> 関数を書こう。</p>
+
+<p><a class="p_ident" id="p_jv/uQJxiXh" href="#p_jv/uQJxiXh" tabindex="-1" role="presentation"></a>次に、数字の配列を受け取ってその和を返す <code>sum</code> 関数を書こう。プログラムを実行して実際に55が返ってくるか見てみよう。</p>
+
+<p><a class="p_ident" id="p_jwt5T4yQAh" href="#p_jwt5T4yQAh" tabindex="-1" role="presentation"></a>ボーナスとして、 <code>range</code> 関数が、配列の作るときの&quot;ステップ(step)”の値を3番目のオプション引数として受け取れるようにしよう。もしステップが渡されなければ、前のヴァージョンの動作と同じで、要素の数字は1ずつ上がっていく。 <code>range(1, 10, 2)</code> は <code>[1, 3, 5, 7, 9]</code> を返さないといけない。また負のステップにも対応するようにしよう。 <code>range(5, 2, -1)</code> は <code>[5, 4, 3, 2]</code> になるように。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_gV3XCKJAqj" href="#c_gV3XCKJAqj" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">range</span>(<span class="cm-number">1</span>, <span class="cm-number">10</span>));
+<span class="cm-comment">// → [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">range</span>(<span class="cm-number">5</span>, <span class="cm-number">2</span>, <span class="cm-operator">-</span><span class="cm-number">1</span>));
+<span class="cm-comment">// → [5, 4, 3, 2]</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sum</span>(<span class="cm-variable">range</span>(<span class="cm-number">1</span>, <span class="cm-number">10</span>)));
+<span class="cm-comment">// → 55</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>配列を組み立てるには、まず空の配列 <code>[]</code> から始めて、繰り返し <code>push</code> を呼び出して値を加えていくと簡単だ。関数の終わりでは、その配列を返すのを忘れないように。</p>
+
+<p>目的の配列は <code>end</code> の値を含むから、ループの終わりをチェックするには、 <code>&lt;</code> よりも <code>&lt;=</code> を使った方がいい。</p>
+
+<p>ステップのパラメーターはデフォルトで1のオプション引数にしてもいいだろう( <code>=</code> 演算子を使う)。</p>
+
+<p><code>range</code>　が負のステップを理解できるようにするには、たぶんカウントアップ用とカウントダウン用で2つ別々のループを書くといいだろう。カウントダウンのときはループ終了のチェックが <code>&gt;=</code> になるだろうから。</p>
+
+<p>他にもデフォルトステップとして <code>-1</code> を使うのもいいだろう。 <code>end</code> が <code>start</code> より小さい場合に、( <code>range(5,2)</code> のように)無限ループにはまり込まずに、意味のあるものを返せる。パラメーターのデフォルト値の中では、自分より前に出てきたパラメーターを参照することもできる。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_6xTmjj4Rf5" href="#i_6xTmjj4Rf5" tabindex="-1" role="presentation"></a>Reversing an array</h3>
+
+<p>(配列のリバース)</p>
+
+<p>配列には、要素が現れる順番を反対にする <code>reverse</code> メソッドがある。このエクササイズでは、 <code>reverseArray</code> と <code>reverseArrayInPlace</code> という2つの関数を書こう。 <code>reverseArray</code> は配列を引数に取って、同じ要素で順番だけ反対にした <em>新しい</em> 配列を作って返す。 <code>reverseArrayInPlace</code> は <code>reverse</code> メソッドと同じことをする。与えられた配列を <em>変更</em> して要素の並びを反対にする。標準の <code>reverse</code> メソッドを使ってはいけない。</p>
+
+<p>副作用と純粋な関数(<a href="03_functions.html#pure">前の章</a>で見た)についてもう一度考えてみよう。どちらのバージョンが便利だろうか?どちらの処理が速いだろうか?</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_sghv5avX0H" href="#c_sghv5avX0H" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">reverseArray</span>([<span class="cm-string">&quot;A&quot;</span>, <span class="cm-string">&quot;B&quot;</span>, <span class="cm-string">&quot;C&quot;</span>]));
+<span class="cm-comment">// → [&quot;C&quot;, &quot;B&quot;, &quot;A&quot;];</span>
+<span class="cm-keyword">let</span> <span class="cm-def">arrayValue</span> <span class="cm-operator">=</span> [<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>, <span class="cm-number">5</span>];
+<span class="cm-variable">reverseArrayInPlace</span>(<span class="cm-variable">arrayValue</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">arrayValue</span>);
+<span class="cm-comment">// → [5, 4, 3, 2, 1]</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><a class="p_ident" id="p_KuJ51zMK0i" href="#p_KuJ51zMK0i" tabindex="-1" role="presentation"></a><code>reverseArray</code> の実装には明らかな方法が2つある。1つ目は、入力の配列を頭から順番に見ていって、新しい配列の <code>unshift</code> メソッドを使って頭から挿入していくことだ。2つ目は、入力の配列を逆向きにループしていって、 <code>push</code> メソッドを使うことだ。配列を逆向きにループするには少しおかしな <code>for</code> の指定が必要になる(<code>(let i = array.<wbr>length - 1; i &gt;= 0; i--)</code> というように)。</p>
+
+<p>配列をその場でリバースする方が難しい。後で必要になる要素を上書きしないように気をつけないといけない。 <code>reverseArray</code> を使ったり、配列をコピーすれば(<code>array.slice(0)</code> は配列コピーの良い方法だ)できるだろうけど、これは反則だ。</p>
+
+<p>最初の最後の要素を <em>交換する</em> というワザが使える。それから2番目と後ろから2番目を交換、というように続けていく。配列の長さの半分をループしていけば実現できるだろう( <code>Math.floor</code> を使って半分を切り捨てしよう、要素が奇数の配列のとき、真ん中の要素をいじる必要はない)。 <code>i</code> の位置にある要素と <code>array.<wbr>length - 1 - i</code> の位置にある要素を交換していくんだ。要素を一時的に保持するのにローカルバインディングを使ってもいい。反対側にある値でそのバインディングを上書きしてから、その値を反対側の値があったところに置く。</p>
+
+</div></div>
+
+<h3 id="list"><a class="i_ident" id="i_nSTX34CM1M" href="#i_nSTX34CM1M" tabindex="-1" role="presentation"></a>A list</h3>
+
+<p>(リスト)</p>
+
+<p><a class="p_ident" id="p_jsOpfi617R" href="#p_jsOpfi617R" tabindex="-1" role="presentation"></a>オブジェクトは、一般的な値の塊だから、どんな種類のデータ構造を作るためにも使える。一般的なデータ構造に <em>リスト</em> がある(配列と混同しないように)。リストは、入れ子になったオブジェクトのセットだ。最初のオブジェクトは2番目のオブジェクトを参照し、2番目のオブジェクトは3番目のオブジェクトを参照する、というように続いていく。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_kYAco70aHD" href="#c_kYAco70aHD" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">list</span> <span class="cm-operator">=</span> {
+  <span class="cm-property">value</span>: <span class="cm-number">1</span>,
+  <span class="cm-property">rest</span>: {
+    <span class="cm-property">value</span>: <span class="cm-number">2</span>,
+    <span class="cm-property">rest</span>: {
+      <span class="cm-property">value</span>: <span class="cm-number">3</span>,
+      <span class="cm-property">rest</span>: <span class="cm-atom">null</span>
+    }
+  }
+};</pre>
+
+<p>出来上がるオブジェクトは以下のような鎖のようになる。</p><figure><img src="img/linked-list.svg" alt="A linked list"></figure>
+
+<p><a class="p_ident" id="p_87kfEH2fxJ" href="#p_87kfEH2fxJ" tabindex="-1" role="presentation"></a>リストの素晴らしいところは構造の一部を共有できることだ。例えば、新しい2つの値、 <code>{value: 0, rest: list}</code> と <code>{value: -1, rest: list}</code> を作ったとして( <code>list</code> はすでに定義したバインディングを参照する)、両方とも独立したリストではあるけど、最後の3要素を作る構造を共有している。オリジナルのリストもまた有効な3要素リストだ。</p>
+
+<p><a class="p_ident" id="p_U9mavMZxuB" href="#p_U9mavMZxuB" tabindex="-1" role="presentation"></a><code>arrayToList</code> という関数を書いて、 <code>[1, 2, 3]</code> のような引数を渡されると、上のようなリスト構造を作るようにしよう。さらに、 <code>listToArray</code> 関数を書いて、リストから配列を作るようにしよう。それから、 <code>prepend</code> というヘルパー関数を書いて、要素1つとリストを引数にして、入力リストの先頭に要素を加えた新しいリストを作るようにしよう。それから <code>nth</code> という関数を書いて、これはリストと数字を引数にして、その数字の位置にある要素を返すようにしよう(0が最初の要素を参照する)。その位置の要素がなければ <code>undefined</code> を返すようにしよう。</p>
+
+<p>まだやってなければ、 <code>nth</code> 関数の再帰バージョンを書いてみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_rufmukl+AQ" href="#c_rufmukl+AQ" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">arrayToList</span>([<span class="cm-number">10</span>, <span class="cm-number">20</span>]));
+<span class="cm-comment">// → {value: 10, rest: {value: 20, rest: null}}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">listToArray</span>(<span class="cm-variable">arrayToList</span>([<span class="cm-number">10</span>, <span class="cm-number">20</span>, <span class="cm-number">30</span>])));
+<span class="cm-comment">// → [10, 20, 30]</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">prepend</span>(<span class="cm-number">10</span>, <span class="cm-variable">prepend</span>(<span class="cm-number">20</span>, <span class="cm-atom">null</span>)));
+<span class="cm-comment">// → {value: 10, rest: {value: 20, rest: null}}</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">nth</span>(<span class="cm-variable">arrayToList</span>([<span class="cm-number">10</span>, <span class="cm-number">20</span>, <span class="cm-number">30</span>]), <span class="cm-number">1</span>));
+<span class="cm-comment">// → 20</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>リストを組み立てるのは後ろから前へやっていくと簡単だ。だから <code>arrayToList</code> 関数は配列を後ろからループしていくといいかもしれない(前の章のエクササイズを見よう)。各要素につき、リストに1つオブジェクトを加えていこう。要素を追加するには、それまでに組み立てたリストの部分を保持しておくローカルバインディングを使って、 <code>list = {value: X, rest: list}</code> というように代入していくこともできる。</p>
+
+<p>リストを見ていくには( <code>listToArray</code> や <code>nth</code> で)、以下のような <code>for</code> ループの書き方が使えるだろう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_HLrOQGihFR" href="#c_HLrOQGihFR" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">node</span> <span class="cm-operator">=</span> <span class="cm-variable">list</span>; <span class="cm-variable">node</span>; <span class="cm-variable">node</span> <span class="cm-operator">=</span> <span class="cm-variable">node</span>.<span class="cm-property">rest</span>) {}</pre>
+
+<p>この仕組みが分かるだろうか?ループの周回ごとに、 <code>node</code> は現在のサブリストを指し、ループの本体では <code>value</code> プロパティで現在の要素にアクセスできる。周回の最後では、 <code>node</code> は次のサブリストへ移っていく。次のサブリストが <code>null</code> の場合はリストの最後に達したということだから、ループを終了する。</p>
+
+<p><a class="p_ident" id="p_YJ4Fc+Jaqr" href="#p_YJ4Fc+Jaqr" tabindex="-1" role="presentation"></a>再帰バージョンの <code>nth</code> 関数でも同じように、リストの&quot;しっぽ(tail)”のさらに小さい部分をどんどん見ていく。同時にインデックスをカウントダウンしておいて、0に達したらその時に見ているノードの <code>value</code> プロパティを返せばいい。リストの0番目の要素を得るには、単に頭ノードの <code>value</code> プロパティを取ればいい。 <em>N</em> + 1番目の要素を得るには、 <em>N</em> 番目の要素を取って、そこで <code>rest</code> プロパティを見ればいい。</p>
+
+</div></div>
+
+<h3 id="exercise_deep_compare"><a class="i_ident" id="i_IJBU+aXOIC" href="#i_IJBU+aXOIC" tabindex="-1" role="presentation"></a>Deep comparison</h3>
+
+<p>(ディープな比較)</p>
+
+<p><code>==</code> 演算子はオブジェクトをアイデンティティで比較する。でも、実際にプロパティが保持している値を比較したい場合もあるだろう。</p>
+
+<p>2つの値を引数に取って、それらが同じ値か同じプロパティで同じ値のオブジェクトだったら <code>true</code> を返す <code>deepEqual</code> 関数を書こう。プロパティの値を比較するには、 <code>deepEqual</code> 関数を再帰的に呼び出すようにしよう。</p>
+
+<p>値を直接比較するべきか( <code>===</code> 演算子を使うか)、プロパティを比較するべきか知るには、 <code>typeof</code> 演算子を使えばいい。両方の値が <code>&quot;object&quot;</code> を返したら、ディープな比較をする。でも、1つバカバカしい例外を念頭に置かないといけない。というのは、歴史的な事故のせいで、 <code>typeof null</code> も <code>&quot;object&quot;</code> を返すんだ。</p>
+
+<p><code>Object.keys</code> 関数が、オブジェクトのプロパティを見ていって比較するには便利だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_kWPN5i/Y3x" href="#c_kWPN5i/Y3x" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-keyword">let</span> <span class="cm-def">obj</span> <span class="cm-operator">=</span> {<span class="cm-property">here</span>: {<span class="cm-property">is</span>: <span class="cm-string">&quot;an&quot;</span>}, <span class="cm-property">object</span>: <span class="cm-number">2</span>};
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">deepEqual</span>(<span class="cm-variable">obj</span>, <span class="cm-variable">obj</span>));
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">deepEqual</span>(<span class="cm-variable">obj</span>, {<span class="cm-property">here</span>: <span class="cm-number">1</span>, <span class="cm-property">object</span>: <span class="cm-number">2</span>}));
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">deepEqual</span>(<span class="cm-variable">obj</span>, {<span class="cm-property">here</span>: {<span class="cm-property">is</span>: <span class="cm-string">&quot;an&quot;</span>}, <span class="cm-property">object</span>: <span class="cm-number">2</span>}));
+<span class="cm-comment">// → true</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>実際にオブジェクトを扱っているか知るためのテストは、 <code>typeof x == &quot;object&quot; &amp;&amp; x != null</code> のような感じになるだろう。 <em>両方の</em> 引数がオブジェクトのときだけ、プロパティを比較するように気をつけよう。その他の場合は単に、 <code>===</code> 演算子を適用した結果を直接返せばいい。</p>
+
+<p>プロパティを見ていくには <code>Object.keys</code> を使おう。両方のオブジェクトが同じプロパティのセットを持っているか、そのプロパティの持つ値が同じかどうか調べないといけない。1つのやり方は、両方のオブジェクトのプロパティの数が同じかどうか調べることだ(プロパティリストの長さが同じということ)。それから比較のために、片方のオブジェクトのプロパティをループしていって、もう一方も実際にその名前のプロパティを持っているか調べる。もし、両方とも同じ数のプロパティを持っていて、一方の全プロパティをもう一方も持っているなら、同じプロパティのセットを持っていることになる。</p>
+
+<p>関数から正しい値を返すには、不一致が見つかったらすぐに <code>false</code> を返して、関数の最後まで到達できた場合だけ <code>true</code> を返すようにすればいい。</p>
+
+</div></div><nav><a href="03_functions.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_higher_order.html" title="next chapter">▶</a></nav>
+</article>

@@ -1,0 +1,292 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>値(Values)、タイプ(Types)、そして演算子 :: Eloquent JavaScript</title>
+  <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
+  <script src="js/acorn_codemirror.js"></script>
+  <link rel=stylesheet href="css/ejs.css">
+  <script src="js/sandbox.js"></script>
+  <script src="js/ejs.js"></script><script>var chapNum = 1;</script></head>
+
+<article>
+<nav><a href="00_intro.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_program_structure.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 1</span>値(Values)、タイプ(Types)、そして演算子</h1>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>マシーンの表層の下ではな、プログラムが動いておるのだ。それは苦もなく、伸び縮みをする。偉大なる調和の下で、電子は離散し、再び集合する。モニター上の形体はただの水のさざなみのようなものじゃ。本質はその下に潜んで目には見えん。</p>
+
+<footer>Master Yuan-Ma, <cite>The Book of Programming</cite></footer>
+
+</blockquote><figure class="chapter framed"><img src="img/chapter_picture_1.jpg" alt="Picture of a sea of bits"></figure>
+
+<p>コンピューターの世界では、存在するのはデータだけだ。君はデータを読み込んだり、変更したり、新しく作ったりする。でも、データではないものは扱えない。こうしたデータは全てビットの長いシーケンスとして保存される。だから本質的には同じようなものだ。(訳注:シーケンスとは何かが連続したもののこと)</p>
+
+<p><a class="p_ident" id="p_ghjfrvZT2H" href="#p_ghjfrvZT2H" tabindex="-1" role="presentation"></a><em>ビット</em> とは、2つの値で表されるあらゆるものだ。たいていは0と1で表現される。コンピューターの内部では、電荷の大小であったり、信号の強弱であったり、CDの表面の点の輝き具合いだったりする。どんなに違った情報でも0と1のシーケンスにまで分解ができて、ビットで表現できる。</p>
+
+<p><a class="p_ident" id="p_jgtHGEeCWE" href="#p_jgtHGEeCWE" tabindex="-1" role="presentation"></a>例えば、数字の13をビットで表現することができる。これは10進数と同じように動作するけど、ただ数字が10種類ではなくて2種類しかない。そして各桁の大きさは右から左に向かって2の累乗で増える。以下のビットは数字の13と同じになるビットで、各桁の大きさも下に示している。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_+fMMNc3yUt" href="#c_+fMMNc3yUt" tabindex="-1" role="presentation"></a>   0   0   0   0   1   1   0   1
+ 128  64  32  16   8   4   2   1</pre>
+
+<p><a class="p_ident" id="p_oWSwnClIPM" href="#p_oWSwnClIPM" tabindex="-1" role="presentation"></a>というわけで、00001101という2進数になる。0ではない桁はそれぞれ8,4,1を表していて、足して13になる。</p>
+
+<h2><a class="h_ident" id="h_aU11mhgytP" href="#h_aU11mhgytP" tabindex="-1" role="presentation"></a>値(Values)</h2>
+
+<p><a class="p_ident" id="p_ItIA+GcNvb" href="#p_ItIA+GcNvb" tabindex="-1" role="presentation"></a>ビットの海を想像してみよう、ビットの大海を。今時のコンピュータは揮発性データストレージ(ワーキングメモリー)に30億を超えるビットを持つ。不揮発性メモリ(ハードディスクや同じようなもの)はさらに数桁の容量を持つ場合が多い。</p>
+
+<p><a class="p_ident" id="p_nAgK8Izbah" href="#p_nAgK8Izbah" tabindex="-1" role="presentation"></a>こんな量のビットを混乱せずに扱うためには、ある情報を表す塊(chunk)に分けてやらないといけない。JavaScriptの環境ではこういう塊を <em>値(value)</em> と呼ぶ。全ての値はビットからできているけど、それぞれ違う役割を果たす。全ての値はその役割を決めるために型(type)を持つ。ある値は数字で、ある値はちょっとしたテキストで、ある値は関数だったりする。</p>
+
+<p>値を作るためには、ほとんど名前を呼び出せばいいだけだ。これは便利だ。構成要素を集めたりコストをかけたりしないでいい。君はただ呼びだせば、 <em>おお！</em> 、値が手に入った。値は実際には空気から作り出されるわけじゃない。全ての値はどこかに保存されないといけないし、一度に大量に使おうとすればメモリー切れになってしまう。幸い、これは一度に全部を必要とするときだけの問題だ。値はいらなくなったらすぐに消え去って、ビットは次の値の構成要素として再利用できるようになる。</p>
+
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>この章ではJavaScriptプログラムにとっての元素を紹介する。つまり単純な値の型と、その値に作用する演算子だ。</p>
+
+<h2><a class="h_ident" id="h_nF1RO27Iy9" href="#h_nF1RO27Iy9" tabindex="-1" role="presentation"></a>数値(Numbers)</h2>
+
+<p><em>数値</em> の型をもつ値は(何の驚きもないだろうけど)、数値型だ。JavaScriptのプログラムでは以下のように書く。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/u5ErTZbax" href="#c_/u5ErTZbax" tabindex="-1" role="presentation"></a><span class="cm-number">13</span></pre>
+
+<p><a class="p_ident" id="p_vTB6PsMp4Q" href="#p_vTB6PsMp4Q" tabindex="-1" role="presentation"></a>プログラムでこれを使うと、数字の13を意味するビットのパターンがコンピュータのメモリ内部にできる。</p>
+
+<p><a class="p_ident" id="p_a8zajuOYf+" href="#p_a8zajuOYf+" tabindex="-1" role="presentation"></a>JavaScriptは、固定長で64ビットを1つの数値を表すために使う。64ビットで表現できるビットのパターンしか存在できないから、表現できる数値の数にも限界がある。 <em>N</em> 桁の10進数だったら 10<sup>N</sup> 種類の数値が表現できる。同じように、64桁の2進数では 2<sup>64</sup> 種類だ。これは18の後ろに18個の0を並べたぐらい(クインテリオン)でとても大きい。</p>
+
+<p><a class="p_ident" id="p_DZ9yrZgCFH" href="#p_DZ9yrZgCFH" tabindex="-1" role="presentation"></a>コンピュータのメモリは以前はもっと小さくて、8ビットや16ビットが数値を表すのに使われていた。それぐらいの小さい数では <em>オーバーフロー</em> (使えるビット数が足りないような数字ができること)もよく起きた。今では、ポケットに入るコンピュータでも十分なメモリを持っていて、64ビットの塊を自由に使える。オーバーフローを心配しないといけないのは本当に天文学的な数を扱うときだけだ。</p>
+
+<p><a class="p_ident" id="p_Xiivn8FFQV" href="#p_Xiivn8FFQV" tabindex="-1" role="presentation"></a>18クインテリオンより小さい整数は何でもJavaScriptの数字になるわけではない。ビットで負の数を保存することもあるから、1ビットは符号を表すために使われる。もっと大きな問題は、整数以外の数字も表現しないといけないことだ。そのためには、いくつかのビットが小数点の位置を示すために使われる。実際のところ、保存できる最大の整数は9クアドリオン(0が15個)より大きくて、これでも十分巨大な数だ。</p>
+
+<p>小数点以下はドットを使って表現される。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_tM8nqv41Gp" href="#c_tM8nqv41Gp" tabindex="-1" role="presentation"></a><span class="cm-number">9.81</span></pre>
+
+<p><a class="p_ident" id="p_QEh1Nj1nDA" href="#p_QEh1Nj1nDA" tabindex="-1" role="presentation"></a>とても大きい数字やとても小さい数字は、科学的な記法で(exponentを表す) <em>e</em> の後ろに指数を付けて書くこともできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_6ew5w+VhSM" href="#c_6ew5w+VhSM" tabindex="-1" role="presentation"></a><span class="cm-number">2.998e8</span></pre>
+
+<p><a class="p_ident" id="p_USXmCkd+qC" href="#p_USXmCkd+qC" tabindex="-1" role="presentation"></a>これは2.998 × 10<sup>8</sup> = 299,800,000となる。</p>
+
+<p><a class="p_ident" id="p_ovyjEcKhWl" href="#p_ovyjEcKhWl" tabindex="-1" role="presentation"></a>9クアドリオンより小さい整数での計算はいつも厳密だ。残念ながら、少数の計算はたいてい厳密ではない。π(円周率)が限られた桁の数字で厳密に表せないように、64ビットしかない中ではいくらか精密性が失われることになる。これは情けないことではあるけど、特定のシチュエーションでしか実際的な問題は起こらない。大事なのはこのことを知っておくことと、少数の値を厳密な値ではなく近似として扱うことだ。</p>
+
+<h3><a class="i_ident" id="i_mxLaUhN3dy" href="#i_mxLaUhN3dy" tabindex="-1" role="presentation"></a>算術(Arithmetic)</h3>
+
+<p><a class="p_ident" id="p_TkQHxaUQSa" href="#p_TkQHxaUQSa" tabindex="-1" role="presentation"></a>数字を使ってすることといえば算術だ。算術演算子(足す、かけるなど)は2つの数値を受け取って新しい数値を返す。JavaScriptでは以下のような感じになる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_bSU4Vtv/mt" href="#c_bSU4Vtv/mt" tabindex="-1" role="presentation"></a><span class="cm-number">100</span> <span class="cm-operator">+</span> <span class="cm-number">4</span> <span class="cm-operator">*</span> <span class="cm-number">11</span></pre>
+
+<p><a class="p_ident" id="p_VCRi+6QcvA" href="#p_VCRi+6QcvA" tabindex="-1" role="presentation"></a><code>+</code>記号と<code>*</code>記号は <em>演算子(operator)</em> と呼ばれる。<code>+</code>は足し算で<code>*</code>は掛け算を表す。演算子を2つの値の間に置けば、演算子が数値に適用されて、新しい数値が生み出される。</p>
+
+<p><a class="p_ident" id="p_ULVJGzIfB5" href="#p_ULVJGzIfB5" tabindex="-1" role="presentation"></a>ところで、この例は“4と100を足して、結果に11をかける&quot;のか？それともかけ算は足し算の前なのか？君が予想した通り、掛け算が先だ。ただ、数学と同じように足し算をかっこで囲めば話が変わってくる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ij6V90ZZBQ" href="#c_ij6V90ZZBQ" tabindex="-1" role="presentation"></a>(<span class="cm-number">100</span> <span class="cm-operator">+</span> <span class="cm-number">4</span>) <span class="cm-operator">*</span> <span class="cm-number">11</span></pre>
+
+<p>引き算には、<code>-</code>演算子を使う。割り算は<code>/</code>演算子でできる。</p>
+
+<p><a class="p_ident" id="p_Pw2GZyjAl9" href="#p_Pw2GZyjAl9" tabindex="-1" role="presentation"></a>かっこなしで演算子が一緒にあらわれたときには、適用される順番は演算子の <em>優先度(precedence)</em> が決める。上の例から、かけ算は足し算より先にくるのが分かる。<code>/</code>は<code>*</code>と同じ優先度だ。<code>+</code>と<code>-</code>の関係も同じだ。優先度が同じ演算子が続いて現れたら(<code>1 - 2 + 1</code>のように)、左から順番に適用される。</p>
+
+<p>優先度のルールはそんなに心配する必要はない。自信がなければカッコを足しておこう。</p>
+
+<p><a class="p_ident" id="p_DJR6ZbFu+D" href="#p_DJR6ZbFu+D" tabindex="-1" role="presentation"></a>もうひとつ算術演算子がある。すぐには意味が掴めないかもしれないけど。<code>%</code>の記号は <em>余り(remainder)</em> の演算を表す。<code>X % Y</code>は<code>X</code>を<code>Y</code>で割った余りだ。例えば、<code>314 % 100</code>は<code>14</code>だし、<code>144 % 12</code>は<code>0</code>になる。余り演算子の優先度は掛け算割り算と同じだ。 <em>モジュロ(modulo)</em> と呼ばれる場合も多い。</p>
+
+<h3><a class="i_ident" id="i_Trf1MhIFPt" href="#i_Trf1MhIFPt" tabindex="-1" role="presentation"></a>特別な数(Special numbers)</h3>
+
+<p><a class="p_ident" id="p_Kscj5/K1FD" href="#p_Kscj5/K1FD" tabindex="-1" role="presentation"></a>JavaScriptでは、数字とみなされるのに、普通の数字とはふるまいが違う3つの特別な値がある。</p>
+
+<p><a class="p_ident" id="p_ip9HNN9lVX" href="#p_ip9HNN9lVX" tabindex="-1" role="presentation"></a>初めの2つは、<code>Infinity</code>と<code>-Infinity</code>で、無限とマイナス無限を表す。<code>Infinity - 1</code>は<code>Infinity</code>、というようになる。Infinityベースの計算を信頼し過ぎない方がいい。数学的に正しくないし、すぐに残り1つの特別な数字(<code>NaN</code>)ができてしまう。</p>
+
+<p><a class="p_ident" id="p_jhyJ6ChLho" href="#p_jhyJ6ChLho" tabindex="-1" role="presentation"></a><code>NaN</code>は“not a number(数字ではない)”を表す。実際には数値型の値だけど。例えば、<code>0 / 0</code>や<code>Infinity - Infinity</code>を計算しようとすれば結果は<code>NaN</code>になるだろう。その他、意味がある結果にならない数値計算はこうなる。</p>
+
+<h2><a class="h_ident" id="h_AEGhdBej8m" href="#h_AEGhdBej8m" tabindex="-1" role="presentation"></a>文字列(Strings)</h2>
+
+<p><a class="p_ident" id="p_7LJSBEteoP" href="#p_7LJSBEteoP" tabindex="-1" role="presentation"></a>次の基本データ型は <em>文字列(string)</em> だ。文字列はテキストを表すために使う。その中身をクオート(引用符)で囲んで書く。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_JcfC82q1V/" href="#c_JcfC82q1V/" tabindex="-1" role="presentation"></a><span class="cm-string-2">`Down on the sea`</span>
+<span class="cm-string">&quot;Lie on the ocean&quot;</span>
+<span class="cm-string">'Float on the ocean'</span></pre>
+
+<p>上から順番にシングルクオート、ダブルクオート、バッククオートを使っていて、始まりと終わりのクオートが対応していれば、どれを使ってもいい。</p>
+
+<p><a class="p_ident" id="p_wqA3DCxJ1E" href="#p_wqA3DCxJ1E" tabindex="-1" role="presentation"></a>たいていなんでもクオートの間に入れられるし、そうすればJavaScriptは文字列値を作り出す。だけど、文字によっては少し複雑な場合もある。クオートの間にクオートを入れるのが難しいのは想像できるだろう。 <em>改行(Newlines)</em> 、つまり <span class="keyname">ENTER</span> を押すと得られる文字は、バッククオート(<code>`</code>)を使ったときだけエスケープなしで文字列に含められる。</p>
+
+<p><a class="p_ident" id="p_vvDZ9erpZm" href="#p_vvDZ9erpZm" tabindex="-1" role="presentation"></a>こういう文字を文字列に含めるには、以下の記法を使う。バックスラッシュ(<code>\</code>)がクオートにはさまれたテキストに出てきた場合は、バックスラッシュの次にある文字が特別な意味を持つことを示す。これは文字の <em>エスケープ(escaping)</em> と呼ばれる。バックスラッシュが前に付いたクオートは文字列を閉じずに、その一部になる。もし、<code>n</code>という文字がバックスラッシュの次にあれば、改行という意味で解釈される。同じように、バックスラッシュの後の<code>t</code>はタブ文字の意味になる。次の文字列を見てみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_L1XyfWLjvh" href="#c_L1XyfWLjvh" tabindex="-1" role="presentation"></a><span class="cm-string">&quot;This is the first line\nAnd this is the second&quot;</span></pre>
+
+<p>実際に含まれているテキストは以下のとおりだ。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_dbS7S3Fqly" href="#c_dbS7S3Fqly" tabindex="-1" role="presentation"></a>This is the first line
+And this is the second</pre>
+
+<p><a class="p_ident" id="p_Q6b5UvNUnr" href="#p_Q6b5UvNUnr" tabindex="-1" role="presentation"></a>もちろん文字列中のバックスラッシュを特別な記号ではなくて単なるバックスラッシュにしたい場合もある。バックスラッシュを2つ続ければ、2つが合体して、出来上がった文字列には1つだけが残る。 “<em>A newline character is written like <code>&quot;</code>\n<code>&quot;</code>.</em>” という文字列は以下のように書ける。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_AuMrnbfo/X" href="#c_AuMrnbfo/X" tabindex="-1" role="presentation"></a><span class="cm-string">&quot;A newline character is written like \&quot;\\n\&quot;.&quot;</span></pre>
+
+<p id="unicode"><a class="p_ident" id="p_n09ofH/dnd" href="#p_n09ofH/dnd" tabindex="-1" role="presentation"></a>文字列も数値と同じく、コンピュータの内部で存在するために、ビットの並びでモデル化されていないといけない。このときにJavaScriptは <em>Unicode</em> 標準を使う。この標準は、事実上全ての文字に数字を割り当てる。ギリシャ文字、アラビア文字、日本語、アルメニア語などなど、なんでもだ。各文字に対応する数字が分かっていれば、文字列は数字のシーケンスとして表せることになる。</p>
+
+<p><a class="p_ident" id="p_tC+t84Z/nM" href="#p_tC+t84Z/nM" tabindex="-1" role="presentation"></a>実際、JavaScriptはその通りにしている。ただ、ここには複雑な点があって、JavaScriptの表現は文字列の1要素につき16ビットを使っていて、 2<sup>16</sup> 種類の文字を表せる。でもUnicodeではそれより多い文字が定められている(今のところは2倍ほど)。というわけでJavaScriptの文字列では、文字によっては(絵文字とか)2つの &quot;文字ポジション(character positions)”を使う。これについては<a href="05_higher_order.html#code_units">5</a>章でまた扱う。</p>
+
+<p><a class="p_ident" id="p_idn6SiRzM+" href="#p_idn6SiRzM+" tabindex="-1" role="presentation"></a>文字列は割ったり、かけたり、引いたりできないけど、<code>+</code>演算子を使うことは <em>できる</em> 。これは足し算ではなくて、 <em>連結する(concatenate)</em> 。つまり、2つの文字列をくっつける。以下の例は<code>&quot;concatenate&quot;</code>という文字列になる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_eCO7oekmP9" href="#c_eCO7oekmP9" tabindex="-1" role="presentation"></a><span class="cm-string">&quot;con&quot;</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;cat&quot;</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;e&quot;</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;nate&quot;</span></pre>
+
+<p><a class="p_ident" id="p_IWwpqOY+5j" href="#p_IWwpqOY+5j" tabindex="-1" role="presentation"></a>文字列型の値には関連付けられた関数( <em>メソッド(method)</em>)がたくさんあって、他にもいろいろな操作を行える。これについては<a href="04_data.html#methods">4</a>章で詳しく見ていこう。</p>
+
+<p><a class="p_ident" id="p_tsCcGn85LG" href="#p_tsCcGn85LG" tabindex="-1" role="presentation"></a>シングルクオートとダブルクオートで文字列の振る舞いはほとんど同じだ。ただ、一方を使った文字列中では、使っている方をエスケープしないといけない、というだけだ。バッククオートの文字列は、 <em>テンプレートリテラル(template literal)</em> とも呼ばれ、いくつかのワザが使える。改行ができるだけじゃなく、他の値を埋め込むこともできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_1ObyeNEDOw" href="#c_1ObyeNEDOw" tabindex="-1" role="presentation"></a><span class="cm-string-2">`half of 100 is ${</span><span class="cm-number">100</span> <span class="cm-operator">/</span> <span class="cm-number">2</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span></pre>
+
+<p><a class="p_ident" id="p_iLMtgq/DST" href="#p_iLMtgq/DST" tabindex="-1" role="presentation"></a>テンプレートリテラルで、 <code>${}</code> の中に書き込めば、その結果が計算されて、文字列に変換されて、その場所に置き換えられる。この例では&quot; <em>half of 100 is 50</em> &quot;という文字列ができあがる。</p>
+
+<h2><a class="h_ident" id="h_VrkDUIuMI4" href="#h_VrkDUIuMI4" tabindex="-1" role="presentation"></a>単項演算子(unary operators)</h2>
+
+<p>演算子は全てが記号というわけではない。言葉で書かれるものもある。例えば<code>typeof</code>演算子は、君が渡した値の型を文字列で返す。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_iWT//VyY7j" href="#c_iWT//VyY7j" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">typeof</span> <span class="cm-number">4.5</span>)
+<span class="cm-comment">// → number</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">typeof</span> <span class="cm-string">&quot;x&quot;</span>)
+<span class="cm-comment">// → string</span></pre>
+
+<p id="console.log"><a class="p_ident" id="p_edv0ySDJvj" href="#p_edv0ySDJvj" tabindex="-1" role="presentation"></a>We will use <code>console.log</code> in example code to indicate that we want to see the result of evaluating something. More about that in the <a href="02_program_structure.html">next chapter</a>.</p>
+
+<p><a class="p_ident" id="p_nf3OyV8/Vy" href="#p_nf3OyV8/Vy" tabindex="-1" role="presentation"></a>これまで見た他の演算子は全て2つの値に作用していたけど、<code>typeof</code>は1つしか受け取らない。2つの値を受け取る演算子は <em>二項演算子(binary operator)</em> で、1つのものは <em>単項演算子(unary operator)</em> だ。マイナス演算子は二項演算子としても単項演算子としても使われる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_VpL89RFAPj" href="#c_VpL89RFAPj" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-operator">-</span> (<span class="cm-number">10</span> <span class="cm-operator">-</span> <span class="cm-number">2</span>))
+<span class="cm-comment">// → -8</span></pre>
+
+<h2><a class="h_ident" id="h_9M0YeWVG9D" href="#h_9M0YeWVG9D" tabindex="-1" role="presentation"></a>真偽値(Boolean values)</h2>
+
+<p><a class="p_ident" id="p_JoSwV/Lb2L" href="#p_JoSwV/Lb2L" tabindex="-1" role="presentation"></a>2つの可能性があるとして(yes,noやon,off)、その区別をするだけの値があると便利だ。このために、JavaScriptには <em>真偽値型(Boolean type)</em> がある。この型には、真(true)と偽(false)の2種類の値だけがあって、この言葉通りに書く。</p>
+
+<h3><a class="i_ident" id="i_mrht0S3bj9" href="#i_mrht0S3bj9" tabindex="-1" role="presentation"></a>比較(Comparison)</h3>
+
+<p>真偽値型の値を生みだすには以下のような方法がある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_GaxnXrIPwC" href="#c_GaxnXrIPwC" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">3</span> <span class="cm-operator">&gt;</span> <span class="cm-number">2</span>)
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">3</span> <span class="cm-operator">&lt;</span> <span class="cm-number">2</span>)
+<span class="cm-comment">// → false</span></pre>
+
+<p><code>&gt;</code>と<code>&lt;</code>は、それぞれ&quot;〜より大きい&quot;と&quot;〜より小さい&quot;という意味の伝統的な記号だ。これらは二項演算子で、適用されると真かどうかを示す真偽値を返す。</p>
+
+<p>文字列でも同じように比較ができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Qud5plnVuV" href="#c_Qud5plnVuV" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Aardvark&quot;</span> <span class="cm-operator">&lt;</span> <span class="cm-string">&quot;Zoroaster&quot;</span>)
+<span class="cm-comment">// → true</span></pre>
+
+<p>文字列が順序付けされるのは、だいたいアルファベット順だけど、辞書で見られるのとは違う。大文字は常に小文字より「小さい」。つまり“<code>Z&quot; &lt; &quot;a&quot;</code>となる。また、アルファベット以外の文字(!,-などなど)も、順序に含まれる。文字列を比較するときにJavaScriptは左から順に見ていって、一文字ずつUnicodeを比べる。</p>
+
+<p>他にも似たような演算子に<code>&gt;=</code>(以上)や<code>&lt;=</code>(以下)、<code>==</code>(等しい)、<code>!=</code>(等しくない)がある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_9h4L8Mnvdg" href="#c_9h4L8Mnvdg" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Itchy&quot;</span> <span class="cm-operator">!=</span> <span class="cm-string">&quot;Scratchy&quot;</span>)
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Apple&quot;</span> <span class="cm-operator">==</span> <span class="cm-string">&quot;Orange&quot;</span>)
+<span class="cm-comment">// → false</span></pre>
+
+<p><a class="p_ident" id="p_r9XU5+S8JS" href="#p_r9XU5+S8JS" tabindex="-1" role="presentation"></a>JavaScriptには、自分自身と等しくない値が1つだけある。それは<code>NaN</code>だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Vhz09Rgw3h" href="#c_Vhz09Rgw3h" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">NaN</span> <span class="cm-operator">==</span> <span class="cm-atom">NaN</span>)
+<span class="cm-comment">// → false</span></pre>
+
+<p><code>NaN</code>は、無意味な計算の結果を表すはずで、だから <em>その他の</em> どんな無意味な計算の結果とも等しくならない。</p>
+
+<h3><a class="i_ident" id="i_Z2FxpA99UJ" href="#i_Z2FxpA99UJ" tabindex="-1" role="presentation"></a>論理演算子(Logical operators)</h3>
+
+<p><a class="p_ident" id="p_H8rgTvTLqb" href="#p_H8rgTvTLqb" tabindex="-1" role="presentation"></a>他にも真偽値自体に適用できる操作がある。JavaScriptは3つの論理演算子をサポートしている。 <em>and</em> , <em>or</em> , <em>not</em> だ。これらは、ブーリアン値を&quot;理由付け&quot;するのに使われる。</p>
+
+<p><a class="p_ident" id="p_z/pQoyyxOi" href="#p_z/pQoyyxOi" tabindex="-1" role="presentation"></a>まず<code>&amp;&amp;</code>演算子は論理学での <em>and(かつ)</em> を表す。与えられた値が両方とも真なら結果も真だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_SHi38sNkwM" href="#c_SHi38sNkwM" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">true</span> <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span> <span class="cm-atom">false</span>)
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">true</span> <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span> <span class="cm-atom">true</span>)
+<span class="cm-comment">// → true</span></pre>
+
+<p><a class="p_ident" id="p_9BNkIYAAWD" href="#p_9BNkIYAAWD" tabindex="-1" role="presentation"></a><code>||</code>演算子は論理学での <em>or(または)</em> を表す。与えられた値のどちらかがtrueなら結果はtrueだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_diXyv7iPd1" href="#c_diXyv7iPd1" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">false</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-atom">true</span>)
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">false</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-atom">false</span>)
+<span class="cm-comment">// → false</span></pre>
+
+<p><a class="p_ident" id="p_VX8lVRZxnq" href="#p_VX8lVRZxnq" tabindex="-1" role="presentation"></a><em>not(否定)</em> はエクスクラメーションマーク(<code>!</code>)で書かれる。これは単項演算子で与えられた値をひっくり返す。つまり<code>!true</code>は<code>false</code>になり、<code>!false</code>は<code>true</code>になる。</p>
+
+<p>こういう真偽演算子と算術演算子やその他の演算子を混ぜるとき、いつカッコが必要なのかわかりづらい。実際には次のことが分かっていればたいてい上手くいく。<code>||</code>が一番優先度が低く、<code>&amp;&amp;</code>がその次で、比較演算子(<code>&gt;</code>, <code>==</code>など)がその次で, それから残りのものが続く。この順番は、できるだけカッコを少なくできるように選ばれている。次の式はその典型だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_6eZ07bDo11" href="#c_6eZ07bDo11" tabindex="-1" role="presentation"></a><span class="cm-number">1</span> <span class="cm-operator">+</span> <span class="cm-number">1</span> <span class="cm-operator">==</span> <span class="cm-number">2</span> <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span> <span class="cm-number">10</span> <span class="cm-operator">*</span> <span class="cm-number">10</span> <span class="cm-operator">&gt;</span> <span class="cm-number">50</span></pre>
+
+<p><a class="p_ident" id="p_4+vNw/6FT1" href="#p_4+vNw/6FT1" tabindex="-1" role="presentation"></a>最後に紹介する論理演算子は、単項でもなく二項でもなく <em>三項(ternary)</em> 、つまり3つの値に作用する。次のようにクエスチョンマークとコロンで書く。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_G7eVm8ilWm" href="#c_G7eVm8ilWm" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">true</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-number">2</span>);
+<span class="cm-comment">// → 1</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">false</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-number">2</span>);
+<span class="cm-comment">// → 2</span></pre>
+
+<p><a class="p_ident" id="p_ApB3z5mbuS" href="#p_ApB3z5mbuS" tabindex="-1" role="presentation"></a>これは <em>条件演算子(conditional operator)</em> と呼ばれる。もしくは、JavaScriptでは唯一の三項演算子なので単に三項演算子と呼ばれることもある。クエスチョンマークの左の値がどちらの値かを&quot;選ぶ&quot;。trueだったら、真ん中の値、falseだったら右の値だ。</p>
+
+<h2><a class="h_ident" id="h_SGVbWHrzfT" href="#h_SGVbWHrzfT" tabindex="-1" role="presentation"></a>空の値(Empty values)</h2>
+
+<p><code>null</code>と<code>undefined</code>という特別な値もあって、 <em>意味のある</em> 値が存在しないことを示すために使われる。これら自体も値ではあるけど、何の情報も持たない。</p>
+
+<p>JavaScriptでは意味のある値を生まない操作は <code>undefined</code> を生みだすことが多い(これからいくつか見ていくだろう)。これは単に <em>何か</em> の値を返さないといけないからだ。</p>
+
+<p><code>undefined</code>と<code>null</code>の違いはJavaScriptの設計上のちょっとした事故であって、たいていの場合は問題にはならない。実際にこれらの値を取り扱わないといけない場合は、ほぼ交換可能なものとして扱うのをオススメする。</p>
+
+<h2><a class="h_ident" id="h_n4NeXx4MIs" href="#h_n4NeXx4MIs" tabindex="-1" role="presentation"></a>自動型変換(Automatic type conversion)</h2>
+
+<p>イントロダクションで、JavaScriptは無理をしてでも、ほぼどんなプログラムも受け入れるという話をした。変なことをするプログラムでさえもだ。次の式で説明しよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_QqYG9KqZ2/" href="#c_QqYG9KqZ2/" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">8</span> <span class="cm-operator">*</span> <span class="cm-atom">null</span>)
+<span class="cm-comment">// → 0</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;5&quot;</span> <span class="cm-operator">-</span> <span class="cm-number">1</span>)
+<span class="cm-comment">// → 4</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;5&quot;</span> <span class="cm-operator">+</span> <span class="cm-number">1</span>)
+<span class="cm-comment">// → 51</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;five&quot;</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>)
+<span class="cm-comment">// → NaN</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">false</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>)
+<span class="cm-comment">// → true</span></pre>
+
+<p><a class="p_ident" id="p_8goD5s8Nil" href="#p_8goD5s8Nil" tabindex="-1" role="presentation"></a>演算子が&quot;間違った&quot;型の値に適用されたとき、JavaScriptはひっそりと必要な型に変換する。このときのルールは期待や予想と違う場合がよくある。これは <em>型強制(type coercion)</em> と呼ばれる。1番目の式の<code>null</code>は<code>0</code>になって、2番目の式の<code>&quot;5&quot;</code>は<code>5</code>になる(文字列から数値)。だけど3番目の式では<code>+</code>が文字列を連結しようとするから(足し算の前に)、<code>1</code>が<code>&quot;1&quot;</code>に(数値から文字列に)、変換される。</p>
+
+<p>分かりやすく数値に写し変えられないもの(<code>&quot;five&quot;</code>や<code>undefined</code>)が、数値に変換されると、<code>NaN</code>が返ってくる。さらに<code>NaN</code>に算術操作をすると、また<code>NaN</code>が返ってくる。もし、予想もしてない場所で<code>NaN</code>が返ってきたら、意図してない型変換を疑おう。</p>
+
+<p><a class="p_ident" id="p_liaR/PSyJV" href="#p_liaR/PSyJV" tabindex="-1" role="presentation"></a>同じ型の値を<code>==</code>で比べるときは、結果は予想しやすい。<code>NaN</code>の場合を除けば、同じ値だったらtrueになるはずだ。だけど型が違うときには、JavaScriptは複雑でややこしいルールで、どうするか決める。たいていの場合には、片方の型をもう片方の型に変換しようとする。でも、<code>null</code>や<code>undefined</code>が<code>==</code>のどちらかで発生したときは、両方とも<code>null</code>や<code>undefined</code>でないと真にならない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_qmGDPdETlf" href="#c_qmGDPdETlf" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">null</span> <span class="cm-operator">==</span> <span class="cm-atom">undefined</span>);
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">null</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>);
+<span class="cm-comment">// → false</span></pre>
+
+<p>このふるまいは便利な場合も多い。ある値が、<code>null</code>や<code>undefined</code>ではない本当の値かテストしたいときは、<code>null</code>と<code>==</code>(もしくは<code>!=</code>)で比較すればいい。</p>
+
+<p><a class="p_ident" id="p_3/V2tCafS9" href="#p_3/V2tCafS9" tabindex="-1" role="presentation"></a>だけど、ある値が<code>false</code>値そのものかどうかをテストしたいときはどうなる?<code>0 == false</code>や<code>&quot;&quot; == false</code>も、、自動型変換のせいで、trueになってしまう。型変換が起こってほしく <em>ない</em> ときのためには、<code>===</code>と<code>!==</code>という、2つの演算子がある。<code>===</code>は値が完全に等しいかテストし、<code>!==</code>は完全に等しいわけではないかテストする。つまり<code>&quot;&quot; === false</code>は狙い通りに偽になる。</p>
+
+<p>ぼくは三文字の比較演算子を使うことをオススメする。予期しない型変換に惑わされないために防衛的に使うんだ。でも、両側の型が同じだと確信が持てる場合には、短い方を使っても問題はない。</p>
+
+<h3><a class="i_ident" id="i_S2LoY2n+ad" href="#i_S2LoY2n+ad" tabindex="-1" role="presentation"></a>論理演算子の短絡評価(Short-circuiting of logical operators)</h3>
+
+<p>論理演算子<code>&amp;&amp;</code>と<code>||</code>は型の違う値を独特に扱う。いったん、何をするか決めるために、左側の値を真偽値型に変換するけど、演算子や変換の結果にしたがって、 <em>オリジナルの</em> 左側の値か右側の値かを返す。</p>
+
+<p><code>||</code>は、例えば、左側の値が真に変換できれば左側の値を返して、そうでなければ右側の値を返す。これは、値が真偽値の場合に期待されるような作用を、他の型の値に対してするようなものだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ENjxHGMklb" href="#c_ENjxHGMklb" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-atom">null</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-string">&quot;user&quot;</span>)
+<span class="cm-comment">// → user</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Agnes&quot;</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-string">&quot;user&quot;</span>)
+<span class="cm-comment">// → Agnes</span></pre>
+
+<p>この機能は、デフォルト値でバックアップする方法として使える。もし、ある値が空かもしれなければ、<code>||</code>を代わりの値と一緒に置いてやればいい。初めの値が偽に変換された場合は、代わりにデフォルト値が手に入る。文字列と数値をブーリアンに変換する場合のルールでは<code>0</code>と<code>NaN</code>と空の文字列(<code>&quot;&quot;</code>)が<code>false</code>と見なされる。残りの全ての値は<code>true</code>だ。というわけで<code>0 || -1</code>は<code>-1</code>になり、<code>&quot;&quot; || &quot;!?&quot;</code>は<code>&quot;!?&quot;</code>となる。</p>
+
+<p><code>&amp;&amp;</code>演算子も似たような動作をするけど、話が逆になる。もし、左側の値が偽に変換されれば、その値を返す。そうでなければ右側の値を返す。</p>
+
+<p><a class="p_ident" id="p_Y66knGn/CA" href="#p_Y66knGn/CA" tabindex="-1" role="presentation"></a>これらの演算子には、もう1つ大事な性質がある。右側の値は必要にならない限り評価されないんだ。例えば<code>true || X</code>とした場合に、<code>X</code>が何か <em>おかしい</em> ことをするとしても、結果は<code>true</code>で<code>X</code>は評価されない。<code>false &amp;&amp; x</code>にも同じことがいえる。<code>false</code>を返して、<code>X</code>は無視される。これを <em>短絡評価(short-circuit evaluation)</em> という。 called <em>short-circuit evaluation</em>.</p>
+
+<p><a class="p_ident" id="p_UX2YTHtwgX" href="#p_UX2YTHtwgX" tabindex="-1" role="presentation"></a>条件演算子(三項演算子)も同じように動く。2番目と3番目の値のうち、選ばれた方だけが評価される。</p>
+
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
+
+<p><a class="p_ident" id="p_ByjzDGNV1l" href="#p_ByjzDGNV1l" tabindex="-1" role="presentation"></a>この章ではJavaScriptで値がもつ4つの型を見てきた。数値、文字列、真偽値そしてundefinedだ。</p>
+
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>こういう値はその名前(<code>true</code>, <code>null</code>)や値(<code>13</code>, <code>&quot;abc&quot;</code>)を打ち込めば生み出される。値を演算子で合体させたり変形させたりすることもできる。二項演算子には算術(<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>)や文字列連結(<code>+</code>)、比較(<code>==</code>, <code>!=</code>, <code>===</code>, <code>!==</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>)、論理(<code>&amp;&amp;</code>, <code>||</code>)がある。また単項演算子(<code>-</code>は数値を負にする、<code>!</code>は真偽を反転し、<code>typeof</code>は値の型を返す)や、初めの値によって2つの値を選ぶ三項演算子(<code>?:</code>)についてみてきた。</p>
+
+<p>JavaScriptをちょっとした電卓として使うにはこれで十分な情報かもしれないけど、それ以上のものではない。<a href="02_program_structure.html">次の章</a>では、こういう式を基本的なプログラムに結びつけていく。</p><nav><a href="00_intro.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_program_structure.html" title="next chapter">▶</a></nav>
+</article>

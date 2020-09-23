@@ -1,0 +1,521 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>プログラムの構造(Program Structure) :: Eloquent JavaScript</title>
+  <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
+  <script src="js/acorn_codemirror.js"></script>
+  <link rel=stylesheet href="css/ejs.css">
+  <script src="js/sandbox.js"></script>
+  <script src="js/ejs.js"></script><script>var chapNum = 2;</script></head>
+
+<article>
+<nav><a href="01_values.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="03_functions.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 2</span>プログラムの構造(Program Structure)</h1>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_jMO9pynZZx" href="#p_jMO9pynZZx" tabindex="-1" role="presentation"></a>そして俺の心臓はフィルムみたいに薄くて透明な皮膚の下で次第に赤くなった。連中は10ccのJavaScriptを俺が意識を取り戻すために施さなきゃならなかった。(俺は血中の毒にすぐ反応した。)まったく、こいつはエラから桃を放り出してくれたぜ!</p>
+
+<footer>_why, <cite>Why's (Poignant) Guide to Ruby</cite></footer>
+
+</blockquote><figure class="chapter framed"><img src="img/chapter_picture_2.jpg" alt="Picture of tentacles holding objects"></figure>
+
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>この章では、 <em>プログラミング</em> と呼ばれることを始める。JavaScript言語のコマンドを、これまで見てきたのを名詞や文の断片とするなら、意味のある散文が表現できるまで広げていく。</p>
+
+<h2><a class="h_ident" id="h_CwoLJUNdya" href="#h_CwoLJUNdya" tabindex="-1" role="presentation"></a>式と文(Expressions and statements)</h2>
+
+<p><a class="p_ident" id="p_0hDNfTtQRd" href="#p_0hDNfTtQRd" tabindex="-1" role="presentation"></a><a href="01_values.html">1</a>章では、値を作ったり、それに演算子を適用して、新しい値を得たりした。こうして値を作るのが、どんなJavaScriptプログラムでもメインの材料だ。でもこの材料を本当に便利にするには、もっと大きい構造にはめ込まないといけない。ということで、それが次に扱うことだ。</p>
+
+<p><a class="p_ident" id="p_TuCiPFGIjH" href="#p_TuCiPFGIjH" tabindex="-1" role="presentation"></a>値を生み出すようなコードの断片は <em>式(expression)</em> と呼ばれる。直接書かれた全ての値(<code>22</code>や<code>&quot;psychoanalysis&quot;</code>)は式だ。カッコの間に挟まれた式も、また式だ。二項演算子が2つの式に適用されたものも、単項演算子が1つの式に適用されたものも、同じように式だ。</p>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>ここに、言語ベースのインターフェースの素晴らしさが現れている。ある式が他の式を含み得るというのは、人間の言語が入れ子になるのと似ている。サブセンテンスがさらにサブセンテンスを含み得る、というように。このおかげで、どんな複雑な計算でも表現する式が組み立てられる。</p>
+
+<p><a class="p_ident" id="p_ttgdBP13jX" href="#p_ttgdBP13jX" tabindex="-1" role="presentation"></a>1つの式が文の断片に相当するとしたら、JavaScriptの <em>文(statement)</em> が1文全体に当たる。そして、文がリストになったのがプログラムだ。</p>
+
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a>一番単純な種類の文は、1つの式にセミコロンをくっつけたものだ。これがプログラムだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_hjwmfcgDR0" href="#c_hjwmfcgDR0" tabindex="-1" role="presentation"></a><span class="cm-number">1</span>;
+<span class="cm-operator">!</span><span class="cm-atom">false</span>;</pre>
+
+<p><a class="p_ident" id="p_gWstW3nH5w" href="#p_gWstW3nH5w" tabindex="-1" role="presentation"></a>とはいえこれは使い道のないプログラムだ。式はただ値を生み出すだけで、それを周囲のコードが使うことになる。ある文はそれ自体が独立したものだ。だから、世界に影響を与えてこそ意味がある。スクリーンに何かを表示するかもしれないし(これも世界を変えることだ)、マシーン内部の状態を変更してその後の文に影響を与えるかもしれない。こういう変更は <em>副作用(side effect)</em> と呼ばれる。前の例での文は単に<code>1</code> と <code>true</code> という値を生み出して、すぐに捨ててしまうだけだった。これは世界に何の驚きも残さないだろう。このプログラムを走らせてみても目に見える変化は起こらない。</p>
+
+<p>場合によっては、JavaScriptでは文末のセミコロンを省略してもいい。一方で、なければならない場合もある。そうしなければ次の文が同じ文の一部として扱われることになるんだ。どういう場合に安全に省略できるかのルールは、ちょっと複雑でエラーが起こりやすい。この本では、セミコロンが必要な全ての文には、付けることにした。君も同じようにすることをすすめる。少なくとも、セミコロンをつけないことについて細かいところは学んでしまうまでは。</p>
+
+<h2><a class="h_ident" id="h_WytDIhMAVw" href="#h_WytDIhMAVw" tabindex="-1" role="presentation"></a>バインディング(Bindings)</h2>
+
+<p><a class="p_ident" id="p_fmeTWtR0mp" href="#p_fmeTWtR0mp" tabindex="-1" role="presentation"></a>プログラムはどうやって内部の状態をキープしておくのか?どうやって物事を覚えておくのか?これまで古い値から新しい値を生み出す方法は見てきた。でも、これは古い値を変更することではないし、新しい値はすぐ使われるかまた消え去るだけだった。値をつかまえて保持しておくためにJavaScriptには <em>バインディング(binding)</em> もしくは <em>変数(variable)</em> というものがある。 (訳注: バインディングは束縛と訳されることもありますが、値に結びつけられたタコの手というイメージが束縛という言葉に合わないと判断し、バインディングを採用しています。)</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_aT9yLxdY/V" href="#c_aT9yLxdY/V" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">caught</span> <span class="cm-operator">=</span> <span class="cm-number">5</span> <span class="cm-operator">*</span> <span class="cm-number">5</span>;</pre>
+
+<p><a class="p_ident" id="p_0XjWYpHnFw" href="#p_0XjWYpHnFw" tabindex="-1" role="presentation"></a>これが2種類目の文だ。この特別な単語( <em>keyword</em> ) <code>let</code> は、この文がバインディングを定義するという意味だ。 <code>let</code> にはバインディングの名前が続き、その場で値を与えたければ、さらに <code>=</code> 演算子と値を続ける。</p>
+
+<p><a class="p_ident" id="p_zK0bHLrYOB" href="#p_zK0bHLrYOB" tabindex="-1" role="presentation"></a>上の文では <code>caught</code> というバインディングが作られ5×5の結果をつかまえておくために使われる。</p>
+
+<p>バインディングを定義したら、その名前を式として使えるようになる。その式の値は、バインディングがその時につかまえている値となる。これがその例だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_FfLIqaoaFx" href="#c_FfLIqaoaFx" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">ten</span> <span class="cm-operator">=</span> <span class="cm-number">10</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">ten</span> <span class="cm-operator">*</span> <span class="cm-variable">ten</span>);
+<span class="cm-comment">// → 100</span></pre>
+
+<p>あるバインディングがある値を指していても、その値に永遠に結びつけられているわけではない。<code>=</code>演算子は存在するバインディングに対していつでも使えて、現在の値から切り離したり、新しい値を指すようにもできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_FiZBrHz3CX" href="#c_FiZBrHz3CX" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">mood</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;light&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">mood</span>);
+<span class="cm-comment">// → light</span>
+<span class="cm-variable">mood</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;dark&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">mood</span>);
+<span class="cm-comment">// → dark</span></pre>
+
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>バインディングは箱というよりは触手だと想像すればいい。値を <em>含む</em> のではなくて、 <em>つかんで</em> いる。だから2つのバインディングが同じ値を参照することもある。プログラムは参照されている値だけにアクセスができる。何かを覚えておく必要があるときは、新しく触手を伸ばしてつかむか、既に存在する触手をつかみ変えるかだ。</p>
+
+<p><a class="p_ident" id="p_y2wGde7xNs" href="#p_y2wGde7xNs" tabindex="-1" role="presentation"></a>もう1つ例を見てみよう。Luigiが君に何ドル借りてるか覚えるために、バインディングを作る。彼が35ドル返してくれたら、バインディングに新しい値を与える。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_UpFQBNACng" href="#c_UpFQBNACng" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">luigisDebt</span> <span class="cm-operator">=</span> <span class="cm-number">140</span>;
+<span class="cm-variable">luigisDebt</span> <span class="cm-operator">=</span> <span class="cm-variable">luigisDebt</span> <span class="cm-operator">-</span> <span class="cm-number">35</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">luigisDebt</span>);
+<span class="cm-comment">// → 105</span></pre>
+
+<p>バインディングの定義だけして値を与えないと、触手は掴むものがなくて空中をさまようことになる。空のバインディングの値を問い合わせると、 <code>undefined</code> という値が返ってくるだろう。</p>
+
+<p>1つの <code>let</code> 宣言でたくさんのバインディングを定義することもできる。この場合の定義はコンマで分けないといけない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_pT4pqev8kx" href="#c_pT4pqev8kx" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">one</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>, <span class="cm-def">two</span> <span class="cm-operator">=</span> <span class="cm-number">2</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">one</span> <span class="cm-operator">+</span> <span class="cm-variable">two</span>);
+<span class="cm-comment">// → 3</span></pre>
+
+<p><code>var</code> や <code>const</code> も <code>let</code> と同じようにバインディングを作り出すのに使える。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_8QmBe23E5V" href="#c_8QmBe23E5V" tabindex="-1" role="presentation"></a><span class="cm-keyword">var</span> <span class="cm-def">name</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;Ayda&quot;</span>;
+<span class="cm-keyword">const</span> <span class="cm-def">greeting</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;Hello &quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">greeting</span> <span class="cm-operator">+</span> <span class="cm-variable">name</span>);
+<span class="cm-comment">// → Hello Ayda</span></pre>
+
+<p><a class="p_ident" id="p_VUg0Fw1h6Y" href="#p_VUg0Fw1h6Y" tabindex="-1" role="presentation"></a>1つ目の <code>var</code>(“variable”の省略形) は2015年以前のJavaScriptではバインディングを宣言する唯一の方法だった。<a href="03_functions.html">次の章</a>では <code>let</code> とは厳密には何が違うのか見てみよう。今のところ、ほとんど同じことをすると覚えておこう。ただ、 <code>var</code> にはややこしい性質もあるから、この本ではほとんど使わない。</p>
+
+<p><a class="p_ident" id="p_2BDKllojbG" href="#p_2BDKllojbG" tabindex="-1" role="presentation"></a><code>const</code>は <em>定数(constant)</em> という意味だ。これは生きている限り同じ値を指しつづける。後で簡単に参照できるように、ある値に名前を付けておくようなバインディングに便利だ。</p>
+
+<h2><a class="h_ident" id="h_ABGaUxry1s" href="#h_ABGaUxry1s" tabindex="-1" role="presentation"></a>バインディングの名前</h2>
+
+<p>バインディングの名前はどんな言葉でもいい。数字を入れてもいい(例えば <code>catch22</code> も有効だ)けど、数字で始まってはいけない。ドル記号( <code>$</code> )やアンダースコア( <code>_</code> )を入れてもいいけど、それ以外の記号はだめだ。</p>
+
+<p><a class="p_ident" id="p_v4GgsG3a+N" href="#p_v4GgsG3a+N" tabindex="-1" role="presentation"></a><code>let</code> のように特別な意味の言葉は <em>キーワード(keyword)</em> で、バインディングの名前としては使えない。いくつかの言葉は将来のバージョンのJavaScriptのために&quot;予約されて&quot;いて、これも使えない。キーワードと予約語のフルリストはけっこう長い。</p>
+
+<pre class="snippet cm-s-default" data-language="text/plain" ><a class="c_ident" id="c_7BGolnv7qC" href="#c_7BGolnv7qC" tabindex="-1" role="presentation"></a>break case catch class const continue debugger default
+delete do else enum export extends false finally for
+function if implements import interface in instanceof let
+new package private protected public return static super
+switch this throw true try typeof var void while with yield</pre>
+
+<p>このリストを覚えるのか、なんて心配しなくていい。バインディングを作ってみて予想しない文法エラーが起こったら、予約キーワードを使おうとしてないか確認すればいい。</p>
+
+<h2><a class="h_ident" id="h_x66MKNqmxx" href="#h_x66MKNqmxx" tabindex="-1" role="presentation"></a>環境(The environment)</h2>
+
+<p><a class="p_ident" id="p_xuRU2WDfSE" href="#p_xuRU2WDfSE" tabindex="-1" role="presentation"></a>ある瞬間に存在するバインディングの集まりとその値を <em>環境(environment)</em> と呼ぶ。プログラムが走りだした時から、環境は空ではなくなる。言語標準の一部になっているバインディングがいつでも含まれているし、たいていは周囲のシステムとやり取りする方法を提供するバインディングもあるはずだ。例えば、ブラウザーには、読み込まれたウェブサイトとやり取りしたり、マウスやキーボードの入力を読み込んだりするための関数がある。</p>
+
+<h2><a class="h_ident" id="h_QuSTYH0JSK" href="#h_QuSTYH0JSK" tabindex="-1" role="presentation"></a>関数</h2>
+
+<p><a class="p_ident" id="p_dUI4N+jNwv" href="#p_dUI4N+jNwv" tabindex="-1" role="presentation"></a>デフォルトの環境が提供する値には <em>関数(function)</em> 型のものが多い。関数とは、プログラムの断片を値としてラッピングしたものだ。そしてこの値は、ラッピングされたプログラムを実行するために、 <em>適用(apply)</em> できる。例えば、ブラウザの環境では、 <code>prompt</code> バインディングが、ダイアログボックスを表示してユーザーの入力を要求する関数を保持している。以下のように使う。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_QSUssd4nHv" href="#c_QSUssd4nHv" tabindex="-1" role="presentation"></a><span class="cm-variable">prompt</span>(<span class="cm-string">&quot;Enter passcode&quot;</span>);</pre><figure><img src="img/prompt.png" alt="A prompt dialog"></figure>
+
+<p><a class="p_ident" id="p_SqxG+GVHsa" href="#p_SqxG+GVHsa" tabindex="-1" role="presentation"></a>関数の実行は、 <em>生起(invoking)</em> , <em>呼び出し(calling)</em> , <em>適用(applying)</em> などと呼ばれる。関数型の値を生み出す式の後ろにカッコをつければ関数を呼び出せる。たいていは、その関数をつかまえているバインディングの名前を使う。カッコに囲まれた値はその関数の中身のプログラムに渡される。上の例では、 <code>prompt</code> 関数は渡された文字列をダイアログボックスに表示するテキストとして使う。関数に渡される値を <em>引数(argument)</em> と呼ぶ。関数が違えば、要求する引数の数や型が違う。</p>
+
+<p><code>prompt</code> 関数は、今時のウェブプログラミングではあまり使われない。ダイアログボックスの見た目をコントロールできないのが主な理由だ。でも、ちょっとしたプログラムや実験の助けにはなる。</p>
+
+<h2><a class="h_ident" id="h_9rFGpNPlZ8" href="#h_9rFGpNPlZ8" tabindex="-1" role="presentation"></a>console.log関数</h2>
+
+<p><a class="p_ident" id="p_GQUxvZqMJi" href="#p_GQUxvZqMJi" tabindex="-1" role="presentation"></a>これまでの例では、結果を表示するのに <code>console.log</code> を使ってきた。たいていのJavaScriptシステム(全てのモダンブウラザやNode.js)では <code>console.log</code> が使えて、 <em>何かしらの</em> テキスト表示デバイスに引数を書き出してくれる。ブラウザでは結果はJavaScriptコンソールに表示される。コンソールはデフォルトでは隠されているけど、たいていのブラウザではF12キーで開く(Macだったら、<span class="keyname">command</span>-<span class="keyname">option</span>-I)。これで上手くいかなかったら、メニューからデベロッパーツール(Developer Tools)や似たような名前のアイテムを探す。</p>
+
+<p>この本の例を実行すると <code>console.log</code> の結果は例に続いて表示される(ブラウザのJavaScriptコンソールではなく)。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_TuaqUrwlKB" href="#c_TuaqUrwlKB" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;the value of x is&quot;</span>, <span class="cm-variable">x</span>);
+<span class="cm-comment">// → the value of x is 30</span></pre>
+
+<p><a class="p_ident" id="p_G2RTiSRzpG" href="#p_G2RTiSRzpG" tabindex="-1" role="presentation"></a>バインディングの名前にピリオド文字は使えないはずなのに、 <code>console.log</code> には含まれている。これは <code>console.log</code> がただのバインディングではないからだ。この式は <code>console</code> バインディングから <code>log</code> プロパティを取り出しているんだ。これがどういう意味なのか<a href="04_data.html#properties">4</a>章で詳しく見ていく。</p>
+
+<h2 id="return_values"><a class="h_ident" id="h_VUEd8dAOVW" href="#h_VUEd8dAOVW" tabindex="-1" role="presentation"></a>返り値(Return values)</h2>
+
+<p>ダイアログボックスを表示したり、スクリーンにテキストを書き出すのは、 <em>副作用(side effect)</em> だ。多くの関数は、生み出す副作用のおかげで使い道がある。値を生み出すための関数もあって、その場合は副作用がなくても使い道がある。例えば、 <code>Math.max</code> 関数はいくらでも引数を受け取って、その中で最大のものを返す。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_PEuTYZX6NI" href="#c_PEuTYZX6NI" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">max</span>(<span class="cm-number">2</span>, <span class="cm-number">4</span>));
+<span class="cm-comment">// → 4</span></pre>
+
+<p><a class="p_ident" id="p_3Wwe0zbX5P" href="#p_3Wwe0zbX5P" tabindex="-1" role="presentation"></a>関数が値を生み出すとき、値を <em>返す(return)</em> と表現する。JavaScriptでは値を生み出すものは何でも式だから、大きい式の一部として関数呼び出しを使うこともできる。以下の例では、 <code>Math.min</code> ( <code>Math.max</code> の反対)の呼び出しが足し算の式の一部として使われている。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_V4eUUr1Irj" href="#c_V4eUUr1Irj" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">min</span>(<span class="cm-number">2</span>, <span class="cm-number">4</span>) <span class="cm-operator">+</span> <span class="cm-number">100</span>);
+<span class="cm-comment">// → 102</span></pre>
+
+<p><a href="03_functions.html">次の章</a>では、自分で関数を書く方法を説明する。</p>
+
+<h2><a class="h_ident" id="h_VdgRI4rNc2" href="#h_VdgRI4rNc2" tabindex="-1" role="presentation"></a>制御フロー</h2>
+
+<p><a class="p_ident" id="p_Q5/mP8yfxQ" href="#p_Q5/mP8yfxQ" tabindex="-1" role="presentation"></a>あるプログラムに2つ以上の文が含まれ場合には、物語と同じように上から下へ順番に実行されていく。以下のプログラム例には2つの文がある。1つ目はユーザーに数字を要求して、2つ目が次に実行されて、その数字の2乗を表示する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_6hF1Rg3sJ/" href="#c_6hF1Rg3sJ/" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">theNumber</span> <span class="cm-operator">=</span> <span class="cm-variable">Number</span>(<span class="cm-variable">prompt</span>(<span class="cm-string">&quot;Pick a number&quot;</span>));
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Your number is the square root of &quot;</span> <span class="cm-operator">+</span>
+            <span class="cm-variable">theNumber</span> <span class="cm-operator">*</span> <span class="cm-variable">theNumber</span>);</pre>
+
+<p>ここで <code>Number</code> 関数は値を数字へ変換している。なぜ変換が必要かというと、　<code>prompt</code> の結果は文字列になるけど、ここでは数字がほしいからだ。似た関数には <code>String</code> や <code>Boolean</code> があって、それぞれ値をその型に変換する。</p>
+
+<p>直線的な制御フローの概略図は(あまり意味はないけど)以下の通りだ。</p><figure><img src="img/controlflow-straight.svg" alt="Trivial control flow"></figure>
+
+<h2><a class="h_ident" id="h_XUQfa1lVRn" href="#h_XUQfa1lVRn" tabindex="-1" role="presentation"></a>条件付きの実行</h2>
+
+<p><a class="p_ident" id="p_wpz5oi2dy7" href="#p_wpz5oi2dy7" tabindex="-1" role="presentation"></a>全てのプログラムが直線的に進むわけではない。例えば、枝分かれする道を作ることもできる(その時々の状況に適した道を選ぶようなものだ)。これを <em>条件付きの実行(Conditional execution)</em> と呼ぶ。</p><figure><img src="img/controlflow-if.svg" alt="Conditional control flow"></figure>
+
+<p><a class="p_ident" id="p_qEK82lpY3H" href="#p_qEK82lpY3H" tabindex="-1" role="presentation"></a>JavaScriptでは、条件付きの実行を <code>if</code> キーワードで書く。単純なケースとして、ある条件が満たされているときにだけ、あるコードを実行したい場合がある。例えば、入力された値が本当に数値だった場合だけ、入力値の2乗を表示したいとしよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_D0zJWB8mO1" href="#c_D0zJWB8mO1" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">theNumber</span> <span class="cm-operator">=</span> <span class="cm-variable">Number</span>(<span class="cm-variable">prompt</span>(<span class="cm-string">&quot;Pick a number&quot;</span>));
+<span class="cm-keyword">if</span> (<span class="cm-operator">!</span><span class="cm-variable">Number</span>.<span class="cm-property">isNaN</span>(<span class="cm-variable">theNumber</span>)) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Your number is the square root of &quot;</span> <span class="cm-operator">+</span>
+              <span class="cm-variable">theNumber</span> <span class="cm-operator">*</span> <span class="cm-variable">theNumber</span>);
+}</pre>
+
+<p><a class="p_ident" id="p_q5pBj5KOXK" href="#p_q5pBj5KOXK" tabindex="-1" role="presentation"></a>この修正によって、もし“parrot”と入力しても、何も表示されないようになった。</p>
+
+<p><code>if</code> キーワードは、真偽値式の値によって、文を実行したりスキップしたりする。この決定をするための式は <code>if</code> キーワードの後のカッコ内に書かれる。そして、実行するべき文が続く。</p>
+
+<p><a class="p_ident" id="p_/S7SZx0Kr4" href="#p_/S7SZx0Kr4" tabindex="-1" role="presentation"></a><code>Number.isNaN</code> は標準のJavaScript関数で、引数が <code>NaN</code> の場合にのみ <code>true</code> を返すものだ。 <code>Number</code> 関数は数値として解釈できない文字列を受け取ると <code>NaN</code> を返す。だから上の条件は「 <code>theNumber</code> が数値でない(NaN)ならば、これをしろ」というように翻訳できる。</p>
+
+<p><a class="p_ident" id="p_3bKAjbMzV7" href="#p_3bKAjbMzV7" tabindex="-1" role="presentation"></a>上の例では、 <code>if</code> に続く文は波カッコ( <code>{</code> と <code>}</code> )で囲まれていた。波カッコは、いくつもの文を、 <em>ブロック(block)</em> と呼ばれる1つの文にまとめる。上の例では、1つの式しか波カッコ内にないから、波カッコを省略することもできる。必要かどうか考えずに済むように、たいていのJavaScriptプログラマーは毎回波カッコを付ける。この本では基本的にこの習慣に従うけど、たまにワンライナー(1行の <code>if</code> 文)で使う。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/Ndk5rqq2Z" href="#c_/Ndk5rqq2Z" tabindex="-1" role="presentation"></a><span class="cm-keyword">if</span> (<span class="cm-number">1</span> <span class="cm-operator">+</span> <span class="cm-number">1</span> <span class="cm-operator">==</span> <span class="cm-number">2</span>) <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;It's true&quot;</span>);
+<span class="cm-comment">// → It's true</span></pre>
+
+<p><a class="p_ident" id="p_qDxEnJELVa" href="#p_qDxEnJELVa" tabindex="-1" role="presentation"></a>条件が合致したときに実行するコードだけではなくて、その他の場合を扱うコードがほしいこともある。このもう1つの道は、上の図での2つ目の矢印のようなものだ。 <code>if</code> と一緒に <code>else</code> キーワードを使うことで、2つの分かれ道を作ることができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_kLpqX2fnaC" href="#c_kLpqX2fnaC" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">theNumber</span> <span class="cm-operator">=</span> <span class="cm-variable">Number</span>(<span class="cm-variable">prompt</span>(<span class="cm-string">&quot;Pick a number&quot;</span>));
+<span class="cm-keyword">if</span> (<span class="cm-operator">!</span><span class="cm-variable">Number</span>.<span class="cm-property">isNaN</span>(<span class="cm-variable">theNumber</span>)) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Your number is the square root of &quot;</span> <span class="cm-operator">+</span>
+              <span class="cm-variable">theNumber</span> <span class="cm-operator">*</span> <span class="cm-variable">theNumber</span>);
+} <span class="cm-keyword">else</span> {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Hey. Why didn't you give me a number?&quot;</span>);
+}</pre>
+
+<p><a class="p_ident" id="p_6uD2BfYk5U" href="#p_6uD2BfYk5U" tabindex="-1" role="presentation"></a>もし3つ以上の選択肢があるなら、いくつかの <code>if</code> と <code>else</code> のペアーを&quot;チェイン(chain)”してもいい。以下がその例だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_QrvIive0zT" href="#c_QrvIive0zT" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">num</span> <span class="cm-operator">=</span> <span class="cm-variable">Number</span>(<span class="cm-variable">prompt</span>(<span class="cm-string">&quot;Pick a number&quot;</span>));
+
+<span class="cm-keyword">if</span> (<span class="cm-variable">num</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Small&quot;</span>);
+} <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable">num</span> <span class="cm-operator">&lt;</span> <span class="cm-number">100</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Medium&quot;</span>);
+} <span class="cm-keyword">else</span> {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Large&quot;</span>);
+}</pre>
+
+<p><a class="p_ident" id="p_o0ppuYdtVU" href="#p_o0ppuYdtVU" tabindex="-1" role="presentation"></a>上のプログラムは、 <code>num</code> が10より小さいかチェックして、もしそうなら <code>&quot;Small&quot;</code> を表示する分岐に進んで、終了する。そうでなければ、 <code>else</code> の分岐に進む。その分岐自体にも2つ目の条件(<code>&lt; 100</code>)があって、この条件に合致するなら <code>num</code> は10と100の間の数だ。だから <code>&quot;Medium&quot;</code> が表示される。そうでなければ、最後の <code>else</code> 分岐が選ばれる。</p>
+
+<p>上のプログラムの概略式は以下のように書ける。</p><figure><img src="img/controlflow-nested-if.svg" alt="Nested if control flow"></figure>
+
+<h2 id="loops"><a class="h_ident" id="h_WdZACasjEn" href="#h_WdZACasjEn" tabindex="-1" role="presentation"></a>whileとdoのループ</h2>
+
+<p><a class="p_ident" id="p_56Q9x8C+H4" href="#p_56Q9x8C+H4" tabindex="-1" role="presentation"></a>0から12の間の全ての偶数を表示するプログラムを考えてみよう。1つは以下のように書く方法だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_NiH5lbw9eg" href="#c_NiH5lbw9eg" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">0</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">2</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">4</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">6</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">8</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">10</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">12</span>);</pre>
+
+<p><a class="p_ident" id="p_6QAw2tH71f" href="#p_6QAw2tH71f" tabindex="-1" role="presentation"></a>これでも動きはする。でもプログラム書くことの理想は作業を <em>少なく</em> することだ。もし1000より小さい偶数が全て必要だったら、このアプローチでは上手くいかない。必要なのはあるコードの部品を何度も実行する仕組みだ。こういう制御フローのことを <em>ループ(loop)</em> と呼ぶ。</p><figure><img src="img/controlflow-loop.svg" alt="Loop control flow"></figure>
+
+<p>ループという制御フローのおかげで、現在のプログラムの状態を持ったまま、ある時点に戻って再実行することができる。数えるためのバインディングとループを組み合わせれば、以下のようなことができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_jr3IOcnSzK" href="#c_jr3IOcnSzK" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">number</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+<span class="cm-keyword">while</span> (<span class="cm-variable">number</span> <span class="cm-operator">&lt;=</span> <span class="cm-number">12</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">number</span>);
+  <span class="cm-variable">number</span> <span class="cm-operator">=</span> <span class="cm-variable">number</span> <span class="cm-operator">+</span> <span class="cm-number">2</span>;
+}
+<span class="cm-comment">// → 0</span>
+<span class="cm-comment">// → 2</span>
+<span class="cm-comment">//   … などなど</span></pre>
+
+<p><code>while</code> キーワードで始まる文はループを作る。 <code>if</code> と同じように <code>while</code> にはカッコ内の式と、文が続く。 <code>while</code> は、式が真偽値に変換したときに <code>true</code> と評価される値を生み出している限りは、波カッコ内の文を繰り返す。</p>
+
+<p><a class="p_ident" id="p_Ph3DtL+xPq" href="#p_Ph3DtL+xPq" tabindex="-1" role="presentation"></a>上の例では <code>number</code> バインディングが、プログラムの進捗をバインディングで追いかける方法を示している。ループが繰り返される度に、 <code>number</code> は以前より2大きい値になる。繰り返しの開始時点で <code>number</code> は12と比較されて、プログラムの仕事が終わったかどうか判断される。</p>
+
+<p><a class="p_ident" id="p_8ujVdJs2wW" href="#p_8ujVdJs2wW" tabindex="-1" role="presentation"></a>実際に役に立つプログラムの例として、 2<sup>10</sup> (2の10乗)を計算して表示するプログラムを書いてみよう。ここでは2つのバインディングを使う。1つは、計算結果を追いかけるため、もう1つはこの結果に何回2をかけたか数えるためのものだ。このループでは2つ目のバインディングが10に到達したかテストして、まだだったら両方のバインディングをアップデートする。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_9AxUm9n4M9" href="#c_9AxUm9n4M9" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+<span class="cm-keyword">let</span> <span class="cm-def">counter</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+<span class="cm-keyword">while</span> (<span class="cm-variable">counter</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>) {
+  <span class="cm-variable">result</span> <span class="cm-operator">=</span> <span class="cm-variable">result</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>;
+  <span class="cm-variable">counter</span> <span class="cm-operator">=</span> <span class="cm-variable">counter</span> <span class="cm-operator">+</span> <span class="cm-number">1</span>;
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">result</span>);
+<span class="cm-comment">// → 1024</span></pre>
+
+<p><a class="p_ident" id="p_MRQRpXOQNK" href="#p_MRQRpXOQNK" tabindex="-1" role="presentation"></a>上の <code>counter</code> は <code>1</code> から始めて、 <code>&lt;=10</code> でテストしてもいい。でも、理由は<a href="04_data.html#array_indexing">4</a>章で説明するけど、0から数え上げるのになれた方がいい。</p>
+
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a><code>do</code> ループは <code>while</code> ループに似た制御構造だ。違いは1つで、 <code>do</code> ループは少なくとも1回は必ず中身を実行してから、終了するべきかテストする。この性質を反映してテストはループの中身の後にくる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Rdlc+hwgyM" href="#c_Rdlc+hwgyM" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">yourName</span>;
+<span class="cm-keyword">do</span> {
+  <span class="cm-variable">yourName</span> <span class="cm-operator">=</span> <span class="cm-variable">prompt</span>(<span class="cm-string">&quot;Who are you?&quot;</span>);
+} <span class="cm-keyword">while</span> (<span class="cm-operator">!</span><span class="cm-variable">yourName</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">yourName</span>);</pre>
+
+<p>このプログラムは君に名前の入力を強制する。空の文字列ではないものを受け取るまで何度も聞き続けるんだ。 <code>!</code> 演算子を適用された値は、真偽を反転する前にまず真偽値に変換される。このとき <code>&quot;&quot;</code> 以外の全ての文字列は <code>true</code> に変換される。というわけで、空以外の名前が入力されるまでは、ループは回り続けることになるんだ。</p>
+
+<h2><a class="h_ident" id="h_oXEh4OPAdi" href="#h_oXEh4OPAdi" tabindex="-1" role="presentation"></a>コードのインデント(Indenting Code)</h2>
+
+<p>これまでの例で、より大きい文の一部になっている文の前にはスペースを入れてきた。このスペースは必須ではなくて、なかったとしてもコンピュータはプログラムを受け入れてくれる。実際のところ、改行さえコンピュータにとってもはどちらでもいい。長い1行にプログラムを書くことだってできる。もしそうしたければ。</p>
+
+<p><a class="p_ident" id="p_umJ0MEh8Zv" href="#p_umJ0MEh8Zv" tabindex="-1" role="presentation"></a>ブロックの内側をインデントすることの役割はコードの構造を目立たせることだ。ブロックの中に別のブロックが展開するようなコードでは、ブロックの始まりと終わりが分かりづらくなる。規則正しくインデントすれば、プログラムの見かけがブロックの構造に対応する。個人的には、ブロックが始まるごとにスペース2つのインデントが好きだが、好みは人による。4つのスペースやタブ文字を使う人もいる。重要なのは、それぞれのブロックに対して同じスペースを加えることだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Dmd8L2VV0d" href="#c_Dmd8L2VV0d" tabindex="-1" role="presentation"></a><span class="cm-keyword">if</span> (<span class="cm-atom">false</span> <span class="cm-operator">!=</span> <span class="cm-atom">true</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;That makes sense.&quot;</span>);
+  <span class="cm-keyword">if</span> (<span class="cm-number">1</span> <span class="cm-operator">&lt;</span> <span class="cm-number">2</span>) {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;No surprise there.&quot;</span>);
+  }
+}</pre>
+
+<p>たいていのコードエディター(この本のものを含む)は、自動的に新しい行に適度なインデントをしてくれる。</p>
+
+<h2><a class="h_ident" id="h_6QVZZW/m3K" href="#h_6QVZZW/m3K" tabindex="-1" role="presentation"></a>forループ</h2>
+
+<p><a class="p_ident" id="p_RYeW5OljoW" href="#p_RYeW5OljoW" tabindex="-1" role="presentation"></a>たいていのループは <code>while</code> の例と同じパターンに従う。まず、&quot;カウンター(counter)”バインディングがループの進捗を追いかけるために作られる。それから <code>while</code> ループがくる。たいていはテスト式がカウンターが終了に達しているかチェックする。ループ本体の最後ではカウンターが更新される。</p>
+
+<p>このパターンはあまりにも共通しているから、JavaScriptや似た言語には、もっと短くてもっと幅広く使える形式がある。それは <code>for</code> ループだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_7QeZZqjFdm" href="#c_7QeZZqjFdm" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">number</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">number</span> <span class="cm-operator">&lt;=</span> <span class="cm-number">12</span>; <span class="cm-variable">number</span> <span class="cm-operator">=</span> <span class="cm-variable">number</span> <span class="cm-operator">+</span> <span class="cm-number">2</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">number</span>);
+}
+<span class="cm-comment">// → 0</span>
+<span class="cm-comment">// → 2</span>
+<span class="cm-comment">//   … などなど</span></pre>
+
+<p><a class="p_ident" id="p_qkpfgSXyNB" href="#p_qkpfgSXyNB" tabindex="-1" role="presentation"></a>このプログラムは<a href="02_program_structure.html#loops">前に出てきた</a>偶数を出力するプログラムと全く同等のものだ。唯一の違いは、&quot;状態(state)”に関係する全ての文が、 <code>for</code> の次に集められていることだ。</p>
+
+<p><a class="p_ident" id="p_xjqFOOL9R1" href="#p_xjqFOOL9R1" tabindex="-1" role="presentation"></a><code>for</code> キーワードに続くカッコ内には2つのセミコロンが必要だ。1つ目のセミコロンの前の部分では式が <em>初期化(initialize)</em> される。セミコロンの間の部分では、ループを継続するべきか <em>チェック(check)</em> される。最後の部分では、ループの各回の終わりに、ループの状態が <em>更新(update)</em> される。たいていの場合、 <code>for</code> の方が <code>while</code> 構文よりも短く見通しよく書ける。</p>
+
+<p><a class="p_ident" id="p_E13r1INwJr" href="#p_E13r1INwJr" tabindex="-1" role="presentation"></a>以下は、 2<sup>10</sup> を計算するコードを、 <code>while</code> ではなくて、 <code>for</code> を使って書いたものだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_BPd5Bl+eyt" href="#c_BPd5Bl+eyt" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+<span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">counter</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">counter</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>; <span class="cm-variable">counter</span> <span class="cm-operator">=</span> <span class="cm-variable">counter</span> <span class="cm-operator">+</span> <span class="cm-number">1</span>) {
+  <span class="cm-variable">result</span> <span class="cm-operator">=</span> <span class="cm-variable">result</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>;
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">result</span>);
+<span class="cm-comment">// → 1024</span></pre>
+
+<h2><a class="h_ident" id="h_EbAqMr11y6" href="#h_EbAqMr11y6" tabindex="-1" role="presentation"></a>ループから抜け出す</h2>
+
+<p>ループの条件が <code>false</code> になる以外にもループを終える方法がある。それは <code>break</code> と呼ばれる特別な文で、囲まれているループからすぐに脱出するという効果を持つ。</p>
+
+<p><a class="p_ident" id="p_rD5dRfPR87" href="#p_rD5dRfPR87" tabindex="-1" role="presentation"></a>以下のプログラムでは <code>break</code> の効果を説明している。ここでは、20以上かつ7で割り切れるような最初の数字を探している。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_G/xQzCJ2hv" href="#c_G/xQzCJ2hv" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">current</span> <span class="cm-operator">=</span> <span class="cm-number">20</span>; ; <span class="cm-variable">current</span> <span class="cm-operator">=</span> <span class="cm-variable">current</span> <span class="cm-operator">+</span> <span class="cm-number">1</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-variable">current</span> <span class="cm-operator">%</span> <span class="cm-number">7</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">current</span>);
+    <span class="cm-keyword">break</span>;
+  }
+}
+<span class="cm-comment">// → 21</span></pre>
+
+<p><a class="p_ident" id="p_tlifxqsNyC" href="#p_tlifxqsNyC" tabindex="-1" role="presentation"></a>余り( <code>%</code> )演算子を使うと、ある数字がもう一方の数字で割り切れるか簡単に調べられる。割り切れる場合には、余りが0になるからだ。</p>
+
+<p>上の例の <code>for</code> 構文にはループを終えるかテストする部分がない。これはループの内側にある <code>break</code> 文が実行されない限りループが止まらないということだ。</p>
+
+<p><a class="p_ident" id="p_8AjLpQaD5L" href="#p_8AjLpQaD5L" tabindex="-1" role="presentation"></a>もし、 <code>break</code> 文を取り除いたり、間違って常に <code>true</code> の終了条件を書いてしまったら、プログラムは <em>無限ループ(infinite loop)</em> にはまる。無限ループにはまったプログラムは実行が終らなくなる。たいていの場合、これは悪いことだ。</p>
+
+<p>この本の中のプログラムをいじっていて無限ループを作ってしまったら、数秒後にスクリプトを停止するかどうか聞かれるだろう。これが失敗したときは作業しているタブを閉じるか、(ブラウザによっては)ブラウザ自体を閉じないといけない。</p>
+
+<p><code>continue</code> キーワードは <code>break</code> と似ている。ループの進捗に影響するという点でだ。 <code>continue</code> がループ本体に現れると、制御はループ本体からいったん抜けて、ループの次のイテレーションを開始する。 (訳注: イテレーションとはループの各回のこと)</p>
+
+<h2><a class="h_ident" id="h_nAZ5teHQYR" href="#h_nAZ5teHQYR" tabindex="-1" role="presentation"></a>バインディングを簡潔にアップデートする</h2>
+
+<p>ループさせるときには特に、現在の値に応じてバインディングを&quot;アップデート&quot;することが必要になる場合がよくある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_aegdj8V5XM" href="#c_aegdj8V5XM" tabindex="-1" role="presentation"></a><span class="cm-variable">counter</span> <span class="cm-operator">=</span> <span class="cm-variable">counter</span> <span class="cm-operator">+</span> <span class="cm-number">1</span>;</pre>
+
+<p>JavaScriptではこれをショートカットできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/XU8FyoU4+" href="#c_/XU8FyoU4+" tabindex="-1" role="presentation"></a><span class="cm-variable">counter</span> <span class="cm-operator">+=</span> <span class="cm-number">1</span>;</pre>
+
+<p>同じようなショートカットが他の演算子でもできて、 <code>result *= 2</code> は2倍にして、 <code>counter -= 1</code> はカウントダウンする。</p>
+
+<p>これで上で見た数え上げの例がさらに短くなる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_h8HkwMM+IM" href="#c_h8HkwMM+IM" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">number</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">number</span> <span class="cm-operator">&lt;=</span> <span class="cm-number">12</span>; <span class="cm-variable">number</span> <span class="cm-operator">+=</span> <span class="cm-number">2</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">number</span>);
+}</pre>
+
+<p><code>counter += 1</code> と <code>counter -= 1</code> には、さらに短い書き方もある。 <code>counter++</code> と <code>counter--</code> だ。</p>
+
+<h2><a class="h_ident" id="h_lf+Hlhs4HB" href="#h_lf+Hlhs4HB" tabindex="-1" role="presentation"></a>switchで値を割り当てる</h2>
+
+<p>以下のような見た目のコードは一般的ではない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Q96dt8DAU9" href="#c_Q96dt8DAU9" tabindex="-1" role="presentation"></a><span class="cm-keyword">if</span> (<span class="cm-variable">x</span> <span class="cm-operator">==</span> <span class="cm-string">&quot;value1&quot;</span>) <span class="cm-variable">action1</span>();
+<span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable">x</span> <span class="cm-operator">==</span> <span class="cm-string">&quot;value2&quot;</span>) <span class="cm-variable">action2</span>();
+<span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable">x</span> <span class="cm-operator">==</span> <span class="cm-string">&quot;value3&quot;</span>) <span class="cm-variable">action3</span>();
+<span class="cm-keyword">else</span> <span class="cm-variable">defaultAction</span>();</pre>
+
+<p><a class="p_ident" id="p_E7jg7dxaQp" href="#p_E7jg7dxaQp" tabindex="-1" role="presentation"></a><code>switch</code> という構文があって、上のような&quot;割り当て(dispatch)”をより直接表現できるからだ。残念ながら、JavaScriptの <code>switch</code> 構文はちょっと不自然なものだ(これはCやJava系の言語から受け継がれたものだ)。 <code>if</code> をチェインした方が見た目がいい。以下はその例だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_B7WAWZEgcU" href="#c_B7WAWZEgcU" tabindex="-1" role="presentation"></a><span class="cm-keyword">switch</span> (<span class="cm-variable">prompt</span>(<span class="cm-string">&quot;What is the weather like?&quot;</span>)) {
+  <span class="cm-keyword">case</span> <span class="cm-string">&quot;rainy&quot;</span>:
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Remember to bring an umbrella.&quot;</span>);
+    <span class="cm-keyword">break</span>;
+  <span class="cm-keyword">case</span> <span class="cm-string">&quot;sunny&quot;</span>:
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Dress lightly.&quot;</span>);
+  <span class="cm-keyword">case</span> <span class="cm-string">&quot;cloudy&quot;</span>:
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Go outside.&quot;</span>);
+    <span class="cm-keyword">break</span>;
+  <span class="cm-keyword">default</span>:
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Unknown weather type!&quot;</span>);
+    <span class="cm-keyword">break</span>;
+}</pre>
+
+<p><a class="p_ident" id="p_uJLwZ5IdIx" href="#p_uJLwZ5IdIx" tabindex="-1" role="presentation"></a><code>switch</code> で始まったブロック内では、いくつ <code>case</code> ラベルを置いてもいい。プログラムは <code>switch</code> に渡された値に合致した <code>case</code> ラベルの部分を実行する。あるいは、何も合致しなければ <code>default</code> の部分を実行する。実行は、いくつかのラベルを実行したとしても、 <code>break</code> に達するまでは続く。だから、例の“sunny”のように、ケースをまたいでコードをシェアするためにこのふるまいを使うこともできる(ここでは晴れでも曇りでも外出をすすめている)。 <code>break</code> を忘れて、実行したくないコードを実行してしまうことには注意しよう。</p>
+
+<h2><a class="h_ident" id="h_2X1zVIVOQJ" href="#h_2X1zVIVOQJ" tabindex="-1" role="presentation"></a>大文字にする</h2>
+
+<p>バインディング名にスペースは使えないけど、いくつかの単語を使って意味を明確にすると使い勝手がよくなる。いくつかの単語を含むバインディング名をどう書くかは、君次第だ。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_HtUFwP9TF9" href="#c_HtUFwP9TF9" tabindex="-1" role="presentation"></a>fuzzylittleturtle
+fuzzy_little_turtle
+FuzzyLittleTurtle
+fuzzyLittleTurtle</pre>
+
+<p><a class="p_ident" id="p_Z5Desc68VJ" href="#p_Z5Desc68VJ" tabindex="-1" role="presentation"></a>1つ目の例は読みづらい。個人的にはアンダースコア(_)を使ったものの見た目が好きだけど、これはタイプが面倒だ。標準のJavaScript関数や、たいていのJavaScriptプログラマーは1番下のやり方にしたがっている。初めの単語以外の頭を大文字にする。こういうちょっとしたことに慣れるのは難しくないし、いろいろ命名スタイルを混ぜるとうっとうしいから、この本ではこの習慣に従う。</p>
+
+<p><a class="p_ident" id="p_wd/ZbuqMwr" href="#p_wd/ZbuqMwr" tabindex="-1" role="presentation"></a>場合によっては、 <code>Number</code> 関数のように、始めの文字が大文字になっていることもある。これは関数がコンストラクターだということを表すためだ。コンストラクターが何かは<a href="06_object.html#constructors">6</a>章で明らかにする。今のところは、一貫性がないように見えてもいちいち気にしないでほしい。</p>
+
+<h2><a class="h_ident" id="h_QaYy76MINR" href="#h_QaYy76MINR" tabindex="-1" role="presentation"></a>コメント</h2>
+
+<p><a class="p_ident" id="p_EYqZiYFUic" href="#p_EYqZiYFUic" tabindex="-1" role="presentation"></a>生のコードでは人間の読み手に伝えたい情報を伝えられないことも多い。あるいは他人には理解できない暗号みたいにしか伝えないこともある。場合によっては関連するような考えを、プログラムの一部として書いておきたいこともあるだろう。こういうときのために <em>&quot;コメント(comment)”</em> がある。</p>
+
+<p><a class="p_ident" id="p_Yd3BJK10Vj" href="#p_Yd3BJK10Vj" tabindex="-1" role="presentation"></a>コメントは、プログラムに含まれるテキストだけど、コンピュータには完全に無視される。JavaScriptにはコメントを書く方法が2つある。1行のコメントを書くには、2つのスラッシュ文字(<code>//</code>)に続けてコメントのテキストを書けばいい。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/8e+JeWltg" href="#c_/8e+JeWltg" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">accountBalance</span> <span class="cm-operator">=</span> <span class="cm-variable">calculateBalance</span>(<span class="cm-variable">account</span>);
+<span class="cm-comment">// It's a green hollow where a river sings</span>
+<span class="cm-variable">accountBalance</span>.<span class="cm-property">adjust</span>();
+<span class="cm-comment">// Madly catching white tatters in the grass.</span>
+<span class="cm-keyword">let</span> <span class="cm-def">report</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Report</span>();
+<span class="cm-comment">// Where the sun on the proud mountain rings:</span>
+<span class="cm-variable">addToReport</span>(<span class="cm-variable">accountBalance</span>, <span class="cm-variable">report</span>);
+<span class="cm-comment">// It's a little valley, foaming like light in a glass.</span></pre>
+
+<p><code>//</code> でのコメントは行の終わりまでしか続かない。 <code>/*</code> と <code>*/</code> で囲まれたテキストは、改行を含んでいようが関係なく、全て無視される。これはファイルやプログラムのかたまりに対して、まとまった情報を与えるのに便利だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Y2dX9lh8tD" href="#c_Y2dX9lh8tD" tabindex="-1" role="presentation"></a><span class="cm-comment">/*</span>
+<span class="cm-comment">  I first found this number scrawled on the back of an old notebook.</span>
+<span class="cm-comment">  (初めは、この数字が古いノートの背表紙に止められているのに気づいた)</span>
+<span class="cm-comment">  Since then, it has often dropped by, showing up in phone numbers</span>
+<span class="cm-comment">  and the serial numbers of products that I've bought.</span>
+<span class="cm-comment">  (それからというもの、この数字はいろいろな所に現れるようになった。電話番号や商品のシリアルナンバーだ。)</span>
+<span class="cm-comment">  It obviously likes me, so I've decided to keep it.</span>
+<span class="cm-comment">  (どう考えてもぼくのことが好きに違いないから保存しておくことにした。)</span>
+<span class="cm-comment">*/</span>
+<span class="cm-keyword">const</span> <span class="cm-def">myNumber</span> <span class="cm-operator">=</span> <span class="cm-number">11213</span>;</pre>
+
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
+
+<p>君はプログラムが文で構成されることを知った。文はさらに他の文を含むこともある。文は、式を含むことが多く、式自体もさらに小さい式で組み立てられる。</p>
+
+<p>式を次々に並べれば、上から下に順番に実行されるプログラムができる。条件(<code>if</code> , <code>else</code> , <code>switch</code> )文やループ(<code>while</code> , <code>do</code> , <code>for</code> )文を導入すれば、上から下へのフローを乱すこともできる。</p>
+
+<p>バインディングは、データに名前をつけて取っておくのに使える。そしてプログラムの状態を追いかけるのに便利だ。環境とは、定義されているバインディングの集まりだ。JavaScriptシステムは、環境に、便利な標準バインディングをいくつも用意してくれている。</p>
+
+<p><a class="p_ident" id="p_3lwkR0WTLA" href="#p_3lwkR0WTLA" tabindex="-1" role="presentation"></a>関数はプログラムの断片をカプセル化(encapsulate)した特別な値だ。 <code>functionName(argument1, argument2)</code> と書けば、関数を呼び出せる。こうした関数の呼び出しは式なので、値を生み出すかもしれない。</p>
+
+<h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
+
+<p>(エクササイズ)</p>
+
+<p>もしもエクササイズの結果をテストする方法がわからなければ<a href="00_intro.html">導入</a>を見てほしい。</p>
+
+<p><a class="p_ident" id="p_ejmYnxbJ8x" href="#p_ejmYnxbJ8x" tabindex="-1" role="presentation"></a>各エクササイズは問題の説明から始まる。この説明を読んで、問題に取り組もう。手こずったらエクササイズの後に書いてあるヒントを読むことを検討しよう。回答はこの本には含まれていないけど、オンラインで見つけられる。 <a href="https://eloquentjavascript.net/code#2"><em>https://eloquentjavascript.net/code</em></a> エクササイズから何かを学び取りたいなら、問題を解いてから回答を見るのをすすめる。あるいは頭痛がするぐらいしっかり問題に取り組んでから。</p>
+
+<h3><a class="i_ident" id="i_umoXp9u0e7" href="#i_umoXp9u0e7" tabindex="-1" role="presentation"></a>Looping a triangle</h3>
+
+<p>(ループで三角形)</p>
+
+<p><a class="p_ident" id="p_kCujzaGIOA" href="#p_kCujzaGIOA" tabindex="-1" role="presentation"></a><code>console.log</code>を7回呼び出すループを書いて、以下の三角形を書こう。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_iAdOqXrnTq" href="#c_iAdOqXrnTq" tabindex="-1" role="presentation"></a>#
+##
+###
+####
+#####
+######
+#######</pre>
+
+<p>文字列の後に <code>.length</code> を付ければ長さが分かるということを知っておくと役に立つかもしれない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_qHvXAGuPvV" href="#c_qHvXAGuPvV" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">abc</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;abc&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">abc</span>.<span class="cm-property">length</span>);
+<span class="cm-comment">// → 3</span></pre>
+
+<p>たいていのエクササイズには、回答の元にできるコードの断片が含まれている。コードブロックをクリックして編集しよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_HRKSrZS1tJ" href="#c_HRKSrZS1tJ" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><a class="p_ident" id="p_jGwpEa81Ry" href="#p_jGwpEa81Ry" tabindex="-1" role="presentation"></a>まずは、1から7までの数字をプリントするプログラムから始めてみよう。 <code>for</code> ループを紹介した<a href="02_program_structure.html#loops">偶数を出力するプログラムの例</a>を少しいじればいい。</p>
+
+<p><a class="p_ident" id="p_JOMewKFSWn" href="#p_JOMewKFSWn" tabindex="-1" role="presentation"></a>それから数字と#文字の共通性について考えればいい。1足す1で2になるように、 <code>&quot;#&quot;</code> にもう1つ足して( <code>+= &quot;#&quot;</code> ) <code>&quot;##&quot;</code> にするんだ。つまりは答えは数字を出力するプログラムに近いものになる。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_rebKE3gdjV" href="#i_rebKE3gdjV" tabindex="-1" role="presentation"></a>FizzBuzz</h3>
+
+<p><a class="p_ident" id="p_8tGF7ShOTq" href="#p_8tGF7ShOTq" tabindex="-1" role="presentation"></a><code>console.log</code> で1から100までの数字を出力するプログラムを書こう。例外として3で割り切れる数の代わりに <code>&quot;Fizz&quot;</code> 、5で割り切れて3では割り切れない数には <code>&quot;Buzz&quot;</code> を出力する。</p>
+
+<p><a class="p_ident" id="p_HVmHS/So9r" href="#p_HVmHS/So9r" tabindex="-1" role="presentation"></a>そこまで出来たら、今度は3と5の両方で割り切れる数には <code>&quot;FizzBuzz&quot;</code> と出力するように改良しよう(3と5の片方だけで割り切れる数は <code>&quot;Fizz&quot;</code> , <code>&quot;Buzz&quot;</code> の片方だけ出力するようにしたまま)。</p>
+
+<p>(これは実際にかなりの数のプログラマーをふるい落とすと言われている面接の問題だ。これを解ければ、労働市場での価値が上がる。)</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><span class="cm-comment">// Your code here.</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><a class="p_ident" id="p_U9mavMZxuB" href="#p_U9mavMZxuB" tabindex="-1" role="presentation"></a>数字を数えるのは明らかにループの仕事で、何を表示するか選ぶのは条件付き実行に関する問題だ。余り( <code>%</code> )演算子で、ある数がもう1つの数で割り切れるかチェックするワザを忘れないように(割り切れるなら余りが0になる)。</p>
+
+<p><a class="p_ident" id="p_d95o2uzYI7" href="#p_d95o2uzYI7" tabindex="-1" role="presentation"></a>最初のバージョンでは、全ての数に対して3つの出力の可能性がある。だから <code>if</code> / <code>else if</code> / <code>else</code> のチェインを作らないといけない。</p>
+
+<p><a class="p_ident" id="p_nhQ9cw18xX" href="#p_nhQ9cw18xX" tabindex="-1" role="presentation"></a>次のバージョンでは素直なやり方と賢いやり方がある。単純な回答は、条件分岐をもう1つ増やして条件をテストすることだ。賢いやり方は、“Fizz”や“Buzz”や“FizzBuzz”を含む文字列を作っておいて、この文字列や数字を表示する方法だ。おそらくは <code>||</code> 演算子を上手く使うことによって。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_swb9JBtSQQ" href="#i_swb9JBtSQQ" tabindex="-1" role="presentation"></a>Chessboard</h3>
+
+<p>チェスボード</p>
+
+<p><a class="p_ident" id="p_6rp3kofaLm" href="#p_6rp3kofaLm" tabindex="-1" role="presentation"></a>8×8のグリッドを表す文字列を作るプログラムを書こう。列を分けるには改行文字を使う。グリッドの各ポジションにはスペースか <code>&quot;#&quot;</code> 文字を置く。この文字の並びがチェスボードを作る。</p>
+
+<p>完成した文字列を<code>console.log</code>に渡せば、以下のような出力になる。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_7yVx5TrcJ/" href="#c_7yVx5TrcJ/" tabindex="-1" role="presentation"></a> # # # #
+# # # # 
+ # # # #
+# # # # 
+ # # # #
+# # # # 
+ # # # #
+# # # #</pre>
+
+<p>このパターンを作るプログラムが出来たら、 <code>size = 8</code> というバインディングを定義して、プログラムがどんな <code>size</code> にも対応できるように(与えられたの幅と高さでグリッドを出力するように)改良しよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><span class="cm-comment">// Your code here.</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>まずは空の文字列( <code>&quot;&quot;</code> )から組み立て始めて、少しずつ文字を加えていけばいい。改行文字は <code>&quot;\n&quot;</code> と書く。</p>
+
+<p><a class="p_ident" id="p_5z5wa++8Y+" href="#p_5z5wa++8Y+" tabindex="-1" role="presentation"></a>2次元にするために、ループの中にループが必要になるだろう。両方のループの始まりと終わりが分かりやすいように波カッコで囲む。ループ本体のインデントもきちんとしてみよう。ループの順番は文字列を組み立てる順番と一緒にする(1行ずつ、左から右へ、上から下へ)。というわけで、外側のループは行を扱って、内側のループは行内の文字をコントロールする。</p>
+
+<p><a class="p_ident" id="p_wwW0b1Mdqm" href="#p_wwW0b1Mdqm" tabindex="-1" role="presentation"></a>ループの進捗を追いかけるのに2つのバインディングが必要だろう。あるポジションにスペースと <code>&quot;#&quot;</code> のどちらを置くか知るためには、2つのカウンターの和が偶数か調べる( <code>% 2</code> )といい。</p>
+
+<p>ある行に改行文字を加えて終了するのは、行が完成してからだ。だから、改行文字を足すのは内側のループが終わってから、外側のループの中でにしよう。</p>
+
+</div></div><nav><a href="01_values.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="03_functions.html" title="next chapter">▶</a></nav>
+</article>

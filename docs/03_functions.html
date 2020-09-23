@@ -1,0 +1,590 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>関数 :: Eloquent JavaScript</title>
+  <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
+  <script src="js/acorn_codemirror.js"></script>
+  <link rel=stylesheet href="css/ejs.css">
+  <script src="js/sandbox.js"></script>
+  <script src="js/ejs.js"></script><script>var chapNum = 3;</script></head>
+
+<article>
+<nav><a href="02_program_structure.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_data.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 3</span>関数</h1>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>コンピュータサイエンスは天才の業だと思われているが、現実はその反対で単純に多くの人々が、小石で石垣を作るように、互いの上に築きあげるような事をしているだけだ。</p>
+
+<footer>Donald Knuth</footer>
+
+</blockquote><figure class="chapter framed"><img src="img/chapter_picture_3.jpg" alt="Picture of fern leaves with a fractal shape"></figure>
+
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>関数はJavaScriptプログラミングにとって、パンとバターみたいに欠かせないものだ。プログラムの断片を値としてラッピングするという概念には色々使いみちがある。大きいプログラムの構造を作る方法になるし、繰り返しを減らせるし、部分的なプログラムに名前を付けられるし、部分的なプログラム同士を分離することもできる。</p>
+
+<p>関数の一番明らかな使い道は新しい語彙を定義することだ。散文で新しい言葉を作るのはたいてい悪いスタイルだけど、プログラミングには欠かせない。</p>
+
+<p><a class="p_ident" id="p_9nkc20pB5J" href="#p_9nkc20pB5J" tabindex="-1" role="presentation"></a>典型的な成人の英語話者は20,000語の語彙を持っている。20,000のコマンドが組み込まれているプログラミング言語は少ない。そして、人間の言語に比べれば、使用可能な語彙は厳密に定義されているから、柔軟性には欠ける。というわけで、繰り返しを避けるための新しい概念を導入する必要がある。</p>
+
+<h2><a class="h_ident" id="h_reb6682ms/" href="#h_reb6682ms/" tabindex="-1" role="presentation"></a>関数を定義する</h2>
+
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>関数の定義するのも、値が関数だというだけで、普通のバインディングと変わらない。例えば、以下のコードでは、 <code>square</code> バインディングを定義して、与えられた数字の2乗を返す関数を参照するようにしている。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_JW7vLBZMWv" href="#c_JW7vLBZMWv" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">square</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">x</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">x</span> <span class="cm-operator">*</span> <span class="cm-variable-2">x</span>;
+};
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">square</span>(<span class="cm-number">12</span>));
+<span class="cm-comment">// → 144</span></pre>
+
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a>関数は、 <code>function</code> キーワードでは始まる式によって作られる。関数は、いくつかのパラメーター(この場合は <code>x</code> だけだ)とボディを持つ。ボディは、関数が呼び出された時に実行される文を保持する。上のように作られる関数のボディは常に波カッコで囲まないといけない。それが1文だけで構成されていても。</p>
+
+<p>関数は複数のパラメーターを持っていてもいいし、全くパラメーターなしでもいい。以下の例では <code>makeNoise</code> はパラメーターを持たないけど、 <code>power</code> は2つ持つ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_8fTeYA4ABW" href="#c_8fTeYA4ABW" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">makeNoise</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Pling!&quot;</span>);
+};
+
+<span class="cm-variable">makeNoise</span>();
+<span class="cm-comment">// → Pling!</span>
+
+<span class="cm-keyword">const</span> <span class="cm-def">power</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">base</span>, <span class="cm-def">exponent</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">count</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">exponent</span>; <span class="cm-variable-2">count</span><span class="cm-operator">++</span>) {
+    <span class="cm-variable-2">result</span> <span class="cm-operator">*=</span> <span class="cm-variable-2">base</span>;
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">result</span>;
+};
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">power</span>(<span class="cm-number">2</span>, <span class="cm-number">10</span>));
+<span class="cm-comment">// → 1024</span></pre>
+
+<p><code>power</code> や <code>square</code> のように値を生み出す関数もあるし、値を生み出さない関数もある。 <code>makeNoise</code> の結果は副作用だけだ。 <code>return</code> 文が関数の返す値を決定する。プログラムの進んでいって <code>return</code> に出会うと、その関数から脱出して、関数を呼び出したコードに値を渡す。 <code>return</code> キーワードの後に値がなければ、関数は <code>undefined</code>を返す。 <code>makeNoise</code> のように、そもそも <code>return</code> 文自体がない関数も <code>undefined</code> を返す。</p>
+
+<p><a class="p_ident" id="p_FNxp3ioeYI" href="#p_FNxp3ioeYI" tabindex="-1" role="presentation"></a>関数のパラメーターは普通のバインディングと同じようにふるまう。ただ初期値が <em>呼び出し側(caller)</em> によって与えられるだけだ(関数自身によってではなく)。</p>
+
+<h2><a class="h_ident" id="h_4fo9HW1ufa" href="#h_4fo9HW1ufa" tabindex="-1" role="presentation"></a>バインディングとスコープ</h2>
+
+<p><a class="p_ident" id="p_6/Y7S6OhW/" href="#p_6/Y7S6OhW/" tabindex="-1" role="presentation"></a>どのバインディングにも <em>スコープ(scope)</em> がある。これは、プログラムのどの部分からそのバインディングが視えるか、ということだ。関数やブロックの外側で定義されたバインディングのスコープはプログラム全体だ。つまり、そういうバインディングはどこからでも参照できるんだ。この状態を <em>グローバル(global)</em> と呼ぶ。</p>
+
+<p><a class="p_ident" id="p_k5u0agTDZA" href="#p_k5u0agTDZA" tabindex="-1" role="presentation"></a>だけど、関数のパラメーターとして作られたバインディングや、関数の内側で定義されたバインディングはその関数の中からしか参照できない。これを <em>ローカル(local)</em> バインディングと呼ぶ。関数が呼ばれる度に、そういうバインディングの新しいインスタンスが作られる。これは関数同士の分離に役立つ。関数呼び出しがそれにぞれに小さい世界(ローカル環境)で完結して、グローバル環境で何が起こっているか知らずに理解できる場合が多い。</p>
+
+<p><a class="p_ident" id="p_oB79r/sedC" href="#p_oB79r/sedC" tabindex="-1" role="presentation"></a><code>let</code> や <code>const</code> で宣言されたバインディングは、実際のところそれが宣言された <em>ブロック(block)</em> 内部のローカルになる。ループの中で宣言したバインディングを、ループ前後のコードは &quot;視る&quot; ことができない。2015年より前のJavaScriptでは、関数でしか新しいスコープを作れなかった。つまり <code>var</code> で作られる古いスタイルのバインディングは、宣言された関数内部のどこからでも視えるし、もし関数の外で宣言されたならグローバルスコープのどこからでも視える。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_H2rhVNmEsG" href="#c_H2rhVNmEsG" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-number">10</span>;
+<span class="cm-keyword">if</span> (<span class="cm-atom">true</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">y</span> <span class="cm-operator">=</span> <span class="cm-number">20</span>;
+  <span class="cm-keyword">var</span> <span class="cm-def">z</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">x</span> <span class="cm-operator">+</span> <span class="cm-variable-2">y</span> <span class="cm-operator">+</span> <span class="cm-variable">z</span>);
+  <span class="cm-comment">// → 60</span>
+}
+<span class="cm-comment">// y はここからは視えない</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">x</span> <span class="cm-operator">+</span> <span class="cm-variable">z</span>);
+<span class="cm-comment">// → 40</span></pre>
+
+<p><a class="p_ident" id="p_7tungmQRmP" href="#p_7tungmQRmP" tabindex="-1" role="presentation"></a>それぞれのスコープは、囲まれている外のスコープを視る(“look out”)ことはできる。上の例での <code>x</code> は、ブロックの中からでも視えた。例外は複数のバインディングが同じ名前の場合だ。その場合、コードは一番内側のものだけを視ることができるんだ。例えば <code>halve</code> 関数の中のコードが <code>n</code> を参照しようとすれば、自分の <code>n</code> は視えるけど、グローバルの<code>n</code>は視えない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_5g6POeoiQv" href="#c_5g6POeoiQv" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">halve</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">n</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">n</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>;
+};
+
+<span class="cm-keyword">let</span> <span class="cm-def">n</span> <span class="cm-operator">=</span> <span class="cm-number">10</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">halve</span>(<span class="cm-number">100</span>));
+<span class="cm-comment">// → 50</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">n</span>);
+<span class="cm-comment">// → 10</span></pre>
+
+<h3 id="scoping"><a class="i_ident" id="i_YuI/YWyAJ/" href="#i_YuI/YWyAJ/" tabindex="-1" role="presentation"></a>入れ子になったスコープ</h3>
+
+<p><a class="p_ident" id="p_7iImVQUn0A" href="#p_7iImVQUn0A" tabindex="-1" role="presentation"></a>JavaScriptはバインディングを <em>グローバル(global)</em> と <em>ローカル(local)</em> だけに区別するわけじゃない。ブロックや関数の内側で、さらに他のブロックや関数を作ることもできるから、ローカルさの度合いがいろいろになるんだ。</p>
+
+<p>例えば、以下の関数はひとまとまりのフムスを作るための材料を出力するものだけど、内側にもう1つの他の関数を含んでいる。 (訳注: フムスとは中東の料理で、ひよこ豆をペーストにしてスパイスを加えたもの)</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_cOSfyI1GsW" href="#c_cOSfyI1GsW" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">hummus</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">factor</span>) {
+  <span class="cm-keyword">const</span> <span class="cm-def">ingredient</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">amount</span>, <span class="cm-def">unit</span>, <span class="cm-def">name</span>) {
+    <span class="cm-keyword">let</span> <span class="cm-def">ingredientAmount</span> <span class="cm-operator">=</span> <span class="cm-variable-2">amount</span> <span class="cm-operator">*</span> <span class="cm-variable-2">factor</span>;
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">ingredientAmount</span> <span class="cm-operator">&gt;</span> <span class="cm-number">1</span>) {
+      <span class="cm-variable-2">unit</span> <span class="cm-operator">+=</span> <span class="cm-string">&quot;s&quot;</span>;
+    }
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable-2">ingredientAmount</span><span class="cm-string-2">}</span> <span class="cm-string-2">${</span><span class="cm-variable-2">unit</span><span class="cm-string-2">}</span> <span class="cm-string-2">${</span><span class="cm-variable-2">name</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
+  };
+  <span class="cm-variable-2">ingredient</span>(<span class="cm-number">1</span>, <span class="cm-string">&quot;can&quot;</span>, <span class="cm-string">&quot;chickpeas&quot;</span>);
+  <span class="cm-variable-2">ingredient</span>(<span class="cm-number">0.25</span>, <span class="cm-string">&quot;cup&quot;</span>, <span class="cm-string">&quot;tahini&quot;</span>);
+  <span class="cm-variable-2">ingredient</span>(<span class="cm-number">0.25</span>, <span class="cm-string">&quot;cup&quot;</span>, <span class="cm-string">&quot;lemon juice&quot;</span>);
+  <span class="cm-variable-2">ingredient</span>(<span class="cm-number">1</span>, <span class="cm-string">&quot;clove&quot;</span>, <span class="cm-string">&quot;garlic&quot;</span>);
+  <span class="cm-variable-2">ingredient</span>(<span class="cm-number">2</span>, <span class="cm-string">&quot;tablespoon&quot;</span>, <span class="cm-string">&quot;olive oil&quot;</span>);
+  <span class="cm-variable-2">ingredient</span>(<span class="cm-number">0.5</span>, <span class="cm-string">&quot;teaspoon&quot;</span>, <span class="cm-string">&quot;cumin&quot;</span>);
+};</pre>
+
+<p><code>ingredient</code> (材料)関数の中のコードからは、外側の関数の <code>factor</code> (バッチ数)バインディングが視える。だけど <code>ingredient</code> 関数の中の、 <code>unit</code> (単位)や <code>ingredientAmount</code> (材料の量)は外側の関数からは視えない。</p>
+
+<p><a class="p_ident" id="p_f5s74XqT5Z" href="#p_f5s74XqT5Z" tabindex="-1" role="presentation"></a>ブロックの内側で視えるバインディングのセットは、そのブロックがプログラムのどこにあるかで決まる。それぞれのローカルスコープは、それを含んでいる(その外側にある)ローカルスコープの全てを視ることができる。さらに、全てのスコープはグローバルスコープも視ることができる。バインディングの可視性に関するこのアプローチを <em>レキシカルスコープ(lexical scope)</em> と呼ぶ。</p>
+
+<h2><a class="h_ident" id="h_sZiivPvMdW" href="#h_sZiivPvMdW" tabindex="-1" role="presentation"></a>値としての関数</h2>
+
+<p>関数バインディングは、単にプログラムの断片に付けられた名前としてふるまうことが多い。こういうバインディングはいったん定義されて、もう変更されない。このせいで、関数自体とその名前を混同しやすくなってしまう。</p>
+
+<p>だけど、関数とその名前は別物だ。関数値にだって、他の値ができることが全てできる。関数値は呼び出すだけではなくて、好きなように式の中で使えるのも他の値と同じだ。関数値を新しいバインディングに保存することもできるし、他の関数の引数として渡すこともできる。同じように、関数を保持しているバインディングも普通のバインディングと変わらないから、 <code>const</code> でなければ新しい値を割り当てることもできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_jhdAQnzOea" href="#c_jhdAQnzOea" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">launchMissiles</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {<span class="cm-comment">//訳注: launchMissilesはミサイル発射</span>
+  <span class="cm-variable">missileSystem</span>.<span class="cm-property">launch</span>(<span class="cm-string">&quot;now&quot;</span>);<span class="cm-comment">//訳注:missileSystemのlaunch関数を呼び出す</span>
+};
+<span class="cm-keyword">if</span> (<span class="cm-variable">safeMode</span>) { <span class="cm-comment">//訳注: 安全モードだったら</span>
+  <span class="cm-variable">launchMissiles</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {<span class="cm-comment">/* 何もしない */</span>};
+}</pre>
+
+<p><a class="p_ident" id="p_rDR41po8gf" href="#p_rDR41po8gf" tabindex="-1" role="presentation"></a><a href="05_higher_order.html">5</a>章では、関数値をさらに他の関数に渡すと、どんな面白いことができるか見ていく。</p>
+
+<h2><a class="h_ident" id="h_V4iGEI5RGA" href="#h_V4iGEI5RGA" tabindex="-1" role="presentation"></a>宣言記法(Declaration notation)</h2>
+
+<p>関数バインディングを生み出すための、もう少し短いやり方もある。 <code>function</code> キーワードが文の始めに使われる場合は、違った働きをするんだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_4uHhsg+h7S" href="#c_4uHhsg+h7S" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">square</span>(<span class="cm-def">x</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">x</span> <span class="cm-operator">*</span> <span class="cm-variable-2">x</span>;
+}</pre>
+
+<p><a class="p_ident" id="p_pjXZoFlJYu" href="#p_pjXZoFlJYu" tabindex="-1" role="presentation"></a>これが関数の <em>宣言(declaration)</em> だ。上の文では <code>square</code> というバインディングを定義して、与えられた関数を指すようにしている。こういう宣言の後にセミコロンは必要ないけど書いてしまいがちだ。</p>
+
+<p>この関数定義の方法にはちょっとしたクセがある。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_G+ldggUjFu" href="#c_G+ldggUjFu" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;The future says:&quot;</span>, <span class="cm-variable">future</span>());
+
+<span class="cm-keyword">function</span> <span class="cm-def">future</span>() {
+  <span class="cm-keyword">return</span> <span class="cm-string">&quot;You'll never have flying cars&quot;</span>;<span class="cm-comment">//訳注: 空飛ぶ車を持てるだろう</span>
+}</pre>
+
+<p><a class="p_ident" id="p_SJx/yDOffE" href="#p_SJx/yDOffE" tabindex="-1" role="presentation"></a>このコードはちゃんと動く。関数がそれを使っているコードの <em>下で(below)</em> 定義されているのに。関数の宣言は、普通の上から下へ進む制御フローの一部にはならないんだ。概念上、同じスコープの一番上に移動されて、そのスコープのどこからでも参照できるようになる。これは便利な場合もある。関数を使う前に宣言したかどうか心配しないで、意味があると思う方法で、自由にコードを並べられるんだ。</p>
+
+<h2><a class="h_ident" id="h_/lhi2AsbTa" href="#h_/lhi2AsbTa" tabindex="-1" role="presentation"></a>アロー関数(Arrow functions)</h2>
+
+<p><a class="p_ident" id="p_d95o2uzYI7" href="#p_d95o2uzYI7" tabindex="-1" role="presentation"></a>関数の書き方には3つ目の方法がある。これは他とは全く違った見かけをしている。　<code>function</code>　キーワードの代わりに、イコールと大なりの記号で作った矢印( <code>=&gt;</code> )が使われる( <code>&gt;=</code> で書かれる「以上」演算子と混同しないように)。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_4WdKJKvocO" href="#c_4WdKJKvocO" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">power</span> <span class="cm-operator">=</span> (<span class="cm-def">base</span>, <span class="cm-def">exponent</span>) <span class="cm-operator">=&gt;</span> {
+  <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">count</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">exponent</span>; <span class="cm-variable-2">count</span><span class="cm-operator">++</span>) {
+    <span class="cm-variable-2">result</span> <span class="cm-operator">*=</span> <span class="cm-variable-2">base</span>;
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">result</span>;
+};</pre>
+
+<p><a class="p_ident" id="p_QFkGydW+au" href="#p_QFkGydW+au" tabindex="-1" role="presentation"></a>矢印はパラメーターリストの <em>後に(after)</em> に来て、それから関数本体が続く。これは、&quot;この入力(パラメーター)がこの結果を生み出す(関数本体)”というようなことを表現しているんだ。</p>
+
+<p><a class="p_ident" id="p_HFDGhh3PP2" href="#p_HFDGhh3PP2" tabindex="-1" role="presentation"></a>パラメーター名が1つの場合にはパラメーターリストの周りのカッコを取ってもいい。関数本体が式1つだけなら、波カッコのブロックではなくて、その式が関数の返す値になる。というわけで、以下の2通りに定義した <code>square</code> 関数は同じことをする。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_VIDIsvgTjA" href="#c_VIDIsvgTjA" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">square1</span> <span class="cm-operator">=</span> (<span class="cm-def">x</span>) <span class="cm-operator">=&gt;</span> { <span class="cm-keyword">return</span> <span class="cm-variable-2">x</span> <span class="cm-operator">*</span> <span class="cm-variable-2">x</span>; };
+<span class="cm-keyword">const</span> <span class="cm-def">square2</span> <span class="cm-operator">=</span> <span class="cm-def">x</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">x</span> <span class="cm-operator">*</span> <span class="cm-variable-2">x</span>;</pre>
+
+<p>アロー関数が全くパラメーターを受け取らない場合には、空のカッコを書けばいい。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_VfJZoQnqTl" href="#c_VfJZoQnqTl" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">horn</span> <span class="cm-operator">=</span> () <span class="cm-operator">=&gt;</span> {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Toot&quot;</span>);
+};</pre>
+
+<p><a class="p_ident" id="p_QnIrHVpDHq" href="#p_QnIrHVpDHq" tabindex="-1" role="presentation"></a>アロー関数と <code>function</code> 式の両方が存在することに深い理由はない。<a href="06_object.html">6</a>章で触れる小さい違いを除けば、同じ働きをする。アロー関数は2015年に追加された。主に、ちょっとした関数を、わずらわしくなく書けるようにだ。<a href="05_higher_order.html">5</a>章ではアロー関数をたくさん使う。</p>
+
+<h2 id="stack"><a class="h_ident" id="h_lXHlSZhsbo" href="#h_lXHlSZhsbo" tabindex="-1" role="presentation"></a>コールスタック</h2>
+
+<p><a class="p_ident" id="p_2Pfpx4O+gj" href="#p_2Pfpx4O+gj" tabindex="-1" role="presentation"></a>制御が関数を流れていく(flow)方法は少し複雑だ。詳しく見てみよう。以下はいくつかの関数を呼び出すシンプルなプログラムだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_vruWG+bXUz" href="#c_vruWG+bXUz" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">greet</span>(<span class="cm-def">who</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Hello &quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">who</span>);
+}
+<span class="cm-variable">greet</span>(<span class="cm-string">&quot;Harry&quot;</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Bye&quot;</span>);</pre>
+
+<p><a class="p_ident" id="p_6ac+snl/68" href="#p_6ac+snl/68" tabindex="-1" role="presentation"></a>このプログラムの実行は、だいたい以下のような流れになる。 <code>greet</code> の呼び出しで、制御が関数の始まり(2行目)にジャンプする。そして <code>greet</code>　関数が　<code>console.log</code>　を呼び出す。すると <code>console.log</code> が制御を自分のものにして、作業を終えたら2行目に制御が戻る。その後 <code>greet</code> 関数の終わりに達したら、呼び出したところ(4行目)に制御が戻る。次の行では <code>console.log</code> がもう1回呼ばれ、プログラムは終わりに達する。</p>
+
+<p>この制御フローを概略的に以下のように表せる。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_sK38O0sD4t" href="#c_sK38O0sD4t" tabindex="-1" role="presentation"></a>not in function
+   in greet
+        in console.log
+   in greet
+not in function
+   in console.log
+not in function</pre>
+
+<p>関数の実行が終わったら、呼び出したところに制御を戻さないといけないから、コンピュータは呼び出し時のコンテキスト(文脈)を覚えている必要がある。ある場合には <code>console.log</code> は <code>greet</code> 関数に制御を戻したし、またある場合にはプログラムの末尾に制御が戻った。</p>
+
+<p><a class="p_ident" id="p_Rt4vc4mScd" href="#p_Rt4vc4mScd" tabindex="-1" role="presentation"></a>こうしたコンテキストをコンピュータが保存しておく場所が <em>コールスタック(call stack)</em> だ。関数が呼び出されるたびに、その時のコンテキストがスタックの上に積み上げられる。関数が終了したら、スタックから一番上のコンテキストが取り除かれて次に続けて実行される。</p>
+
+<p><a class="p_ident" id="p_4EfnJXY6wl" href="#p_4EfnJXY6wl" tabindex="-1" role="presentation"></a>コールスタックを積み上げていくと、コンピュータのメモリを食う。スタックが大きくなりすぎたら、コンピュータは“out of stack space(スタックのスペースが足りない)”や“too much recursion(再帰呼出しが多すぎる)”というメッセージを出して、実行に失敗する。次のコード例でこれを説明しよう。ここでは、コンピュータに難しい質問をして2つの関数の間で無限の行き来を作り出している(より正確には、コンピュータが無限のスタックを持っていたとしたら、無限 <em>かもしれない</em>　行き来だ)。というわけで、スタックのスペースが足りなくなる。言い換えると&quot;スタックが&quot;吹っ飛ぶ(blow the stack)”ことになる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_fZaWglCohr" href="#c_fZaWglCohr" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">chicken</span>() {
+  <span class="cm-keyword">return</span> <span class="cm-variable">egg</span>();
+}
+<span class="cm-keyword">function</span> <span class="cm-def">egg</span>() {
+  <span class="cm-keyword">return</span> <span class="cm-variable">chicken</span>();
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">chicken</span>() <span class="cm-operator">+</span> <span class="cm-string">&quot; came first.&quot;</span>);
+<span class="cm-comment">// → ??</span></pre>
+
+<p>(訳注: この2つの関数は「卵が先か、鶏が先か」という議論が無限にループすることになぞらえられています。)</p>
+
+<h2><a class="h_ident" id="h_L9bHc5Z+AW" href="#h_L9bHc5Z+AW" tabindex="-1" role="presentation"></a>オプショナルな引数</h2>
+
+<p>以下のコードは許されるし、何の問題もなく実行される。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_IckdVt0tqA" href="#c_IckdVt0tqA" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">square</span>(<span class="cm-def">x</span>) { <span class="cm-keyword">return</span> <span class="cm-variable-2">x</span> <span class="cm-operator">*</span> <span class="cm-variable-2">x</span>; }
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">square</span>(<span class="cm-number">4</span>, <span class="cm-atom">true</span>, <span class="cm-string">&quot;hedgehog&quot;</span>));
+<span class="cm-comment">// → 16</span></pre>
+
+<p><a class="p_ident" id="p_Yi56Tb7n2m" href="#p_Yi56Tb7n2m" tabindex="-1" role="presentation"></a>ここでは <code>square</code> をパラメーター1つで定義している。だけど、引数3つで呼び出したとしても、JavaScriptは特に文句を言わない。ただ余分な引数を無視して、始めの引数の2乗を計算するだけだ。</p>
+
+<p>JavaScriptは関数に渡す引数の数についてはものすごく心が広いんだ。渡すのが多過ぎたら余りは無視されるし、少な過ぎたら足りないパラメーターに <code>undefined</code> が割当てられる。</p>
+
+<p>この方式の欠点は、関数の引数の数を間違ってしまいかねない(むしろ、間違いがちになる)ことだ。しかも誰もその間違いを教えてくれない。</p>
+
+<p>良い点は、1つの関数をいろいろな引数の数で使えるようにできることだ。例えば、以下の <code>minus</code> 関数は、引数が1つでも2つでも動くようになっていて、 <code>-</code> 演算子に似せられている。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_8zGcY0SKdo" href="#c_8zGcY0SKdo" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">minus</span>(<span class="cm-def">a</span>, <span class="cm-def">b</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">b</span> <span class="cm-operator">===</span> <span class="cm-atom">undefined</span>) <span class="cm-keyword">return</span> <span class="cm-operator">-</span><span class="cm-variable-2">a</span>;
+  <span class="cm-keyword">else</span> <span class="cm-keyword">return</span> <span class="cm-variable-2">a</span> <span class="cm-operator">-</span> <span class="cm-variable-2">b</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">minus</span>(<span class="cm-number">10</span>));
+<span class="cm-comment">// → -10</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">minus</span>(<span class="cm-number">10</span>, <span class="cm-number">5</span>));
+<span class="cm-comment">// → 5</span></pre>
+
+<p id="power">パラメーターの後に <code>=</code> 演算子を置いて式を続ければ、その式の値が引数がなかった場合の置き換えになる。</p>
+
+<p><a class="p_ident" id="p_77na0v4xJ+" href="#p_77na0v4xJ+" tabindex="-1" role="presentation"></a>例えば、以下のヴァージョンの <code>power</code> は2つ目の引数をオプショナルにしている。2つ目の引数を渡さないか、 <code>undefined</code> を渡せば、デフォルトの2になって <code>square</code> のようにふるまうことになる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_nTMMMpMRLQ" href="#c_nTMMMpMRLQ" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">power</span>(<span class="cm-def">base</span>, <span class="cm-def">exponent</span> <span class="cm-operator">=</span> <span class="cm-number">2</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">count</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">exponent</span>; <span class="cm-variable-2">count</span><span class="cm-operator">++</span>) {
+    <span class="cm-variable-2">result</span> <span class="cm-operator">*=</span> <span class="cm-variable-2">base</span>;
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">result</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">power</span>(<span class="cm-number">4</span>));
+<span class="cm-comment">// → 16</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">power</span>(<span class="cm-number">2</span>, <span class="cm-number">6</span>));
+<span class="cm-comment">// → 64</span></pre>
+
+<p><a href="04_data.html#rest_parameters">次の章</a>では、関数の本体で渡された引数全てのリストを手に入れる方法を見ていく。この方法なら、関数がいくらでも引数を受け入れられることになるので便利だ。例えば、 <code>console.log</code> はこの方法を使っているので、渡された値を全て出力する。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_RvkwVkcUZ7" href="#c_RvkwVkcUZ7" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;C&quot;</span>, <span class="cm-string">&quot;O&quot;</span>, <span class="cm-number">2</span>);
+<span class="cm-comment">// → C O 2</span></pre>
+
+<h2><a class="h_ident" id="h_FgIsccwoT0" href="#h_FgIsccwoT0" tabindex="-1" role="presentation"></a>クロージャー</h2>
+
+<p>関数を値として扱えるということと、関数が呼び出されるたびにローカルバインディングが再生産されるということを考え合わせると、面白い疑問が浮かぶ。ローカルバインディングを作り出した関数の呼び出しが終わった後、そのローカルバインディングはどうなる?</p>
+
+<p>以下のコードはこうした状況の例だ。ここではローカルバインディングを作る <code>wrapValue</code> 関数が定義されている。 <code>wrapValue</code> 関数は、このローカルバインディングにアクセスしてその値を返す関数を返り値にする。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_DF70h3opbx" href="#c_DF70h3opbx" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">wrapValue</span>(<span class="cm-def">n</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">local</span> <span class="cm-operator">=</span> <span class="cm-variable-2">n</span>;
+  <span class="cm-keyword">return</span> () <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">local</span>;
+}
+
+<span class="cm-keyword">let</span> <span class="cm-def">wrap1</span> <span class="cm-operator">=</span> <span class="cm-variable">wrapValue</span>(<span class="cm-number">1</span>);
+<span class="cm-keyword">let</span> <span class="cm-def">wrap2</span> <span class="cm-operator">=</span> <span class="cm-variable">wrapValue</span>(<span class="cm-number">2</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">wrap1</span>());
+<span class="cm-comment">// → 1</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">wrap2</span>());
+<span class="cm-comment">// → 2</span></pre>
+
+<p>上のようなプログラムは許されるし、期待した通りに動く。つまり両方のバインディングのインスタンスに後でアクセスができるんだ。この状況はローカルバインディングが関数呼び出しごとに生まれることを良く説明している。それに、別々の関数呼び出しがお互いのローカルバインディングを踏み潰してしまわないことも分かる。</p>
+
+<p><a class="p_ident" id="p_0JHO/HaV9q" href="#p_0JHO/HaV9q" tabindex="-1" role="presentation"></a>この機能、つまり周囲のスコープのローカルバインディングの特定のインスタンスを参照できること、は <em>クロージャー(closure)</em> と呼ばれる。自身の外側にあるローカルスコープのバインディングを参照する関数自体もクロージャーと呼ぶ。このふるまいのおかげでバインディングの寿命について心配しないで良くなるし、関数値をクリエイティブに使うこともできる。</p>
+
+<p>少しだけの変更で、先のプログラム例を、好きな値で掛け算をする関数を作り出すようにできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_iIlCVmvMSs" href="#c_iIlCVmvMSs" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">multiplier</span>(<span class="cm-def">factor</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-def">number</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">number</span> <span class="cm-operator">*</span> <span class="cm-variable-2">factor</span>;
+}
+
+<span class="cm-keyword">let</span> <span class="cm-def">twice</span> <span class="cm-operator">=</span> <span class="cm-variable">multiplier</span>(<span class="cm-number">2</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">twice</span>(<span class="cm-number">5</span>));
+<span class="cm-comment">// → 10</span></pre>
+
+<p><code>wrapValue</code> での明示的な <code>local</code> バインディングは、関数のパラメーター自体がローカルバインディングだから実は必要なかった。</p>
+
+<p>この種のプログラムについて考えるには慣れが必要だ。メンタルモデルとして、関数値とは本体のコードと作られたときの環境と両方を含んだものだ、と考えるといい。その関数が呼び出されると、関数本体は作られた時の環境を見る。呼び出された時点の環境ではなく。</p>
+
+<p><a class="p_ident" id="p_wwW0b1Mdqm" href="#p_wwW0b1Mdqm" tabindex="-1" role="presentation"></a>上の例では <code>multiplier</code> が呼び出されたとき <code>factor</code> パラメーターが2に固定された環境が作り出された。 <code>multiplier</code> が返した値は <code>twice</code> に保存されて、その環境を覚えている。だから、その関数が呼び出されたときに、引数を2でかけ算することができるんだ。</p>
+
+<h2><a class="h_ident" id="h_A5g0NfUuhO" href="#h_A5g0NfUuhO" tabindex="-1" role="presentation"></a>再帰(Recursion)</h2>
+
+<p><a class="p_ident" id="p_WUpDRt77M4" href="#p_WUpDRt77M4" tabindex="-1" role="presentation"></a>関数が自分自身を呼び出しても何の問題もない。頻繁にやりすぎてスタックがオーバーフローしない限りは。自分自身を呼び出す関数は <em>再帰的(recursive)</em> と呼ばれる。再帰を使えば、ある種の関数は違った書き方ができる。 <code>power</code> の違った実装方法を例にとろう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_agdELfiRGm" href="#c_agdELfiRGm" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">power</span>(<span class="cm-def">base</span>, <span class="cm-def">exponent</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">exponent</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+    <span class="cm-keyword">return</span> <span class="cm-number">1</span>;
+  } <span class="cm-keyword">else</span> {
+    <span class="cm-keyword">return</span> <span class="cm-variable-2">base</span> <span class="cm-operator">*</span> <span class="cm-variable">power</span>(<span class="cm-variable-2">base</span>, <span class="cm-variable-2">exponent</span> <span class="cm-operator">-</span> <span class="cm-number">1</span>);
+  }
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">power</span>(<span class="cm-number">2</span>, <span class="cm-number">3</span>));
+<span class="cm-comment">// → 8</span></pre>
+
+<p>これは数学者によるべき乗の定義に近いし、間違いなくループのバージョンよりもべき乗の概念を明確に説明している。この関数はかけ算の繰り返しを実現するために、指数を小さくしながら自分自身を何度も呼び出している。</p>
+
+<p><a class="p_ident" id="p_MMzqMKSH0n" href="#p_MMzqMKSH0n" tabindex="-1" role="presentation"></a>でも、この実装には1つ問題がある。典型的なJavaScriptの実装では、ループのバージョンよりも3倍は時間がかかる。シンプルなループを回す方が、関数を何度も呼び出すよりも一般的にはコストが低いんだ。</p>
+
+<p>この実行速度とエレガンスとのジレンマは面白い。人間にやさしいのかマシーンにやさしいのかという問題の延長にも見える。ほとんどどんなプログラムでも、より大きくより複雑にすれば高速化できる。だからプログラマーはちょうどいいバランスを見つけないといけない。</p>
+
+<p><code>power</code> の場合には、エレガントではない(ループの)バージョンでも、まだシンプルで読みやすかった。だから再帰バージョンに置き換えてもあまり意味がない。でも、もっと複雑な概念を扱うプログラムでは、効率を捨ててでも分かりやすくするのが有効なことがある。</p>
+
+<p>効率を心配するのは気が散ることでもある。これもプログラムデザインを複雑にする要因になる。そもそも複雑なことをやっているのに、さらに心配が増えたら手が止まってしまうかもしれない。</p>
+
+<p>というわけで、正確で分かりやすいプログラムを書くところから始めるようにしよう。遅すぎるのが心配だったら(コードがあまりにも頻繁に実行されて時間を取り過ぎるのがたいてい原因だけど)、後になってから計測して、必要に応じて改善すればいいだけだ。</p>
+
+<p><a class="p_ident" id="p_UqnOSg08If" href="#p_UqnOSg08If" tabindex="-1" role="presentation"></a>再帰は、ループの非効率な置き換えとは限らない。問題によってはループより再帰の方が解決しやすいことがある。それはたいていの場合、たくさんの&quot;分岐(branches)”を探索したり生成したりする問題だ。分岐が分岐してさらにまた分岐するような問題だ。</p>
+
+<p id="recursive_puzzle"><a class="p_ident" id="p_gsxOCL/1VV" href="#p_gsxOCL/1VV" tabindex="-1" role="presentation"></a>次のパズルを考えてほしい。数字の1からスタートして、繰り返し5を足すか3をかけるかして、無限に数字の組み合わせが生み出せる。ある数字を与えられたとして、上のような足し算とかけ算を繰り返して、その数字にたどり着くような関数はどうすれば書けるだろう?</p>
+
+<p><a class="p_ident" id="p_ciJoafEFkF" href="#p_ciJoafEFkF" tabindex="-1" role="presentation"></a>例えば、13という数字は1にまず3を掛けて5を2回足すことで到達できる。だけど、15という数字にはどうやっても到達できない。</p>
+
+<p>以下はこの問題の再帰的な解き方だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_WGJ7JdCP7T" href="#c_WGJ7JdCP7T" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">findSolution</span>(<span class="cm-def">target</span>) {
+  <span class="cm-keyword">function</span> <span class="cm-def">find</span>(<span class="cm-def">current</span>, <span class="cm-def">history</span>) {
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">current</span> <span class="cm-operator">==</span> <span class="cm-variable-2">target</span>) {
+      <span class="cm-keyword">return</span> <span class="cm-variable-2">history</span>;
+    } <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">current</span> <span class="cm-operator">&gt;</span> <span class="cm-variable-2">target</span>) {
+      <span class="cm-keyword">return</span> <span class="cm-atom">null</span>;
+    } <span class="cm-keyword">else</span> {
+      <span class="cm-keyword">return</span> <span class="cm-variable-2">find</span>(<span class="cm-variable-2">current</span> <span class="cm-operator">+</span> <span class="cm-number">5</span>, <span class="cm-string-2">`(${</span><span class="cm-variable-2">history</span><span class="cm-string-2">}</span> <span class="cm-string-2">+ 5)`</span>) <span class="cm-operator">|</span><span class="cm-operator">|</span>
+             <span class="cm-variable-2">find</span>(<span class="cm-variable-2">current</span> <span class="cm-operator">*</span> <span class="cm-number">3</span>, <span class="cm-string-2">`(${</span><span class="cm-variable-2">history</span><span class="cm-string-2">}</span> <span class="cm-string-2">* 3)`</span>);
+    }
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">find</span>(<span class="cm-number">1</span>, <span class="cm-string">&quot;1&quot;</span>);
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">findSolution</span>(<span class="cm-number">24</span>));
+<span class="cm-comment">// → (((1 * 3) + 5) * 3)</span></pre>
+
+<p>上のプログラムでは <em>最短</em> の計算の手順を見つけるとは限らないことに注意しよう。何でもいいから到達する手順を見つければ納得するプログラムだ。</p>
+
+<p>上のプログラムがどう動くかすぐに理解できなくてもいい。とにかく取り組んでみよう。再帰的な考えのいい訓練になるから。</p>
+
+<p>内側の <code>find</code> 関数が、実際の再帰を担当している。この関数は2つの引数を取っている。それは現在の数字( <code>current</code> )とその数字にたどり着くまでの記録( <code>history</code> )だ。解決法を見つけたときは、目標にたどり着く方法表す文字列を返す。現在の数字からの解法がない場合には <code>null</code> を返す。</p>
+
+<p><a class="p_ident" id="p_KJdlrPkSE/" href="#p_KJdlrPkSE/" tabindex="-1" role="presentation"></a>以上を実現するために、 <code>find</code> 関数は3択でアクションをする。もし現在の値( <code>current</code> )が目標の数字だったら、そのときのヒストリー( <code>history</code> )がそこに達するまでの方法だから、ヒストリーが返される。現在の値がターゲットより大きければ、これ以上かけ算と足し算をしても値が大きくなるだけで、その分岐を探っても意味がないから、 <code>null</code> を返す。最後に、まだ現在の値がターゲットの数字より小さければ、 <code>find</code> 関数は自身を2度呼び出して、足し算とかけ算の選択肢両方を試す。1つ目の再帰呼出し(足し算)が <code>null</code> でない値を返してくれば、それを結果として返す。そうでなければ、2つ目の再帰呼出し(かけ算)が、結果が文字列でも <code>null</code> でも関係なく、値を返す。</p>
+
+<p><a class="p_ident" id="p_vTB6PsMp4Q" href="#p_vTB6PsMp4Q" tabindex="-1" role="presentation"></a><code>find</code> 関数がどうやってぼくらの狙いを実現するか理解するために、数字の13への解法を探すときの呼び出しを見てみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_KtyfRslIz2" href="#c_KtyfRslIz2" tabindex="-1" role="presentation"></a>find(1, &quot;1&quot;)
+  find(6, &quot;(1 + 5)&quot;)
+    find(11, &quot;((1 + 5) + 5)&quot;)
+      find(16, &quot;(((1 + 5) + 5) + 5)&quot;)
+        too big
+      find(33, &quot;(((1 + 5) + 5) * 3)&quot;)
+        too big
+    find(18, &quot;((1 + 5) * 3)&quot;)
+      too big
+  find(3, &quot;(1 * 3)&quot;)
+    find(8, &quot;((1 * 3) + 5)&quot;)
+      find(13, &quot;(((1 * 3) + 5) + 5)&quot;)
+        found!</pre>
+
+<p>インデントはコールスタックの深さを示している。初めに <code>find</code> が呼ばれると、まずは <code>(1 + 5)</code> から始まる解法を、自分自身を再帰的に呼び出して探す。その呼び出しでは、ターゲットの数字以下の数字を生み出すような全ての解法を、さらに深い再帰で探していく。ターゲットにたどり着く解法が見つからないから、 <code>find</code> 関数の最初の呼び出しにまで <code>null</code> が返される。そこで <code>||</code> 演算子によって、 <code>(1 * 3)</code> からの解法を探る再帰呼び出しが起こる。こちらの探索は上手くいく。足し算の分岐への再帰呼び出しが、もう一度の再帰呼び出しを通じて、ターゲットの数字にぶつかる。このとき一番深い呼び出しが文字列を返す。そして、中間の呼び出しにある <code>||</code> 演算子がその文字列を返していって、最後にはこの解が <code>find</code> の返り値になる。</p>
+
+<h2><a class="h_ident" id="h_U1hTANizRD" href="#h_U1hTANizRD" tabindex="-1" role="presentation"></a>育っていく関数</h2>
+
+<p>関数がプログラムに導入されるときには、自然なやり方とそうでもないやり方の2つがある。</p>
+
+<p>自然な方法は、同じようなコードを何度も書いていることに気づくことだ。君もそんなことはしたくないはずだ。コードが多くなればミスの入り込む余地が大きくなるし、プログラムを理解しようとする人に読ませる事も多くなる。だから、繰り返される機能を取り上げて、良い名前を探して付けて、関数に落とし込むんだ。</p>
+
+<p>もう1つのやり方は、まだ書いてもいないうちからある機能が必要だと気づいて、その機能を関数にする価値があると思うことだ。この場合、まずは関数の名前を付けて、それから本体を書くことになるだろう。関数を定義する前から関数を使う側のコードを書くことだってあるかもしれない。</p>
+
+<p>関数に名前を付けるのが難しいかどうかは、関数に閉じ込めようとしている概念がどれぐらい明確になっているかの良い指標だ。1つ例を見てみよう。</p>
+
+<p><a class="p_ident" id="p_V470q0nA7z" href="#p_V470q0nA7z" tabindex="-1" role="presentation"></a>ある農場が飼っている牛(cow)と鶏(chicken)の数という2つの数字を表示するプログラムを書くとしよう。2つの数字の後にはそれぞれ <code>Cows</code> と <code>Chickens</code> という単語が続き、数字は3桁になるように0で隙間を埋める。</p>
+
+<pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_NGDR3Ll2Zn" href="#c_NGDR3Ll2Zn" tabindex="-1" role="presentation"></a>007 Cows
+011 Chickens</pre>
+
+<p>ここでは2つの引数、つまり牛と鶏の数を受け取る関数が必要になる。コーディングに移ろう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_RO+Vw8FSPK" href="#c_RO+Vw8FSPK" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">printFarmInventory</span>(<span class="cm-def">cows</span>, <span class="cm-def">chickens</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">cowString</span> <span class="cm-operator">=</span> <span class="cm-variable">String</span>(<span class="cm-variable-2">cows</span>);
+  <span class="cm-keyword">while</span> (<span class="cm-variable-2">cowString</span>.<span class="cm-property">length</span> <span class="cm-operator">&lt;</span> <span class="cm-number">3</span>) {
+    <span class="cm-variable-2">cowString</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;0&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">cowString</span>;
+  }
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable-2">cowString</span><span class="cm-string-2">}</span> <span class="cm-string-2">Cows`</span>);
+  <span class="cm-keyword">let</span> <span class="cm-def">chickenString</span> <span class="cm-operator">=</span> <span class="cm-variable">String</span>(<span class="cm-variable-2">chickens</span>);
+  <span class="cm-keyword">while</span> (<span class="cm-variable-2">chickenString</span>.<span class="cm-property">length</span> <span class="cm-operator">&lt;</span> <span class="cm-number">3</span>) {
+    <span class="cm-variable-2">chickenString</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;0&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">chickenString</span>;
+  }
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable-2">chickenString</span><span class="cm-string-2">}</span> <span class="cm-string-2">Chickens`</span>);
+}
+<span class="cm-variable">printFarmInventory</span>(<span class="cm-number">7</span>, <span class="cm-number">11</span>);</pre>
+
+<p>文字列の式の後ろに <code>.length</code> と書けばその文字列の長さが得られる。というわけでこの <code>while</code> ループは、数字を文字列にしたものが3文字以上になるまで先頭にゼロを付け加えていく。</p>
+
+<p>ミッション達成だ!だけど、農園主にコードを送ろうとしたところで(大金の請求書と一緒に)、農園主から電話がかかってきた。豚を飼うことにしたから、ソフトウェアを豚の数も出力できるように拡張してくれないか?だって。</p>
+
+<p><a class="p_ident" id="p_Ltg3xZaKpU" href="#p_Ltg3xZaKpU" tabindex="-1" role="presentation"></a>確かにそれも可能だ。だけど、4行分のコードをもう1回コピー&amp;ペーストする前に、いったん止まって考えてみよう。もう少し良いやり方があるはずだ。以下は最初の試みだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_RHETS/If7p" href="#c_RHETS/If7p" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">printZeroPaddedWithLabel</span>(<span class="cm-def">number</span>, <span class="cm-def">label</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">numberString</span> <span class="cm-operator">=</span> <span class="cm-variable">String</span>(<span class="cm-variable-2">number</span>);
+  <span class="cm-keyword">while</span> (<span class="cm-variable-2">numberString</span>.<span class="cm-property">length</span> <span class="cm-operator">&lt;</span> <span class="cm-number">3</span>) {
+    <span class="cm-variable-2">numberString</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;0&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">numberString</span>;
+  }
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable-2">numberString</span><span class="cm-string-2">}</span> <span class="cm-string-2">${</span><span class="cm-variable-2">label</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">printFarmInventory</span>(<span class="cm-def">cows</span>, <span class="cm-def">chickens</span>, <span class="cm-def">pigs</span>) {
+  <span class="cm-variable">printZeroPaddedWithLabel</span>(<span class="cm-variable-2">cows</span>, <span class="cm-string">&quot;Cows&quot;</span>);
+  <span class="cm-variable">printZeroPaddedWithLabel</span>(<span class="cm-variable-2">chickens</span>, <span class="cm-string">&quot;Chickens&quot;</span>);
+  <span class="cm-variable">printZeroPaddedWithLabel</span>(<span class="cm-variable-2">pigs</span>, <span class="cm-string">&quot;Pigs&quot;</span>);
+}
+
+<span class="cm-variable">printFarmInventory</span>(<span class="cm-number">7</span>, <span class="cm-number">11</span>, <span class="cm-number">3</span>);</pre>
+
+<p><a class="p_ident" id="p_rNya+gUNWc" href="#p_rNya+gUNWc" tabindex="-1" role="presentation"></a>上手く行った!でも <code>printZeroPaddedWithLabel</code> という名前は変だ。出力、0でパディングする、ラベルを付ける、という3つの事が1つの関数の中に合体している。</p>
+
+<p>プログラム全体の中から繰り返しの部分をまとめて抜き取るのはやめて、1つの <em>コンセプト</em> だけを抜き出そう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_L3v+xO5gBH" href="#c_L3v+xO5gBH" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">zeroPad</span>(<span class="cm-def">number</span>, <span class="cm-def">width</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">string</span> <span class="cm-operator">=</span> <span class="cm-variable">String</span>(<span class="cm-variable-2">number</span>);
+  <span class="cm-keyword">while</span> (<span class="cm-variable-2">string</span>.<span class="cm-property">length</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">width</span>) {
+    <span class="cm-variable-2">string</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;0&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">string</span>;
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">string</span>;
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">printFarmInventory</span>(<span class="cm-def">cows</span>, <span class="cm-def">chickens</span>, <span class="cm-def">pigs</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable">zeroPad</span>(<span class="cm-variable-2">cows</span>, <span class="cm-number">3</span>)<span class="cm-string-2">}</span> <span class="cm-string-2">Cows`</span>);
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable">zeroPad</span>(<span class="cm-variable-2">chickens</span>, <span class="cm-number">3</span>)<span class="cm-string-2">}</span> <span class="cm-string-2">Chickens`</span>);
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`${</span><span class="cm-variable">zeroPad</span>(<span class="cm-variable-2">pigs</span>, <span class="cm-number">3</span>)<span class="cm-string-2">}</span> <span class="cm-string-2">Pigs`</span>);
+}
+
+<span class="cm-variable">printFarmInventory</span>(<span class="cm-number">7</span>, <span class="cm-number">16</span>, <span class="cm-number">3</span>);</pre>
+
+<p><code>zeroPad(ゼロでパディングする)</code> のような明白な名前の関数は、読む人にも何をやっているのか分かりやすい。さらにこういう関数は特定のプログラムの中だけではなく、いろいろな状況でも使える。例えば、 <code>zeroPad</code> 関数はきれいに並んだ数字の表を出力するためにも使えるだろう。</p>
+
+<p><a class="p_ident" id="p_b+PAE+H+pa" href="#p_b+PAE+H+pa" tabindex="-1" role="presentation"></a>関数はどれぐらいクレバーで使い道が多くある <em>べき</em> だろうか?ただ3文字になるまでパディングするだけの関数から、複雑で一般的な数字のフォーマット(分数や負の数や少数点の位置や0以外の文字でパディングするなど)まで対応する関数まで、どんなものだって書ける。</p>
+
+<p><a class="p_ident" id="p_dWG/sBXY9T" href="#p_dWG/sBXY9T" tabindex="-1" role="presentation"></a>実践的な原則としては、本当に必要になると確信がなければ、クレバーにやろうとしないことだ。思いつく限りの機能に対応できるような一般的な&quot;枠組み(frameworks)”を書きたくなるかもしれない。その衝動に逆らおう。そうしないと、本当の作業が終わらなくなり、ただ使いもしないコードを書いているだけになるだろう。</p>
+
+<h2 id="pure"><a class="h_ident" id="h_HvHXas4hoI" href="#h_HvHXas4hoI" tabindex="-1" role="presentation"></a>関数と副作用</h2>
+
+<p>関数は副作用のために呼び出されるものと返り値のために呼び出されるものに、ざっくりと分けられる。といっても、副作用と返り値の両方を持つことも可能だけど。</p>
+
+<p>農場の例での最初のバージョンのヘルパー関数、 <code>printZeroPaddedWithLabel</code> は副作用を使うために呼び出される。つまり行を出力するためだ。2番目のバージョンの <code>zeroPad</code> は返り値を使うために呼び出される。2番目の方がいろいろな場面で使い道があるのは偶然ではない。直接副作用が実行される関数より、値を返す関数の方が新しい組み合わせ方をするのが簡単なんだ。</p>
+
+<p><a class="p_ident" id="p_r+AD8RdksC" href="#p_r+AD8RdksC" tabindex="-1" role="presentation"></a><em>純粋な(pure)</em> 関数とは、副作用を持たない、他のコードの副作用に影響されることもない関数だ。例えば、純粋な関数は、状況によって変化するグローバルバインディングを読むこともしない。純粋な関数にはうれしい特徴があって、それは同じ引数で呼ばれれば、いつも同じ値を返す(そしてそれ以外のことはしない)ことだ。そういう特徴の関数の呼び出しは、コードの意味を変えることなく、返り値と置き換えることができる。純粋な関数が正しく動作するか分からないときは、単に呼び出してみればテストできる。そして、あるコンテキスト(文脈)の中でしっかり動くことが分かれば、どんなコンテキスト(文脈)でも動くといえるんだ。純粋ではない関数のテストには、もっと下準備が必要になることが多い。</p>
+
+<p>とはいえ、純粋ではない関数を書くことに罪悪感を覚えなくてもいいし、コードから絶滅させる聖戦を遂行しなくてもいい。副作用にはたくさん使い道がある。例えば、純粋な関数として <code>console.log</code> を書く方法はないだろうし、 <code>console.log</code> は良いものだ。それから、ある種の演算は副作用を使った方が効率的に表現できることもある。だから、計算速度も純粋性を避ける理由になり得るんだ。</p>
+
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
+
+<p>この章では自分だけの関数を書く方法を教えた。 <code>function</code> キーワードは式として使われれば関数値を生み出す。文として使われれば、バインディングを宣言して、その値として関数を渡す。関数を作り出すためのもう1つの方法がアロー関数だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_x2/+thzlca" href="#c_x2/+thzlca" tabindex="-1" role="presentation"></a><span class="cm-comment">// Define f to hold a function value</span>
+<span class="cm-keyword">const</span> <span class="cm-def">f</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">a</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">a</span> <span class="cm-operator">+</span> <span class="cm-number">2</span>);
+};
+
+<span class="cm-comment">// Declare g to be a function</span>
+<span class="cm-keyword">function</span> <span class="cm-def">g</span>(<span class="cm-def">a</span>, <span class="cm-def">b</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">a</span> <span class="cm-operator">*</span> <span class="cm-variable-2">b</span> <span class="cm-operator">*</span> <span class="cm-number">3.5</span>;
+}
+
+<span class="cm-comment">// A less verbose function value</span>
+<span class="cm-keyword">let</span> <span class="cm-def">h</span> <span class="cm-operator">=</span> <span class="cm-def">a</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">%</span> <span class="cm-number">3</span>;</pre>
+
+<p>関数を理解するカギはスコープを理解することだ。それぞれのブロックが新しいスコープを作り出す。関数のパラメーターや、あるスコープ内で宣言されたバインディングはローカルになるから、外からは視えない。 <code>var</code> で宣言されるバインディングはふるまいが違っていて、一番近いスタックの関数スコープになるかグローバルスコープになる。</p>
+
+<p>プログラムのタスクを、別々の関数に分けていくといい。繰り返しを避けられるし、関数は、コードを特定の役割のピースにまとめることで、プログラムを整理する助けになる。</p>
+
+<h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
+
+<p>(エクササイズ)</p>
+
+<h3><a class="i_ident" id="i_XTmO7z7MPq" href="#i_XTmO7z7MPq" tabindex="-1" role="presentation"></a>Minimum</h3>
+
+<p>(最小)</p>
+
+<p><a href="02_program_structure.html#return_values">前の章</a>で、最小の引数を返す標準関数の <code>Math.min</code> を紹介した。同じようなものを自分たちで作れるようになったはずだ。2つの引数をとって、小さい方を返す <code>min</code> 関数を書こう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_zoK4eQ6E3E" href="#c_zoK4eQ6E3E" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">min</span>(<span class="cm-number">0</span>, <span class="cm-number">10</span>));
+<span class="cm-comment">// → 0</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">min</span>(<span class="cm-number">0</span>, <span class="cm-operator">-</span><span class="cm-number">10</span>));
+<span class="cm-comment">// → -10</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>カッコや波カッコを正しい場所に置くのに苦戦して、正しい関数定義ができないなら、この章の他の例からコピーしてきてそれを修正していこう。</p>
+
+<p>1つの関数に複数の <code>return</code> 宣言が含まれてもかまわない。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_jxl1p970Fy" href="#i_jxl1p970Fy" tabindex="-1" role="presentation"></a>Recursion</h3>
+
+<p>(再帰)</p>
+
+<p><code>% 2</code> で数字が2で割り切れるか調べれば、数字が偶数か奇数かテストできることを見てきた。ここでは、また違った方法で、ある正の整数が偶数か奇数か定義する。</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_tlifxqsNyC" href="#p_tlifxqsNyC" tabindex="-1" role="presentation"></a>0は偶数だ。</p></li>
+
+<li>
+
+<p>1は奇数だ。</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_KpgZOkANgN" href="#p_KpgZOkANgN" tabindex="-1" role="presentation"></a>全ての数 <em>N</em> は、 <em>N-2</em> と偶奇性が同じだ。</p></li></ul>
+
+<p>再帰的な関数 <code>isEven</code> を以上の説明に合わせて定義しよう。この関数は1つのパラメーター(正の整数)を受け取って真偽値を返さなければいけない。</p>
+
+<p><a class="p_ident" id="p_F8nwhNCAnQ" href="#p_F8nwhNCAnQ" tabindex="-1" role="presentation"></a>50や75でテストしてみよう。-1でどうなるか見てみよう。その原因は?直す方法は?</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_7Dyz/3MMqh" href="#c_7Dyz/3MMqh" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">isEven</span>(<span class="cm-number">50</span>));
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">isEven</span>(<span class="cm-number">75</span>));
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">isEven</span>(<span class="cm-operator">-</span><span class="cm-number">1</span>));
+<span class="cm-comment">// → ??</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>回答は <code>findSolution</code> の<a href="03_functions.html#recursive_puzzle">例</a>での <code>find</code> 関数に似たものになるだろう。 <code>if</code> / <code>else if</code> / <code>else</code> チェインで、どの場合になるかテストしていく。最後の <code>else</code> が3番目の場合に対応するようにして、再帰呼出しをする。どの分岐も <code>return</code> や何かしらの方法で、返す値を指定するかしないといけない。</p>
+
+<p>負の値が渡されたら、関数は再帰しつづけてもっと大きい負の数を渡し続ける。そうして結果を返すことから遠ざかり続ける。そのうちスタックのスペースがなくなって実行が中断される。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_3rsiDgC2do" href="#i_3rsiDgC2do" tabindex="-1" role="presentation"></a>Bean counting</h3>
+
+<p>(豆を数える)</p>
+
+<p><a class="p_ident" id="p_rN4k6SR0PY" href="#p_rN4k6SR0PY" tabindex="-1" role="presentation"></a>文字列に <code>&quot;string&quot;[N]</code> と書けば、N番目の文字が得られる。返ってくる値は1文字だけを含む文字列だ(例えば <code>&quot;b&quot;</code> )。始めの文字はポジション0だから、最後の文字は <code>string.<wbr>length - 1</code> のポジションになる。別の表現では、2文字からなる文字列なら、lengthが2で、それぞれ文字のポジションは0と1だ。</p>
+
+<p><a class="p_ident" id="p_Nav43GAGy8" href="#p_Nav43GAGy8" tabindex="-1" role="presentation"></a>文字列1つを引数として受け取って、大文字の“B”がいくつ含まれているか数字で返す <code>countBs</code> という関数を書こう。</p>
+
+<p><a class="p_ident" id="p_qR/eYzDFhh" href="#p_qR/eYzDFhh" tabindex="-1" role="presentation"></a>次に、 <code>countChar</code> という関数を書こう。これは、 <code>countBs</code> のようにふるまうけど、2つ目の引数として数える文字を受け取る(大文字の“B”を数えるのではなく)。 <code>countBs</code> をこの新しい関数を使って書き直してみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_QN+QdpdCe+" href="#c_QN+QdpdCe+" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">countBs</span>(<span class="cm-string">&quot;BBC&quot;</span>));
+<span class="cm-comment">// → 2</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">countChar</span>(<span class="cm-string">&quot;kakkerlak&quot;</span>, <span class="cm-string">&quot;k&quot;</span>));
+<span class="cm-comment">// → 4</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><a class="p_ident" id="p_Yxe+14zZQg" href="#p_Yxe+14zZQg" tabindex="-1" role="presentation"></a>回答には文字列の全ての文字を調べるループが必要だろう。0から文字列の文字数より1少ない数( <code>&lt; string.<wbr>length</code> )まで、ループを回せばいい。現在のポジションの文字が、探している文字と一緒だったら、カウンターに1を足せばいい。ループが終わったらカウンターの値を返す。</p>
+
+<p>関数に使われるバインディングは <code>let</code> や <code>const</code> で宣言することで <em>ローカル</em> にするように注意しよう。</p>
+
+</div></div><nav><a href="02_program_structure.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_data.html" title="next chapter">▶</a></nav>
+</article>

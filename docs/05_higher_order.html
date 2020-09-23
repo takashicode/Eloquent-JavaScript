@@ -1,0 +1,516 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>高階関数(Higher-Order Functions) :: Eloquent JavaScript</title>
+  <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
+  <script src="js/acorn_codemirror.js"></script>
+  <link rel=stylesheet href="css/ejs.css">
+  <script src="js/sandbox.js"></script>
+  <script src="js/ejs.js"></script><script>var chapNum = 5;var sandboxLoadFiles = ["code/scripts.js","code/chapter/05_higher_order.js","code/intro.js"];</script></head>
+
+<article>
+<nav><a href="04_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_object.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 5</span>高階関数(Higher-Order Functions)</h1>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_B4RFvaTAAZ" href="#p_B4RFvaTAAZ" tabindex="-1" role="presentation"></a>Tzu-liとTzu-ssuはお互いに最新のプログラムの大きさを自慢し合っていた。「200,000行だぜ」Tzu-liが言う、「コメントは抜きでな!」。Tzu-ssuが応える、「ぷっ、俺のはもう百万行だぜ」。Yuan-Ma師は言った、「わしの最高のプログラムは500行じゃ」。これを聞いてTzu-liとTzu-ssu蒙を啓かれた。</p>
+
+<footer>Master Yuan-Ma, <cite>The Book of Programming</cite></footer>
+
+</blockquote>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_VJjg733KUk" href="#p_VJjg733KUk" tabindex="-1" role="presentation"></a>ソフトウェアの構築方法には2つある。1つは、明らかに欠陥がないといえるほどシンプルにすることだ。もう1つは、欠陥が明らかにならないぐらい複雑にすることだ。</p>
+
+<footer>C.A.R. Hoare, <cite>1980 ACM Turing Award Lecture</cite></footer>
+
+</blockquote><figure class="chapter true"><img src="img/chapter_picture_5.jpg" alt="Letters from different scripts"></figure>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>大きなプログラムはコストの高いプログラムだ。しかも、それは構築する時間だけのことではない。大きさは複雑さを生み、複雑さはプログラマーを混乱させる。混乱したプログラマーは、次々に、プログラムにバグを持ち込むんだ。大きなプログラムには、バグが隠れる余地を与えるし、探し出すのも難しくする。</p>
+
+<p><a class="p_ident" id="p_Q+snNChYpf" href="#p_Q+snNChYpf" tabindex="-1" role="presentation"></a>導入部の最後の2つの例に戻ってみよう。1つ目は自己完結していて6行の長さだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_uIkg9pj99q" href="#c_uIkg9pj99q" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">total</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>, <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
+<span class="cm-keyword">while</span> (<span class="cm-variable">count</span> <span class="cm-operator">&lt;=</span> <span class="cm-number">10</span>) {
+  <span class="cm-variable">total</span> <span class="cm-operator">+=</span> <span class="cm-variable">count</span>;
+  <span class="cm-variable">count</span> <span class="cm-operator">+=</span> <span class="cm-number">1</span>;
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">total</span>);</pre>
+
+<p><a class="p_ident" id="p_LMFXHO8K9l" href="#p_LMFXHO8K9l" tabindex="-1" role="presentation"></a>2つ目は外部の関数を2つ使っていて1行の長さだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_KTbQMmMCli" href="#c_KTbQMmMCli" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sum</span>(<span class="cm-variable">range</span>(<span class="cm-number">1</span>, <span class="cm-number">10</span>)));</pre>
+
+<p>どちらがバグを含んでいそうだろうか?</p>
+
+<p><a class="p_ident" id="p_KuJ51zMK0i" href="#p_KuJ51zMK0i" tabindex="-1" role="presentation"></a><code>sum</code> と <code>range</code> の定義までサイズを数えるなら、2つ目のプログラムはむしろ1つ目よりも大きい。それでも、ぼくには2つ目の方がより正しそうに思える。</p>
+
+<p><a class="p_ident" id="p_Oqf5dV/7MI" href="#p_Oqf5dV/7MI" tabindex="-1" role="presentation"></a>これが正しそうに思えるのは、解決しようとする問題に対応する用語で解法が表現されているからだ。ある範囲(range)の数字をsum(足す)のはループやカウンターとは関係ない。あくまで範囲や和に関することだからだ。</p>
+
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a><code>sum</code> や <code>range</code> 自体の定義にはループやカウンターやその他の細々したことが含まれているかもしれない。だけど、これらの関数は1かたまりのプログラムのままよりも、シンプルな概念を表現しているから理解しやすい。</p>
+
+<h2><a class="h_ident" id="h_jn4dbo6xiB" href="#h_jn4dbo6xiB" tabindex="-1" role="presentation"></a>抽象(Abstraction)</h2>
+
+<p><a class="p_ident" id="p_j9ps8qrlyo" href="#p_j9ps8qrlyo" tabindex="-1" role="presentation"></a>プログラミングの文脈では、このような用語のことを <em>抽象(Abstraction)</em> と呼ぶ。抽象は詳細を隠してくれるから、高い(より抽象的な)レベルでプログラムについて語れるようにしてくれる。</p>
+
+<p><a class="p_ident" id="p_5z5wa++8Y+" href="#p_5z5wa++8Y+" tabindex="-1" role="presentation"></a>以下の2種類の豆スープのレシピから類推してほしい。1つ目は以下のようなものだ。</p>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_9hYmKikESA" href="#p_9hYmKikESA" tabindex="-1" role="presentation"></a>1人あたり1カップの乾燥豆を容器に入れる。豆が浸かるまで水を加える。豆を最低12時間は漬けておく。豆を水から出して、鍋に入れる。1人あたり4カップの水を加える。鍋に蓋をして豆を2時間煮る。1人あたりたまねぎ半分を用意する。それを包丁で切る。それを豆に加える。1人あたりセロリ1本を用意する。それを包丁で切る。それを豆に加える。1人あたりにんじん1本を用意する。それを包丁で切る!それを豆に加える。さらに10分煮る。</p>
+
+</blockquote>
+
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>これが2つ目のレシピだ。</p>
+
+<blockquote>
+
+<p><a class="p_ident" id="p_5vG+xEj1sc" href="#p_5vG+xEj1sc" tabindex="-1" role="presentation"></a>1人あたり：1カップの乾燥豆、たまねぎ半分、セロリ一本、ニンジン1本。</p>
+
+<p><a class="p_ident" id="p_JNVB1+eyFO" href="#p_JNVB1+eyFO" tabindex="-1" role="presentation"></a>豆を12時間漬ける。(1人あたり)4カップの水で2時間煮る。野菜を刻んで加える。さらに10分調理する。</p>
+
+</blockquote>
+
+<p>2つ目の方が短くて解釈するのも簡単だ。でも君はいくつかの料理関係の言葉を理解しないといけない。例えば、 <em>漬ける</em> 、 <em>煮る</em> 、 <em>刻む</em> 、もしかしたら <em>野菜</em> とか。</p>
+
+<p>プログラミングでは、必要になる言葉が全て辞書で待ち受けているとは期待できない。だから、1つ目のレシピのパターンに陥りがちなんだ。つまり、コンピューターが実行するステップを1つ1つ書き出して、そこに潜む高レベルの概念に気が付けない。</p>
+
+<p>プログラミングでは、抽象化のレベルが低すぎることに気づくのも大事なスキルなんだ。</p>
+
+<h2><a class="h_ident" id="h_z/G2otb7i5" href="#h_z/G2otb7i5" tabindex="-1" role="presentation"></a>繰返しの抽象化</h2>
+
+<p>これまで見てきたように、普通の関数でも抽象を組み立てるには有効な方法だった。でもそれだけでは足りない場合もある。</p>
+
+<p>プログラムでは、指定された回数だけ何かを繰返すということがよくある。そのために、以下のように <code>for</code> ループを書くのは1つの方法だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_5c+C2+9IG1" href="#c_5c+C2+9IG1" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">i</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>; <span class="cm-variable">i</span><span class="cm-operator">++</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">i</span>);
+}</pre>
+
+<p><a class="p_ident" id="p_0oZoOm1bri" href="#p_0oZoOm1bri" tabindex="-1" role="presentation"></a>&quot;何かを <em>N</em> 回繰返す&quot;ということを抽象できるだろうか?そう、例えば <code>console.log</code> を <em>N</em> 回呼び出す関数を書くのは簡単だ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_/gKhlra9P+" href="#c_/gKhlra9P+" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">repeatLog</span>(<span class="cm-def">n</span>) {
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">n</span>; <span class="cm-variable-2">i</span><span class="cm-operator">++</span>) {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">i</span>);
+  }
+}</pre>
+
+<p>でも、数字をログする以外のこともしたかったらどうする?”何かする&quot;ことは関数として表現できて、関数はただの値だから、ぼくらは&quot;何かする&quot;ことを関数値として渡すことができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_p03rPqGmn9" href="#c_p03rPqGmn9" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">repeat</span>(<span class="cm-def">n</span>, <span class="cm-def">action</span>) {
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">n</span>; <span class="cm-variable-2">i</span><span class="cm-operator">++</span>) {
+    <span class="cm-variable-2">action</span>(<span class="cm-variable-2">i</span>);
+  }
+}
+
+<span class="cm-variable">repeat</span>(<span class="cm-number">3</span>, <span class="cm-variable">console</span>.<span class="cm-property">log</span>);
+<span class="cm-comment">// → 0</span>
+<span class="cm-comment">// → 1</span>
+<span class="cm-comment">// → 2</span></pre>
+
+<p><code>repeat</code> 関数には、あらかじめ定義しておいた関数を渡さなくてもいい。むしろ、その場で関数値を作る方が簡単な場合が多い。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_EiK2Y8M/Mh" href="#c_EiK2Y8M/Mh" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">labels</span> <span class="cm-operator">=</span> [];
+<span class="cm-variable">repeat</span>(<span class="cm-number">5</span>, <span class="cm-def">i</span> <span class="cm-operator">=&gt;</span> {
+  <span class="cm-variable">labels</span>.<span class="cm-property">push</span>(<span class="cm-string-2">`Unit ${</span><span class="cm-variable-2">i</span> <span class="cm-operator">+</span> <span class="cm-number">1</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
+});
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">labels</span>);
+<span class="cm-comment">// → [&quot;Unit 1&quot;, &quot;Unit 2&quot;, &quot;Unit 3&quot;, &quot;Unit 4&quot;, &quot;Unit 5&quot;]</span></pre>
+
+<p>これはいくらか <code>for</code> ループに似た構造を持っている。始めにループの仕方について指定して、それから本体がくる。ただ、本体は関数値として書かれているから、 <code>repeat</code> 関数の呼び出しのカッコに囲まれている。だから、波カッコ <em>と</em> カッコの2つで閉じているんだ。この例のように、本体が短い1つだけの式だったら波カッコを省略して、1行でループを書くこともできる。</p>
+
+<h2><a class="h_ident" id="h_2lHP+uoGAK" href="#h_2lHP+uoGAK" tabindex="-1" role="presentation"></a>高階関数(Higher-order functions)</h2>
+
+<p><a class="p_ident" id="p_cCO1luWLPb" href="#p_cCO1luWLPb" tabindex="-1" role="presentation"></a>他の関数を操作をする関数は <em>高階関数(higher-order function)</em> と呼ばれる。関数を引数に取るにしても、関数を返り値にするにしてもだ。これまでにも関数が普通の値と変わらないことを見てきたから、そういう関数が存在しても特に驚くことはない。高階関数という用語は数学からきている。数学では関数と他の値の区別はもっと厳密だ。</p>
+
+<p>高階関数を使えば、値だけではなくて、 <em>動作</em> を抽象化できる。形にはいろいろあるけど、例えば、新しい関数を作り出す関数を書くこともできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_kHXugeV8Vn" href="#c_kHXugeV8Vn" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">greaterThan</span>(<span class="cm-def">n</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-def">m</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">m</span> <span class="cm-operator">&gt;</span> <span class="cm-variable-2">n</span>;
+}
+<span class="cm-keyword">let</span> <span class="cm-def">greaterThan10</span> <span class="cm-operator">=</span> <span class="cm-variable">greaterThan</span>(<span class="cm-number">10</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">greaterThan10</span>(<span class="cm-number">11</span>));
+<span class="cm-comment">// → true</span></pre>
+
+<p>さらに、他の関数を変化させる関数だって書ける。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_17dfYaooPK" href="#c_17dfYaooPK" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">noisy</span>(<span class="cm-def">f</span>) {
+  <span class="cm-keyword">return</span> (<span class="cm-meta">...</span><span class="cm-def">args</span>) <span class="cm-operator">=&gt;</span> {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;calling with&quot;</span>, <span class="cm-variable-2">args</span>);
+    <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-variable-2">f</span>(<span class="cm-meta">...</span><span class="cm-variable-2">args</span>);
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;called with&quot;</span>, <span class="cm-variable-2">args</span>, <span class="cm-string">&quot;, returned&quot;</span>, <span class="cm-variable-2">result</span>);
+    <span class="cm-keyword">return</span> <span class="cm-variable-2">result</span>;
+  };
+}
+<span class="cm-variable">noisy</span>(<span class="cm-variable">Math</span>.<span class="cm-property">min</span>)(<span class="cm-number">3</span>, <span class="cm-number">2</span>, <span class="cm-number">1</span>);
+<span class="cm-comment">// → calling with [3, 2, 1]</span>
+<span class="cm-comment">// → called with [3, 2, 1] , returned 1</span></pre>
+
+<p>新しいタイプの制御フローを作る関数を書くことだってできる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_of6iH06dyE" href="#c_of6iH06dyE" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">unless</span>(<span class="cm-def">test</span>, <span class="cm-def">then</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-operator">!</span><span class="cm-variable-2">test</span>) <span class="cm-variable-2">then</span>();
+}
+
+<span class="cm-variable">repeat</span>(<span class="cm-number">3</span>, <span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> {
+  <span class="cm-variable">unless</span>(<span class="cm-variable-2">n</span> <span class="cm-operator">%</span> <span class="cm-number">2</span> <span class="cm-operator">==</span> <span class="cm-number">1</span>, () <span class="cm-operator">=&gt;</span> {
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">n</span>, <span class="cm-string">&quot;is even&quot;</span>);
+  });
+});
+<span class="cm-comment">// → 0 is even</span>
+<span class="cm-comment">// → 2 is even</span></pre>
+
+<p>組込みの配列用メソッドとしては <code>forEach</code> があって、 <code>for</code> / <code>of</code> ループのようなことを、高階関数としてやってくれる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_v9jL6NafRj" href="#c_v9jL6NafRj" tabindex="-1" role="presentation"></a>[<span class="cm-string">&quot;A&quot;</span>, <span class="cm-string">&quot;B&quot;</span>].<span class="cm-property">forEach</span>(<span class="cm-def">l</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">l</span>));
+<span class="cm-comment">// → A</span>
+<span class="cm-comment">// → B</span></pre>
+
+<h2><a class="h_ident" id="h_Fn9gxA+ap6" href="#h_Fn9gxA+ap6" tabindex="-1" role="presentation"></a>用字系のデータセット(Script data set)</h2>
+
+<p>高階関数が活躍する領域の1つはデータ処理だ。データ処理には、何かしら実際のデータが必要だから、この章では用字系に関するデータセットを使うことにしよう。用字系とはラテン文字やキリル文字やアラビア文字みたいな、文字を表記する体系のことだ。</p>
+
+<p><a class="p_ident" id="p_ETmCb9zqig" href="#p_ETmCb9zqig" tabindex="-1" role="presentation"></a><a href="01_values.html#unicode">1</a>章のUnicodeを思い出そう。Unicodeとは書き言葉の文字それぞれに数字を割り当てるシステムだった。こうした文字のほとんどは特定の用字系に結びついている。Unicodeの標準には140種類の用字系が含まれていて、その内81種類が現在も使われていて、59種類は歴史上のものだ。</p>
+
+<p><a class="p_ident" id="p_uIiymCa7U9" href="#p_uIiymCa7U9" tabindex="-1" role="presentation"></a>個人的にはラテン文字しかすらすら読めないけど、少なくとも80種類もの他の文字表記体系でテキストを書いている人達がいる、というのは素敵なことだ。たいていそれらを識別することもできないけど。例えば、これは手書きのタミル語のサンプルだ。</p><figure><img src="img/tamil.png" alt="Tamil handwriting"></figure>
+
+<p><a class="p_ident" id="p_xIgAGSmHRA" href="#p_xIgAGSmHRA" tabindex="-1" role="presentation"></a>この章のデータセットは、Unicodeで定義された140種類の用字系についての情報を持っている。この章の<a href="https://eloquentjavascript.net/code/#5">コードサンドボックス</a>では、 <code>SCRIPTS</code> バインディングでアクセスできる。 <code>SCRIPTS</code> バインディングはオブジェクトの配列で、それぞれのオブジェクトが1つの用字系を説明する。</p>
+
+<pre class="snippet cm-s-default" data-language="application/json" ><a class="c_ident" id="c_YkfuyBG2fl" href="#c_YkfuyBG2fl" tabindex="-1" role="presentation"></a>{
+  <span class="cm-property">name</span>: <span class="cm-string">&quot;Coptic&quot;</span>,
+  <span class="cm-property">ranges</span>: [[<span class="cm-number">994</span>, <span class="cm-number">1008</span>], [<span class="cm-number">11392</span>, <span class="cm-number">11508</span>], [<span class="cm-number">11513</span>, <span class="cm-number">11520</span>]],
+  <span class="cm-property">direction</span>: <span class="cm-string">&quot;ltr&quot;</span>,
+  <span class="cm-property">year</span>: <span class="cm-operator">-</span><span class="cm-number">200</span>,
+  <span class="cm-property">living</span>: <span class="cm-atom">false</span>,
+  <span class="cm-property">link</span>: <span class="cm-string">&quot;https://en.wikipedia.org/wiki/Coptic_alphabet&quot;</span>
+}</pre>
+
+<p><a class="p_ident" id="p_tjkWebBrkP" href="#p_tjkWebBrkP" tabindex="-1" role="presentation"></a>このオブジェクトは、用字系の名前、割当てられたUnicodeの範囲、書かれる方向、(概算の)発生年代、現代でも使われているか、追加情報へのリンク、などを教えてくれる。書かれる方向は、 <code>&quot;ltr&quot;</code> (left to right)なら左から右で、 <code>&quot;rtl&quot;</code> (right to left)なら右から左(アラビア文字やヘブライ文字)で、“ttb” (top to bottom)なら上から下(モンゴル文字など)を意味する。</p>
+
+<p><a class="p_ident" id="p_XN6ONTWTwX" href="#p_XN6ONTWTwX" tabindex="-1" role="presentation"></a><code>ranges</code> プロパティはUnicode文字の範囲を保持した配列だ。配列の各要素はさらに2要素の配列で、下限と上限の情報を持っている。その範囲に含まれる文字コードが全て、そのオブジェクトが表す用字系に割当てられている。下限はその値を含み(994はCoptic文字だ)、上限は含まない(1008はCoptic文字ではない)。</p>
+
+<h2><a class="h_ident" id="h_YYxl2XZgEd" href="#h_YYxl2XZgEd" tabindex="-1" role="presentation"></a>配列のフィルタリング</h2>
+
+<p>データセットの配列からまだ使われているものを探すなら、次の関数が使えるだろう。これはある配列からテストを通過しない要素をフィルターしてはじいていく。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_POEf7pMCk0" href="#c_POEf7pMCk0" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">filter</span>(<span class="cm-def">array</span>, <span class="cm-def">test</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">passed</span> <span class="cm-operator">=</span> [];
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">element</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">array</span>) {
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">test</span>(<span class="cm-variable-2">element</span>)) {
+      <span class="cm-variable-2">passed</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">element</span>);
+    }
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">passed</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">filter</span>(<span class="cm-variable">SCRIPTS</span>, <span class="cm-def">script</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">script</span>.<span class="cm-property">living</span>));
+<span class="cm-comment">// → [{name: &quot;Adlam&quot;, …}, …]</span></pre>
+
+<p>この関数は、 <code>test</code> という名前の引数で受け取った関数値を使って、計算の &quot;ギャップ&quot; を埋める。ここでいう &quot;ギャップ&quot; はどの要素を集めるか決める過程のことだ。</p>
+
+<p><code>filter</code> 関数が、渡された配列から要素を消していくのではなくて、テストを通過した要素だけの新しい配列を作っていくことに注意してほしい。この関数は <em>純粋</em> なんだ。渡された配列には変更を加えない。</p>
+
+<p><code>forEach</code> のように、 <code>filter</code> は標準の配列用メソッドだ。上の例では、標準の <code>filter</code> メソッドが内部で何をしているか見るために、 <code>filter</code> 関数を定義した。これからは、 <code>filter</code> メソッドを下のように使っていく。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_x8e0PmGGB1" href="#c_x8e0PmGGB1" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">SCRIPTS</span>.<span class="cm-property">filter</span>(<span class="cm-def">s</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">s</span>.<span class="cm-property">direction</span> <span class="cm-operator">==</span> <span class="cm-string">&quot;ttb&quot;</span>));
+<span class="cm-comment">// → [{name: &quot;Mongolian&quot;, …}, …]</span></pre>
+
+<h2 id="map"><a class="h_ident" id="h_nszXE8F0lS" href="#h_nszXE8F0lS" tabindex="-1" role="presentation"></a>MAP(写像)による変形</h2>
+
+<p><code>SCRIPTS</code> 配列に何かしらフィルタリングをかけて、用字系を表すオブジェクトの配列が得られたとしよう。でも、名前の配列があった方が、調べるのが簡単だ。</p>
+
+<p><code>map</code> メソッドは、配列の各要素に関数を適用していって、その返り値で新しい配列を組み立てることで、配列を変形させる。できあがる配列は入力の配列と同じ長さになるけど、その中身は関数によって新しい形に <em>マップ(写像)</em> されているんだ。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_03caQcQElo" href="#c_03caQcQElo" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">map</span>(<span class="cm-def">array</span>, <span class="cm-def">transform</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">mapped</span> <span class="cm-operator">=</span> [];
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">element</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">array</span>) {
+    <span class="cm-variable-2">mapped</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">transform</span>(<span class="cm-variable-2">element</span>));
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">mapped</span>;
+}
+
+<span class="cm-keyword">let</span> <span class="cm-def">rtlScripts</span> <span class="cm-operator">=</span> <span class="cm-variable">SCRIPTS</span>.<span class="cm-property">filter</span>(<span class="cm-def">s</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">s</span>.<span class="cm-property">direction</span> <span class="cm-operator">==</span> <span class="cm-string">&quot;rtl&quot;</span>);
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">map</span>(<span class="cm-variable">rtlScripts</span>, <span class="cm-def">s</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">s</span>.<span class="cm-property">name</span>));
+<span class="cm-comment">// → [&quot;Adlam&quot;, &quot;Arabic&quot;, &quot;Imperial Aramaic&quot;, …]</span></pre>
+
+<p><code>forEach</code>　や <code>filter</code> のように <code>map</code> も標準の配列用メソッドだ。</p>
+
+<h2><a class="h_ident" id="h_DrLXt9Vbfy" href="#h_DrLXt9Vbfy" tabindex="-1" role="presentation"></a>Reduce(縮約)でまとめる</h2>
+
+<p>もう1つ、典型的な配列でしたいことと言えば、1つの値を計算していくことだ。これまで繰返し出てきた、数値の集合を足しあわせるのも、この1例だ。他の例としては、一番文字数が多い用字系を探すことが考えられる。</p>
+
+<p><a class="p_ident" id="p_dgPymvDJFO" href="#p_dgPymvDJFO" tabindex="-1" role="presentation"></a>こうしたパターンを表現する高階関数による操作を <em>リデュース(縮約)</em> と呼ぶ( <em>fold(折り込み)</em> と呼ぶ場合もある)。リデュースとは、配列の要素を1つずつ取り出しては、現在の値と組み合わせる操作を繰り返して、1つの値を作っていくことだ。数値を合計するなら、数字の0から始めて各要素を足していくことになるだろう。</p>
+
+<p><code>reduce</code> の取る引数は、配列以外には、組み合わせのための関数と初期値だ。この関数は <code>filter</code> と <code>map</code> ほど素直ではないから、詳しく見ていこう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_k5GDHjqpSc" href="#c_k5GDHjqpSc" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">reduce</span>(<span class="cm-def">array</span>, <span class="cm-def">combine</span>, <span class="cm-def">start</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">current</span> <span class="cm-operator">=</span> <span class="cm-variable-2">start</span>;
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">element</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">array</span>) {
+    <span class="cm-variable-2">current</span> <span class="cm-operator">=</span> <span class="cm-variable-2">combine</span>(<span class="cm-variable-2">current</span>, <span class="cm-variable-2">element</span>);
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">current</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">reduce</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>], (<span class="cm-def">a</span>, <span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">+</span> <span class="cm-variable-2">b</span>, <span class="cm-number">0</span>));
+<span class="cm-comment">// → 10</span></pre>
+
+<p><a class="p_ident" id="p_HFDGhh3PP2" href="#p_HFDGhh3PP2" tabindex="-1" role="presentation"></a>標準の配列メソッド <code>reduce</code> は、もちろんこの関数に対応しているけど、さらに便利な点がある。配列に少なくとも1つの要素があるなら、 <code>start</code> 引数を省略できるんだ。この場合、 <code>reduce</code> メソッドは1つ目の要素を <code>start</code> の値にして、2つ目の値からリデュース操作をしていく。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Dxn7muuMkk" href="#c_Dxn7muuMkk" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>].<span class="cm-property">reduce</span>((<span class="cm-def">a</span>, <span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">+</span> <span class="cm-variable-2">b</span>));
+<span class="cm-comment">// → 10</span></pre>
+
+<p><code>reduce</code> を(2回)使って、一番字数が多い用字系を探すには以下のように書けばいい。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_x76Ukt5X+H" href="#c_x76Ukt5X+H" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">characterCount</span>(<span class="cm-def">script</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">script</span>.<span class="cm-property">ranges</span>.<span class="cm-property">reduce</span>((<span class="cm-def">count</span>, [<span class="cm-def">from</span>, <span class="cm-def">to</span>]) <span class="cm-operator">=&gt;</span> {
+    <span class="cm-keyword">return</span> <span class="cm-variable-2">count</span> <span class="cm-operator">+</span> (<span class="cm-variable-2">to</span> <span class="cm-operator">-</span> <span class="cm-variable-2">from</span>);
+  }, <span class="cm-number">0</span>);
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">SCRIPTS</span>.<span class="cm-property">reduce</span>((<span class="cm-def">a</span>, <span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> {
+  <span class="cm-keyword">return</span> <span class="cm-variable">characterCount</span>(<span class="cm-variable-2">a</span>) <span class="cm-operator">&lt;</span> <span class="cm-variable">characterCount</span>(<span class="cm-variable-2">b</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">b</span> : <span class="cm-variable-2">a</span>;
+}));
+<span class="cm-comment">// → {name: &quot;Han&quot;, …}</span></pre>
+
+<p><a class="p_ident" id="p_fBtzG895lQ" href="#p_fBtzG895lQ" tabindex="-1" role="presentation"></a><code>characterCount</code> 関数は、用字系に割当てられたUnicodeの範囲をリデュースして足しあわせていく。リデューサー関数のパラメーターリストで分割代入を使っていることに注意してほしい。 <code>reduce</code> の2度目の呼び出しでは、2つの用字系の範囲を比べていって大きな方を返すことで、最大のものを探している。</p>
+
+<p><a class="p_ident" id="p_VaBaMnpMN0" href="#p_VaBaMnpMN0" tabindex="-1" role="presentation"></a>漢字(The Han script)にはUnicode標準で89,000の文字が割当てられていて、データセットの中で飛び抜けて大きい。漢字は中国語、日本語、韓国語で使われている。これらの言語では多くの文字を共有しているけど、違う書き方をすることも多い。(アメリカが拠点の)Unicode協会は文字コードを節約するために、1つの記述システムとして扱うことを決めてしまった。これを <em>漢字統一(Han unification)</em> と呼ぶけど、これに未だに怒っている人もいる。</p>
+
+<h2><a class="h_ident" id="h_BkJeEEPpx5" href="#h_BkJeEEPpx5" tabindex="-1" role="presentation"></a>合成可能性(Composability)</h2>
+
+<p>前の例(一番大きい用字系を見つける)を高階関数がなかったらどう書いたか考えてみよう。このコードはそこまで悪くない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_1FmIKHNB24" href="#c_1FmIKHNB24" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">biggest</span> <span class="cm-operator">=</span> <span class="cm-atom">null</span>;
+<span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">script</span> <span class="cm-keyword">of</span> <span class="cm-variable">SCRIPTS</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-variable">biggest</span> <span class="cm-operator">==</span> <span class="cm-atom">null</span> <span class="cm-operator">|</span><span class="cm-operator">|</span>
+      <span class="cm-variable">characterCount</span>(<span class="cm-variable">biggest</span>) <span class="cm-operator">&lt;</span> <span class="cm-variable">characterCount</span>(<span class="cm-variable">script</span>)) {
+    <span class="cm-variable">biggest</span> <span class="cm-operator">=</span> <span class="cm-variable">script</span>;
+  }
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">biggest</span>);
+<span class="cm-comment">// → {name: &quot;Han&quot;, …}</span></pre>
+
+<p><a class="p_ident" id="p_G2RTiSRzpG" href="#p_G2RTiSRzpG" tabindex="-1" role="presentation"></a>いくつかバインディングが増えて、プログラムは4行長くなった。それでもまだ読みやすい。</p>
+
+<p id="average_function"><a class="p_ident" id="p_U3usSfs4FR" href="#p_U3usSfs4FR" tabindex="-1" role="presentation"></a>高階関数は操作を <em>合成(compose)</em> する必要があるときに輝き出す。例として、データセットの中で、生きている用字系と死んだ用字系、それぞれが成立した年代の平均を出してみよう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_rumPqbzokK" href="#c_rumPqbzokK" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">average</span>(<span class="cm-def">array</span>) {
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">array</span>.<span class="cm-property">reduce</span>((<span class="cm-def">a</span>, <span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">+</span> <span class="cm-variable-2">b</span>) <span class="cm-operator">/</span> <span class="cm-variable-2">array</span>.<span class="cm-property">length</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable">average</span>(
+  <span class="cm-variable">SCRIPTS</span>.<span class="cm-property">filter</span>(<span class="cm-def">s</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">s</span>.<span class="cm-property">living</span>).<span class="cm-property">map</span>(<span class="cm-def">s</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">s</span>.<span class="cm-property">year</span>))));
+<span class="cm-comment">// → 1165</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable">average</span>(
+  <span class="cm-variable">SCRIPTS</span>.<span class="cm-property">filter</span>(<span class="cm-def">s</span> <span class="cm-operator">=&gt;</span> <span class="cm-operator">!</span><span class="cm-variable-2">s</span>.<span class="cm-property">living</span>).<span class="cm-property">map</span>(<span class="cm-def">s</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">s</span>.<span class="cm-property">year</span>))));
+<span class="cm-comment">// → 204</span></pre>
+
+<p><a class="p_ident" id="p_mrC9mmEm7k" href="#p_mrC9mmEm7k" tabindex="-1" role="presentation"></a>Unicodeの中の死んだ用字系は、平均的には、生きている用字系より古いみたいだ。この統計はそこまで意味があるわけでもないし、意外なわけでもない。でも願わくば、計算に使われたコードが読みづらくないということに同意してほしい。この計算をパイプラインのようなものだと考えることもできる。つまり、全ての用字系から開始して、生きている(もしくは死んでいる)ものだけにフィルタリングして、年代だけ取り出して、平均して、その結果を整数にまるめる。</p>
+
+<p>確かに、この計算を1つの大きいループとして書くことだってできるかもしれない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_noyYOD0Kiy" href="#c_noyYOD0Kiy" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">total</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>, <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+<span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">script</span> <span class="cm-keyword">of</span> <span class="cm-variable">SCRIPTS</span>) {
+  <span class="cm-keyword">if</span> (<span class="cm-variable">script</span>.<span class="cm-property">living</span>) {
+    <span class="cm-variable">total</span> <span class="cm-operator">+=</span> <span class="cm-variable">script</span>.<span class="cm-property">year</span>;
+    <span class="cm-variable">count</span> <span class="cm-operator">+=</span> <span class="cm-number">1</span>;
+  }
+}
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable">total</span> <span class="cm-operator">/</span> <span class="cm-variable">count</span>));
+<span class="cm-comment">// → 1165</span></pre>
+
+<p>でも、これでは何をどうやって計算しているのか分かりづらい。そして中間的な結果が意味のある値を表しているわけではないから、一部を <code>average</code> のような他の関数としてくくり出すのも大変だろう。</p>
+
+<p>コンピュータが実際に何をしているかという観点では、2つのアプローチは全く別物だ。1つ目では、 <code>filter</code> や <code>map</code> が実行されると新しい配列が組み立てられる。一方で2つ目では、いくつかの値が計算されるだけで、作業が少ない。たいていは読みやすいアプローチを採用できるけど、巨大な配列を生成したり何度も繰返し計算したりする場合には、抽象性の低いスタイルにも実行速度分の価値があるかもしれない。</p>
+
+<h2><a class="h_ident" id="h_zYw35VW2ZY" href="#h_zYw35VW2ZY" tabindex="-1" role="presentation"></a>文字列と文字コード</h2>
+
+<p>用字系データセットの使い方の1つは、テキストがどの用字系を使っているか知ることだ。そのためのプログラムを見ていこう。</p>
+
+<p>各用字系が、割当てられた文字コードの範囲を配列として持っていることを思い出してほしい。ある文字コードを与えられたとき、以下のような関数を使えば対応する用字系を探すことができる(もし存在すれば)。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Q8918ecfHn" href="#c_Q8918ecfHn" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">characterScript</span>(<span class="cm-def">code</span>) {
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">script</span> <span class="cm-keyword">of</span> <span class="cm-variable">SCRIPTS</span>) {
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">script</span>.<span class="cm-property">ranges</span>.<span class="cm-property">some</span>(([<span class="cm-def">from</span>, <span class="cm-def">to</span>]) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-keyword">return</span> <span class="cm-variable-2">code</span> <span class="cm-operator">&gt;=</span> <span class="cm-variable-2">from</span> <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span> <span class="cm-variable-2">code</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">to</span>;
+    })) {
+      <span class="cm-keyword">return</span> <span class="cm-variable-2">script</span>;
+    }
+  }
+  <span class="cm-keyword">return</span> <span class="cm-atom">null</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">characterScript</span>(<span class="cm-number">121</span>));
+<span class="cm-comment">// → {name: &quot;Latin&quot;, …}</span></pre>
+
+<p><a class="p_ident" id="p_PKyBDXheTq" href="#p_PKyBDXheTq" tabindex="-1" role="presentation"></a><code>some</code> メソッドもまた高階関数だ。テスト関数を引数として受け取って、配列の要素の内1つでも、trueを返すかどうか教えてくれる。</p>
+
+<p id="code_units">でも、文字列の文字ごとにコードを知るにはどうすればいいだろうか?</p>
+
+<p><a class="p_ident" id="p_EawnPApaOv" href="#p_EawnPApaOv" tabindex="-1" role="presentation"></a><a href="01_values.html">1</a>章で、JavaScriptの文字列は16ビットの数値のシーケンスとしてエンコードされているという話はした。これは <em>コードユニット</em> と呼ばれる。Unicodeの文字コードは、そのコードユニット(65,000種以上の文字が得られる)で十分足りると考えられていた。これでは足りなくなると分かったとき、文字ごとにさらにメモリを使う必要があるというのはためらわれることだった。この問題に対処するために、UTF-16、つまりJavaScriptの文字列で使われるフォーマットが開発された。UTF-16では、一般的によく使われる文字は1つの16ビットコードユニットで表現されて、それ以外の文字には、そのユニットが2つ1組にして使われる。</p>
+
+<p><a class="p_ident" id="p_312vtlqeLQ" href="#p_312vtlqeLQ" tabindex="-1" role="presentation"></a>現在では、UTF-16は一般に悪いアイデアだと思われている。わざとミスを誘うようにデザインされているようにさえ見える。コードユニットと文字が同じものだと思ってプログラムを書いてしまいやすい。もしJavaScriptが2ユニットの文字を使っていなければ、それで上手くいったはずだ。でも、あまり一般的ではない漢字を使おうとした途端に、そのプログラムは壊れてしまう。幸い、絵文字が出現して誰でも2ユニットの文字を使うようになったから、こういう問題に対処する面倒も公平に行き渡るようになった。</p>
+
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>残念ながら、JavaScriptの文字列では、 <code>length</code> プロパティで長さを得るとか角カッコで中身にアクセスするとか、意図の明らかな操作でもコードユニットしか扱えない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_PAJ2RSJQfN" href="#c_PAJ2RSJQfN" tabindex="-1" role="presentation"></a><span class="cm-comment">// 2つの絵文字, 馬と靴</span>
+<span class="cm-keyword">let</span> <span class="cm-def">horseShoe</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;🐴👟&quot;</span>;
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">horseShoe</span>.<span class="cm-property">length</span>);
+<span class="cm-comment">// → 4</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">horseShoe</span>[<span class="cm-number">0</span>]);
+<span class="cm-comment">// → (無効なハーフ文字)</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">horseShoe</span>.<span class="cm-property">charCodeAt</span>(<span class="cm-number">0</span>));
+<span class="cm-comment">// → 55357 (ハーフ文字のコード)</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">horseShoe</span>.<span class="cm-property">codePointAt</span>(<span class="cm-number">0</span>));
+<span class="cm-comment">// → 128052 (馬の絵文字の実際のコード)</span></pre>
+
+<p><a class="p_ident" id="p_QZQX1d4RSb" href="#p_QZQX1d4RSb" tabindex="-1" role="presentation"></a>JavaScriptの <code>charCodeAt</code> メソッドは、フルの文字コードではなく、コードユニットを返す。 <code>codePointAt</code> メソッドは、後から追加されたメソッドで、フルのUnicode文字を返してくれるから、文字列から文字を取り出すために使うことができる。だけど、 <code>codePointAt</code> に渡される引数はコードユニットのシーケンスのインデックスなんだ。だから文字列の文字を1つずつ扱いたいなら、1つの文字が使っているコードユニットが1つか2つかという問題に対処しないといけない。</p>
+
+<p><a class="p_ident" id="p_BaR3OpT/DK" href="#p_BaR3OpT/DK" tabindex="-1" role="presentation"></a><a href="04_data.html#for_of_loop">前の章</a>では、 <code>for</code> / <code>of</code> ループが文字列にも使えるという話をした。 <code>codePointAt</code> のように、このループはUTF-16の問題が心配されている時代に導入された。だから、このループを文字列に適用すると、コードユニットではなくて、本当の文字が返ってくる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_9QIfA1qjtG" href="#c_9QIfA1qjtG" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">roseDragon</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;🌹🐉&quot;</span>;
+<span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">char</span> <span class="cm-keyword">of</span> <span class="cm-variable">roseDragon</span>) {
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">char</span>);
+}
+<span class="cm-comment">// → 🌹</span>
+<span class="cm-comment">// → 🐉</span></pre>
+
+<p>何か1文字(コードユニット1つ分でも2つ分でも)があるとき、そのコードが知りたければ <code>codePointAt(0)</code> を使えばいい。</p>
+
+<h2><a class="h_ident" id="h_26pkGdvLx+" href="#h_26pkGdvLx+" tabindex="-1" role="presentation"></a>テキストの識別</h2>
+
+<p><code>characterScript</code> 関数も書いたし、1文字ずつループする方法も分かった。次のステップでは、文字がどの用字系に属するか数えていく。次の例は、数えるということを抽象化した関数で、後で役に立つだろう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_nau/OQcf6J" href="#c_nau/OQcf6J" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">countBy</span>(<span class="cm-def">items</span>, <span class="cm-def">groupName</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">counts</span> <span class="cm-operator">=</span> [];
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">item</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">items</span>) {
+    <span class="cm-keyword">let</span> <span class="cm-def">name</span> <span class="cm-operator">=</span> <span class="cm-variable-2">groupName</span>(<span class="cm-variable-2">item</span>);
+    <span class="cm-keyword">let</span> <span class="cm-def">known</span> <span class="cm-operator">=</span> <span class="cm-variable-2">counts</span>.<span class="cm-property">findIndex</span>(<span class="cm-def">c</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">c</span>.<span class="cm-property">name</span> <span class="cm-operator">==</span> <span class="cm-variable-2">name</span>);
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">known</span> <span class="cm-operator">==</span> <span class="cm-operator">-</span><span class="cm-number">1</span>) {
+      <span class="cm-variable-2">counts</span>.<span class="cm-property">push</span>({<span class="cm-property">name</span>, <span class="cm-property">count</span>: <span class="cm-number">1</span>});
+    } <span class="cm-keyword">else</span> {
+      <span class="cm-variable-2">counts</span>[<span class="cm-variable-2">known</span>].<span class="cm-property">count</span><span class="cm-operator">++</span>;
+    }
+  }
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">counts</span>;
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">countBy</span>([<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>, <span class="cm-number">5</span>], <span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">&gt;</span> <span class="cm-number">2</span>));
+<span class="cm-comment">// → [{name: false, count: 2}, {name: true, count: 3}]</span></pre>
+
+<p><code>countBy</code> 関数は、コレクション( <code>for</code> / <code>of</code> でループできるもの)と、与えられた要素のグループ名を計算する関数を引数にとる。 <code>countBy</code> はオブジェクトの配列を返す。それぞれのオブジェクトは、グループ名とそのグループに含まれる要素の数を教えてくれる。</p>
+
+<p><a class="p_ident" id="p_0yXQQurvWN" href="#p_0yXQQurvWN" tabindex="-1" role="presentation"></a>ここでは新しい配列メソッド <code>findIndex</code> を使っている。このメソッドは <code>indexOf</code> に似ているけど、何か値を探すのではなく、引数に取る関数がtrueを返す初めの値を探す。 <code>indexOf</code> と同じように、条件に合う要素がなければ-1を返す。</p>
+
+<p><code>countBy</code> 関数を使って、テキストの中でどの用字系が使われているか教えてくれる関数を書くことができる。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_g2Q1FbuyX0" href="#c_g2Q1FbuyX0" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">textScripts</span>(<span class="cm-def">text</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">scripts</span> <span class="cm-operator">=</span> <span class="cm-variable">countBy</span>(<span class="cm-variable-2">text</span>, <span class="cm-def">char</span> <span class="cm-operator">=&gt;</span> {
+    <span class="cm-keyword">let</span> <span class="cm-def">script</span> <span class="cm-operator">=</span> <span class="cm-variable">characterScript</span>(<span class="cm-variable-2">char</span>.<span class="cm-property">codePointAt</span>(<span class="cm-number">0</span>));
+    <span class="cm-keyword">return</span> <span class="cm-variable-2">script</span> <span class="cm-operator">?</span> <span class="cm-variable-2">script</span>.<span class="cm-property">name</span> : <span class="cm-string">&quot;none&quot;</span>;
+  }).<span class="cm-property">filter</span>(({<span class="cm-def">name</span>}) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">name</span> <span class="cm-operator">!=</span> <span class="cm-string">&quot;none&quot;</span>);
+
+  <span class="cm-keyword">let</span> <span class="cm-def">total</span> <span class="cm-operator">=</span> <span class="cm-variable-2">scripts</span>.<span class="cm-property">reduce</span>((<span class="cm-def">n</span>, {<span class="cm-def">count</span>}) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">+</span> <span class="cm-variable-2">count</span>, <span class="cm-number">0</span>);
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">total</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) <span class="cm-keyword">return</span> <span class="cm-string">&quot;No scripts found&quot;</span>;
+
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">scripts</span>.<span class="cm-property">map</span>(({<span class="cm-def">name</span>, <span class="cm-def">count</span>}) <span class="cm-operator">=&gt;</span> {
+    <span class="cm-keyword">return</span> <span class="cm-string-2">`${</span><span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable-2">count</span> <span class="cm-operator">*</span> <span class="cm-number">100</span> <span class="cm-operator">/</span> <span class="cm-variable-2">total</span>)<span class="cm-string-2">}</span><span class="cm-string-2">% ${</span><span class="cm-variable-2">name</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span>;
+  }).<span class="cm-property">join</span>(<span class="cm-string">&quot;, &quot;</span>);
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">textScripts</span>(<span class="cm-string">'英国的狗说&quot;woof&quot;, 俄罗斯的狗说&quot;тяв&quot;'</span>));
+<span class="cm-comment">// → 61% Han(漢字), 22% Latin(ラテン文字), 17% Cyrillic(キリル文字)</span></pre>
+
+<p>この関数はまず文字をグループ名ごとに数える。このとき <code>characterScript</code> でグループ名を割当てるけど、どの用字系にも含まれていない文字はグループ名を <code>&quot;none&quot;</code> にする。それから <code>filter</code> が呼び出されて、配列から <code>&quot;none&quot;</code> の要素をふるい落とす。用字系に含まれていない文字には興味がないからだ。</p>
+
+<p><a class="p_ident" id="p_HXxxJLwaGl" href="#p_HXxxJLwaGl" tabindex="-1" role="presentation"></a>パーセンテージを計算するために、何かしらの用字系に属している(“none”ではない)文字数の合計を計算する。この計算には <code>reduce</code> を使う。そうした文字が1つもなければ、この関数は特別な文字列(“No scripts found(どの用字系もない)”)を返す。そうでなければ、数え上げ用の配列を <code>map</code> で読みやすい文字列に成形して、joinで合体させる。</p>
+
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
+
+<p>ある関数値を、他の関数の引数として渡せるのはJavaScriptの本当に便利なところだ。このおかげで、後から埋められる&quot;ギャップ&quot;を持つような計算をモデル化して関数を書けるんだ。この関数を呼び出すコードが関数値を渡すことで、このギャップが埋められる。</p>
+
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a>配列には便利な高階関数メソッドがたくさんある。 <code>forEach</code> を使えば配列の要素をループしていくことができる。 <code>filter</code> メソッドは、述語関数を通過した要素だけを含む新しい配列を返す。配列の各要素に関数を適用していって変換する操作は <code>map</code> でできる。 <code>reduce</code> で、配列の要素を全て組み合わせて1つの値にすることができる。 <code>some</code> メソッドは要素のうち1つでも述語関数にマッチするかどうかテストする。 <code>findIndex</code> は、述語関数にマッチする最初の要素の位置を返す。</p>
+
+<h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
+
+<h3><a class="i_ident" id="i_aIOczlLyX1" href="#i_aIOczlLyX1" tabindex="-1" role="presentation"></a>Flattening</h3>
+
+<p>(フラットにする)</p>
+
+<p><code>reduce</code> メソッドと <code>concat</code> メソッドを組み合わせて使って、配列が入れ子になった配列から、元の要素を全て持った1つの配列を作ろう。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_I+o+qLGLXB" href="#c_I+o+qLGLXB" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">arrays</span> <span class="cm-operator">=</span> [[<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>], [<span class="cm-number">4</span>, <span class="cm-number">5</span>], [<span class="cm-number">6</span>]];
+<span class="cm-comment">// Your code here.</span>
+<span class="cm-comment">// → [1, 2, 3, 4, 5, 6]</span></pre>
+
+<h3><a class="i_ident" id="i_gKQ1S54F4o" href="#i_gKQ1S54F4o" tabindex="-1" role="presentation"></a>Your own loop</h3>
+
+<p>(自分だけのループ)</p>
+
+<p><a class="p_ident" id="p_fLbvuYully" href="#p_fLbvuYully" tabindex="-1" role="presentation"></a><code>loop</code> という <code>for</code> ループのような効果が得られる高階関数を書こう。引数には初期値、テスト関数、アップデート関数、そしてループ本体の関数を取るようにしよう。繰返し毎に、現在のループ値でテスト関数を実行して、falseが返ってくれば停止する。それから、現在のループ値を渡して、本体の関数を呼び出す。最後に、アップデート関数を呼び出して新しい値を作ったら、ループの始めに戻る。</p>
+
+<p>普通のループを使って実際のループをさせるように、関数を定義してもいい。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Fv1rc97GEM" href="#c_Fv1rc97GEM" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here.</span>
+
+<span class="cm-variable">loop</span>(<span class="cm-number">3</span>, <span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">&gt;</span> <span class="cm-number">0</span>, <span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">-</span> <span class="cm-number">1</span>, <span class="cm-variable">console</span>.<span class="cm-property">log</span>);
+<span class="cm-comment">// → 3</span>
+<span class="cm-comment">// → 2</span>
+<span class="cm-comment">// → 1</span></pre>
+
+<h3><a class="i_ident" id="i_SmbRSAd5GA" href="#i_SmbRSAd5GA" tabindex="-1" role="presentation"></a>Everything</h3>
+
+<p>(全て)</p>
+
+<p><a class="p_ident" id="p_oSonWa6qxT" href="#p_oSonWa6qxT" tabindex="-1" role="presentation"></a><code>some</code> メソッドと同じように、配列には <code>every</code> メソッドもある。これは、引数の関数を適用したときに <em>全ての(every)</em> 要素がtrueを返したときだけtrueになる。ある意味で、 <code>some</code> は配列に作用する <code>||</code> 演算子がようなもので、 <code>every</code> は <code>&amp;&amp;</code> 演算子のようなものだ。</p>
+
+<p><a class="p_ident" id="p_otZzBdmHHw" href="#p_otZzBdmHHw" tabindex="-1" role="presentation"></a>every<code>を、引数に配列と述語関数を受け取る関数として実装してみよう。2つのバージョンを書こう。1つはループを使って、もう1つは</code>some` メソッドを使う。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_NludaTWDls" href="#c_NludaTWDls" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">every</span>(<span class="cm-def">array</span>, <span class="cm-def">test</span>) {
+  <span class="cm-comment">// Your code here.</span>
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">every</span>([<span class="cm-number">1</span>, <span class="cm-number">3</span>, <span class="cm-number">5</span>], <span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>));
+<span class="cm-comment">// → true</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">every</span>([<span class="cm-number">2</span>, <span class="cm-number">4</span>, <span class="cm-number">16</span>], <span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>));
+<span class="cm-comment">// → false</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">every</span>([], <span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>));
+<span class="cm-comment">// → true</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p><a class="p_ident" id="p_9RCa0xcpCW" href="#p_9RCa0xcpCW" tabindex="-1" role="presentation"></a><code>&amp;&amp;</code> 演算子と同じように、 <code>every</code> メソッドはマッチしない要素が見つかったらすぐに評価をやめて、それ以上は要素を評価しない。だからループでのバージョンでは、述語関数がfalseを返す要素が見つかれば <code>break</code> や <code>return</code> でループを脱出するようにする。ループがfalseになる要素にぶつからずに最後までいけば、全ての要素がマッチしたということだからtrueを返せばいい。</p>
+
+<p><a class="p_ident" id="p_zCJ9hRrFre" href="#p_zCJ9hRrFre" tabindex="-1" role="presentation"></a><code>every</code> を <code>some</code> をベースに組み立てるには <em>De Morgan’s laws(ド・モルガンの法則)</em> を適用する。これは <code>a &amp;&amp; b</code> が <code>!(!a || !b)</code> と等しいというものだ。これを配列に一般化すれば、&quot;配列の全ての要素がマッチする&quot;と&quot;配列にはマッチしない要素がない&quot;が等しいということになる。</p>
+
+</div></div>
+
+<h3><a class="i_ident" id="i_4ccl4J1nOw" href="#i_4ccl4J1nOw" tabindex="-1" role="presentation"></a>Dominant writing direction</h3>
+
+<p>(多数派の記述方向)</p>
+
+<p>テキストの文字列から、多数派になっている記述方向を探す関数を書いてみよう。それぞれの用字系オブジェクトには <code>direction</code> プロパティがあって、 <code>&quot;ltr&quot;</code> (左から右へ)、 <code>&quot;rtl&quot;</code> (右から左へ)、または <code>&quot;ttb&quot;</code> (上から下へ)という値を持つことを思い出そう。</p>
+
+<p><a class="p_ident" id="p_Vwd+mFBMiU" href="#p_Vwd+mFBMiU" tabindex="-1" role="presentation"></a>多数派の方向とは、文字に対応する用字系が持つ方向(direction)で多数を占めるもののことだ。すでに定義した <code>characterScript</code> と <code>countBy</code> が役に立つかもしれない。</p>
+
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_CNawUvyti3" href="#c_CNawUvyti3" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">dominantDirection</span>(<span class="cm-def">text</span>) {
+  <span class="cm-comment">// Your code here.</span>
+}
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">dominantDirection</span>(<span class="cm-string">&quot;Hello!&quot;</span>));
+<span class="cm-comment">// → ltr</span>
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">dominantDirection</span>(<span class="cm-string">&quot;Hey, مساء الخير&quot;</span>));
+<span class="cm-comment">// → rtl</span></pre>
+
+<div class="solution"><div class="solution-text">
+
+<p>君の回答は <code>textScripts</code> 関数の前半部分に似ているかもしれない。ここでも <code>characterScript</code> 関数を使って、何らかの基準で文字を数えてから、興味がない(スクリプトをもたない)文字列をフィルタリングしてはじくことになるだろう。</p>
+
+<p>文字のカウントが一番多い方向を探すには、 <code>reduce</code> を使うことになるだろう。もし、よく分からなかったら、この章の前の方の例を見てみよう。そこでは <code>reduce</code> を使って一番文字が多く含まれる用字系を探した。</p>
+
+</div></div><nav><a href="04_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_object.html" title="next chapter">▶</a></nav>
+</article>
