@@ -620,11 +620,13 @@
 
 <h3><a class="i_ident" id="i_djD3XDJ27V" href="#i_djD3XDJ27V" tabindex="-1" role="presentation"></a>Iterable groups</h3>
 
-<p id="group_iterator"><a class="p_ident" id="p_azaOoj0ezw" href="#p_azaOoj0ezw" tabindex="-1" role="presentation"></a>Make the <code>Group</code> class from the previous exercise iterable. Refer to the section about the iterator interface earlier in the chapter if you aren’t clear on the exact form of the interface anymore.</p>
+<p>イテラブルなグループ</p>
 
-<p><a class="p_ident" id="p_SoL9V7zUCt" href="#p_SoL9V7zUCt" tabindex="-1" role="presentation"></a>If you used an array to represent the group’s members, don’t just return the iterator created by calling the <code>Symbol.iterator</code> method on the array. That would work, but it defeats the purpose of this exercise.</p>
+<p id="group_iterator">1つ前のエクササイズのグループをイテラブルにしてみよう。イテレーターのインターフェイスがどんな形式だったかあいまいだったら、この章の前の方のセクションを見返えそう。</p>
 
-<p><a class="p_ident" id="p_rLyKomI6vw" href="#p_rLyKomI6vw" tabindex="-1" role="presentation"></a>It is okay if your iterator behaves strangely when the group is modified during iteration.</p>
+<p>グループのメンバーを表現するのに配列を使ったなら、配列の <code>Symbol.iterator</code> メソッドを呼び出して作られたイテレーターを返すだけ、というのはやめよう。これでも動作はするけど、このエクササイズの意味がなくなる。</p>
+
+<p>イテレーションの途中で、グループに変更が加えられているときには、イテレーターが変なふるまいをしても問題ない。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_n6ZNn/zRLj" href="#c_n6ZNn/zRLj" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here (and the code from the previous exercise)</span>
 
@@ -637,17 +639,19 @@
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_URAzFlYuQP" href="#p_URAzFlYuQP" tabindex="-1" role="presentation"></a>It is probably worthwhile to define a new class <code>GroupIterator</code>. Iterator instances should have a property that tracks the current position in the group. Every time <code>next</code> is called, it checks whether it is done and, if not, moves past the current value and returns it.</p>
+<p><code>GroupIterator</code> という新しいクラスを定義する価値があるかもしれない。イテレーターのインスタンスは、グループでの現在のポジションを追跡するプロパティを持たないといけない。 <code>next</code> が呼び出されるたびに、終了したかどうかチェックして、そうでない場合は現在の値を通過しつつ、返り値にする。</p>
 
-<p><a class="p_ident" id="p_il9bvEkyQT" href="#p_il9bvEkyQT" tabindex="-1" role="presentation"></a>The <code>Group</code> class itself gets a method named by <code>Symbol.iterator</code> that, when called, returns a new instance of the iterator class for that group.</p>
+<p><code>Group</code> クラス自体にも <code>Symbol.iterator</code> という名前のメソッドを持たせて、呼び出されると、そのグループ用のイテレータークラスの新しいインスタンスを返すようにする。</p>
 
 </div></div>
 
 <h3><a class="i_ident" id="i_wcWSnr9zHV" href="#i_wcWSnr9zHV" tabindex="-1" role="presentation"></a>Borrowing a method</h3>
 
-<p><a class="p_ident" id="p_HxMI3VGcht" href="#p_HxMI3VGcht" tabindex="-1" role="presentation"></a>Earlier in the chapter I mentioned that an object’s <code>hasOwnProperty</code> can be used as a more robust alternative to the <code>in</code> operator when you want to ignore the prototype’s properties. But what if your map needs to include the word <code>&quot;hasOwnProperty&quot;</code>? You won’t be able to call that method anymore because the object’s own property hides the method value.</p>
+<p>メソッドの拝借</p>
 
-<p><a class="p_ident" id="p_nxOrPKy+Ky" href="#p_nxOrPKy+Ky" tabindex="-1" role="presentation"></a>Can you think of a way to call <code>hasOwnProperty</code> on an object that has its own property by that name?</p>
+<p>この章の前の方で、プロトタイプが持つプロパティを無視したいときには、 <code>hasOwnProperty</code> が <code>in</code> 演算子のもっと確実な代わりになると書いた。でも君のマップに <code>&quot;hasOwnProperty&quot;</code> という言葉を持たせたいとしたら?このメソッドはオブジェクト自体のプロパティに隠されてしまうから、もう呼び出せなくなる。</p>
+
+<p><code>hasOwnProperty</code> を、同名のプロパティを自分で持っているオブジェクトに対して呼び出す方法を思いつける?</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_LtMKqqkY0Q" href="#c_LtMKqqkY0Q" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">map</span> <span class="cm-operator">=</span> {<span class="cm-property">one</span>: <span class="cm-atom">true</span>, <span class="cm-property">two</span>: <span class="cm-atom">true</span>, <span class="cm-property">hasOwnProperty</span>: <span class="cm-atom">true</span>};
 
@@ -657,9 +661,9 @@
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_Pg/cWjUrKm" href="#p_Pg/cWjUrKm" tabindex="-1" role="presentation"></a>Remember that methods that exist on plain objects come from <code>Object.prototype</code>.</p>
+<p>素のオブジェクトが持っているメソッドは <code>Object.prototype</code> から来ていることを思いだそう。</p>
 
-<p><a class="p_ident" id="p_wCf1aBfcJA" href="#p_wCf1aBfcJA" tabindex="-1" role="presentation"></a>Also remember that you can call a function with a specific <code>this</code> binding by using its <code>call</code> method.</p>
+<p>それから、関数の <code>call</code> メソッドを使えば、 <code>this</code> バインディングを指定して呼び出せることを思い出そう。</p>
 
 </div></div><nav><a href="05_higher_order.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="07_robot.html" title="next chapter">▶</a></nav>
 </article>
