@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Project: A Robot :: Eloquent JavaScript</title>
+  <title>プロジェクト: ロボット :: Eloquent JavaScript</title>
   <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
   <script src="js/acorn_codemirror.js"></script>
   <link rel=stylesheet href="css/ejs.css">
@@ -12,23 +12,23 @@
 <article>
 <nav><a href="06_object.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_error.html" title="next chapter">▶</a></nav>
 
-<h1><span class=chap_num>Chapter 7</span>Project: A Robot</h1>
+<h1><span class=chap_num>Chapter 7</span>プロジェクト: ロボット</h1>
 
 <blockquote>
 
-<p><a class="p_ident" id="p_uJUZHUrdPa" href="#p_uJUZHUrdPa" tabindex="-1" role="presentation"></a>[...] the question of whether Machines Can Think [...] is about as relevant as the question of whether Submarines Can Swim.</p>
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>[...略] 機械が思考できるかという問いは、 [...略] 潜水艦が泳げるかという問いと同じようなものだ。</p>
 
 <footer>Edsger Dijkstra, <cite>The Threats to Computing Science</cite></footer>
 
 </blockquote><figure class="chapter framed"><img src="img/chapter_picture_7.jpg" alt="Picture of a package-delivery robot"></figure>
 
-<p><a class="p_ident" id="p_5AQpMxl1Fi" href="#p_5AQpMxl1Fi" tabindex="-1" role="presentation"></a>In “project” chapters, I’ll stop pummeling you with new theory for a brief moment, and instead we’ll work through a program together. Theory is necessary to learn to program, but reading and understanding actual programs is just as important.</p>
+<p>&quot;プロジェクト&quot;の章では、新しい理論で君を殴りつけるのをいったん止めて、一緒にプログラムに取り組んでみよう。プログラムを学ぶのに理論は大事だけど、実際のプログラムを読んで理解するのも同じぐらい大事だ。</p>
 
-<p><a class="p_ident" id="p_ncfl8fD8N8" href="#p_ncfl8fD8N8" tabindex="-1" role="presentation"></a>Our project in this chapter is to build an automaton, a little program that performs a task in a virtual world. Our automaton will be a mail-delivery robot picking up and dropping off parcels.</p>
+<p><a class="p_ident" id="p_i+9w6YfLn/" href="#p_i+9w6YfLn/" tabindex="-1" role="presentation"></a>この章のプロジェクトは、自動人形(automaton)、つまり仮想世界でタスクをこなすプログラム、を組み立てることだ。この自動人形はメール配達ロボットで、荷物を拾っていったり置いていったりする。</p>
 
-<h2><a class="h_ident" id="h_UmFK5fYed8" href="#h_UmFK5fYed8" tabindex="-1" role="presentation"></a>Meadowfield</h2>
+<h2><a class="h_ident" id="h_K8WR0bQ9I8" href="#h_K8WR0bQ9I8" tabindex="-1" role="presentation"></a>Meadowfield(メドウフィールド)</h2>
 
-<p><a class="p_ident" id="p_rnkG5XLqCA" href="#p_rnkG5XLqCA" tabindex="-1" role="presentation"></a>The village of Meadowfield isn’t very big. It consists of 11 places with 14 roads between them. It can be described with this array of roads:</p>
+<p><a class="p_ident" id="p_sBaKUTzGqX" href="#p_sBaKUTzGqX" tabindex="-1" role="presentation"></a>メドウフィールドはそこまで大きな村ではない。11の場所があって、それらをつなぐ14の道がある。その道は、以下のroadsという配列で表現できる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Zs4LZxNb9d" href="#c_Zs4LZxNb9d" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">roads</span> <span class="cm-operator">=</span> [
   <span class="cm-string">&quot;Alice's House-Bob's House&quot;</span>,   <span class="cm-string">&quot;Alice's House-Cabin&quot;</span>,
@@ -40,9 +40,9 @@
   <span class="cm-string">&quot;Marketplace-Town Hall&quot;</span>,       <span class="cm-string">&quot;Shop-Town Hall&quot;</span>
 ];</pre><figure><img src="img/village2x.png" alt="The village of Meadowfield"></figure>
 
-<p><a class="p_ident" id="p_kUSGv0smF0" href="#p_kUSGv0smF0" tabindex="-1" role="presentation"></a>The network of roads in the village forms a <em>graph</em>. A graph is a collection of points (places in the village) with lines between them (roads). This graph will be the world that our robot moves through.</p>
+<p>この村の道のネットワークは <em>グラフ</em> になっている。グラフとは、点(村の場所)とそれらをつなぐ線(道)の集合のことだ。このグラフが、ぼくらのロボットが動きまわる場所になる。</p>
 
-<p><a class="p_ident" id="p_zOR53PiwWK" href="#p_zOR53PiwWK" tabindex="-1" role="presentation"></a>The array of strings isn’t very easy to work with. What we’re interested in is the destinations that we can reach from a given place. Let’s convert the list of roads to a data structure that, for each place, tells us what can be reached from there.</p>
+<p>文字列の配列はあまり扱いやすくはない。ここで興味があるのは、ある場所からたどり着けるもう一方の場所だ。道のリストから、場所ごとにそこからアクセスできる場所が分かるデータ構造へと変換しよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_URtngTWego" href="#c_URtngTWego" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">buildGraph</span>(<span class="cm-def">edges</span>) {
   <span class="cm-keyword">let</span> <span class="cm-def">graph</span> <span class="cm-operator">=</span> <span class="cm-variable">Object</span>.<span class="cm-property">create</span>(<span class="cm-atom">null</span>);
@@ -62,27 +62,27 @@
 
 <span class="cm-keyword">const</span> <span class="cm-def">roadGraph</span> <span class="cm-operator">=</span> <span class="cm-variable">buildGraph</span>(<span class="cm-variable">roads</span>);</pre>
 
-<p><a class="p_ident" id="p_zU4tmOhQOK" href="#p_zU4tmOhQOK" tabindex="-1" role="presentation"></a>Given an array of edges, <code>buildGraph</code> creates a map object that, for each node, stores an array of connected nodes.</p>
+<p><code>buildGraph</code> はエッジ(辺)の配列を受け取って、それぞれのノード(頂点)に対して、そこに接続しているノードの配列をマップするオブジェクトを作る。</p>
 
-<p><a class="p_ident" id="p_/eUhE55hg6" href="#p_/eUhE55hg6" tabindex="-1" role="presentation"></a>It uses the <code>split</code> method to go from the road strings, which have the form <code>&quot;Start-End&quot;</code>, to two-element arrays containing the start and end as separate strings.</p>
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>ここでは <code>&quot;Start-End&quot;</code> という形式の道の文字列に <code>split</code> メソッドを使って、始点と終点の文字列に分けて保持する2要素の配列を作っている。</p>
 
-<h2><a class="h_ident" id="h_oekYfM5x02" href="#h_oekYfM5x02" tabindex="-1" role="presentation"></a>The task</h2>
+<h2><a class="h_ident" id="h_oZt8ftL2Nd" href="#h_oZt8ftL2Nd" tabindex="-1" role="presentation"></a>The task(タスク)</h2>
 
-<p><a class="p_ident" id="p_MtO6TwqB5I" href="#p_MtO6TwqB5I" tabindex="-1" role="presentation"></a>Our robot will be moving around the village. There are parcels in various places, each addressed to some other place. The robot picks up parcels when it comes to them and delivers them when it arrives at their destinations.</p>
+<p>ぼくらのロボットは村を動き回る。荷物がいろいろな場所にあって、その行き先も決められている。ロボットは荷物に出会ったときには拾い上げて、目的に着いたときには渡す。</p>
 
-<p><a class="p_ident" id="p_jBwlptGwo9" href="#p_jBwlptGwo9" tabindex="-1" role="presentation"></a>The automaton must decide, at each point, where to go next. It has finished its task when all parcels have been delivered.</p>
+<p>自動人形は、各ポイントで次はどこに行くか決めないといけない。そして全ての荷物が配達できたら、タスク終了だ。</p>
 
-<p><a class="p_ident" id="p_xZG2sIniIX" href="#p_xZG2sIniIX" tabindex="-1" role="presentation"></a>To be able to simulate this process, we must define a virtual world that can describe it. This model tells us where the robot is and where the parcels are. When the robot has decided to move somewhere, we need to update the model to reflect the new situation.</p>
+<p>この過程をシミュレートするためには、仮想世界をモデル化して定義しないといけない。このモデルがロボットや荷物がどこにあるか教えてくれる。ロボットが次に動く場所を決めたら、新しい状況を反映してモデルをアップデートしないといけない。</p>
 
-<p><a class="p_ident" id="p_XP2aQths2D" href="#p_XP2aQths2D" tabindex="-1" role="presentation"></a>If you’re thinking in terms of object-oriented programming, your first impulse might be to start defining objects for the various elements in the world: a class for the robot, one for a parcel, maybe one for places. These could then hold properties that describe their current state, such as the pile of parcels at a location, which we could change when updating the world.</p>
+<p>オブジェクト指向プログラミングの視点で考えると、この世界のいろいろな要素をクラスにしたい衝動にかられるかもしれない。ロボットクラス、荷物クラス、場所クラス、というように。これらのクラスが現在の状態(ある場所に荷物の山があるとか)を表現するプロパティを持って、世界をアップデートするにはそれを更新する。</p>
 
-<p><a class="p_ident" id="p_SIo98R3+uq" href="#p_SIo98R3+uq" tabindex="-1" role="presentation"></a>This is wrong.</p>
+<p>これは間違いだ。</p>
 
-<p><a class="p_ident" id="p_md/LJiyP4s" href="#p_md/LJiyP4s" tabindex="-1" role="presentation"></a>At least, it usually is. The fact that something sounds like an object does not automatically mean that it should be an object in your program. Reflexively writing classes for every concept in your application tends to leave you with a collection of interconnected objects that each have their own internal, changing state. Such programs are often hard to understand and thus easy to break.</p>
+<p>少なくとも、たいてい。オブジェクトのように思えるからといって自動的にプログラムの中でもオブジェクトになるべきというわけではない。反射的に全部の概念をオブジェクトにしていると、それぞれのオブジェクトがごちゃごちゃになった上に、個々のオブジェクトが内部的な状態を持ってそれがばらばらに変化する。こうなったプログラムは理解するのは難しくて、壊れるのは簡単だ。</p>
 
-<p><a class="p_ident" id="p_GAVnAUZ9xz" href="#p_GAVnAUZ9xz" tabindex="-1" role="presentation"></a>Instead, let’s condense the village’s state down to the minimal set of values that define it. There’s the robot’s current location and the collection of undelivered parcels, each of which has a current location and a destination address. That’s it.</p>
+<p><a class="p_ident" id="p_gPkLaQ2V0m" href="#p_gPkLaQ2V0m" tabindex="-1" role="presentation"></a>そうではなく、村の状態(village’s state)を最小限の値のセットに凝縮させよう。ロボットの現在地とまだ配達されてない荷物の集合も必要だ。荷物の集合は、それぞれの要素が現在地と目的地のアドレスを持つ。これだけだ。</p>
 
-<p><a class="p_ident" id="p_/m1Ukpe9vV" href="#p_/m1Ukpe9vV" tabindex="-1" role="presentation"></a>And while we’re at it, let’s make it so that we don’t <em>change</em> this state when the robot moves but rather compute a <em>new</em> state for the situation after the move.</p>
+<p>これをプログラムするにあたって、ロボットが移動するたびに村の状態を <em>変更する</em> のではなく、移動後の村の状態を <em>新しく</em> 計算することにしよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_VcDNIi1lcV" href="#c_VcDNIi1lcV" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">VillageState</span> {
   <span class="cm-property">constructor</span>(<span class="cm-def">place</span>, <span class="cm-def">parcels</span>) {
@@ -103,11 +103,11 @@
   }
 }</pre>
 
-<p><a class="p_ident" id="p_+1K4cYKxXh" href="#p_+1K4cYKxXh" tabindex="-1" role="presentation"></a>The <code>move</code> method is where the action happens. It first checks whether there is a road going from the current place to the destination, and if not, it returns the old state since this is not a valid move.</p>
+<p><a class="p_ident" id="p_DPG8hLuLrK" href="#p_DPG8hLuLrK" tabindex="-1" role="presentation"></a><code>move</code> メソッドで移動が実行される。まずは、現在地から目的地(destination)へ行く道があるかを確認して、道がなければ移動は失敗だから古い状態をそのまま返す。</p>
 
-<p><a class="p_ident" id="p_8hikodLOP1" href="#p_8hikodLOP1" tabindex="-1" role="presentation"></a>Then it creates a new state with the destination as the robot’s new place. But it also needs to create a new set of parcels—parcels that the robot is carrying (that are at the robot’s current place) need to be moved along to the new place. And parcels that are addressed to the new place need to be delivered—that is, they need to be removed from the set of undelivered parcels. The call to <code>map</code> takes care of the moving, and the call to <code>filter</code> does the delivering.</p>
+<p><a class="p_ident" id="p_dMcOg6n1gU" href="#p_dMcOg6n1gU" tabindex="-1" role="presentation"></a>それから目的地をロボットの新しい現在地にして、新しい状態のオブジェクトを作り出す。このとき、荷物のセットも新しく作らないといけない。荷物も一緒に新しい場所に移動するからだ。そして、新しい場所が行き先になっている(addressed)荷物は配達されないといけない。つまり、その荷物をまだ配達されていない荷物のセットから取り除く必要があるんだ。 <code>move</code> 関数では、 <code>map</code> が荷物の移動を、 <code>filter</code> が配達を担当している。</p>
 
-<p><a class="p_ident" id="p_r1QwqYFKH8" href="#p_r1QwqYFKH8" tabindex="-1" role="presentation"></a>Parcel objects aren’t changed when they are moved but re-created. The <code>move</code> method gives us a new village state but leaves the old one entirely intact.</p>
+<p>荷物オブジェクトが移動するときには、変更するのではなくて新しく作られる。 <code>move</code> メソッドも、新しい村の状態を返して、古い村の状態はそのままにしておく。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Z0crEkc0Bs" href="#c_Z0crEkc0Bs" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">first</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">VillageState</span>(
   <span class="cm-string">&quot;Post Office&quot;</span>,
@@ -122,32 +122,32 @@
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">first</span>.<span class="cm-property">place</span>);
 <span class="cm-comment">// → Post Office</span></pre>
 
-<p><a class="p_ident" id="p_tNPZKPr/w9" href="#p_tNPZKPr/w9" tabindex="-1" role="presentation"></a>The move causes the parcel to be delivered, and this is reflected in the next state. But the initial state still describes the situation where the robot is at the post office and the parcel is undelivered.</p>
+<p>移動によって荷物が配達されて、それが次の状態にも反映される。だけど、初期状態も保持されていて、そこではロボットは未だに郵便局にいて荷物は配達されていない。</p>
 
-<h2><a class="h_ident" id="h_BgRu2ZQp4Z" href="#h_BgRu2ZQp4Z" tabindex="-1" role="presentation"></a>Persistent data</h2>
+<h2><a class="h_ident" id="h_DzRGiWhLk7" href="#h_DzRGiWhLk7" tabindex="-1" role="presentation"></a>永続データ(Persistent data)</h2>
 
-<p><a class="p_ident" id="p_0XMckw7hMq" href="#p_0XMckw7hMq" tabindex="-1" role="presentation"></a>Data structures that don’t change are called <em>immutable</em> or <em>persistent</em>. They behave a lot like strings and numbers in that they are who they are and stay that way, rather than containing different things at different times.</p>
+<p><a class="p_ident" id="p_PmPz1w2C5d" href="#p_PmPz1w2C5d" tabindex="-1" role="presentation"></a>変化しないデータ構造のことを <em>イミュータブル(immutable)</em> や <em>永続的(persistent)</em> という。こういうデータは、時が違えば内容が違うということがなくて、そういう点では文字列や数字のようにふるまう。</p>
 
-<p><a class="p_ident" id="p_Vzwj9t5LXR" href="#p_Vzwj9t5LXR" tabindex="-1" role="presentation"></a>In JavaScript, just about everything <em>can</em> be changed, so working with values that are supposed to be persistent requires some restraint. There is a function called <code>Object.freeze</code> that changes an object so that writing to its properties is ignored. You could use that to make sure your objects aren’t changed, if you want to be careful. Freezing does require the computer to do some extra work, and having updates ignored is just about as likely to confuse someone as having them do the wrong thing. So I usually prefer to just tell people that a given object shouldn’t be messed with and hope they remember it.</p>
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>JavaScriptでは、ほとんど全てのものが変更 <em>可能</em> だから、ある値を永続的にしたいときは制約が必要になる。 <code>Object.freeze</code> 関数はオブジェクトを変化させて、プロパティを書き換えても無視するようにする。もし慎重に行きたいなら、これでオブジェクトを変更不能にすることもできる。とはいえ、フリージングを使うとコンピュータにさせる作業が増えるし、アップデートが無視されるのは紛らわしいから、読む人が間違ったことをしてしまいそうだ。だからぼくは、このオブジェクトはいじってはいけないとみんなに伝えて、覚えておいてくれるのを願うことにしている。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_tzmey+74SE" href="#c_tzmey+74SE" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">object</span> <span class="cm-operator">=</span> <span class="cm-variable">Object</span>.<span class="cm-property">freeze</span>({<span class="cm-property">value</span>: <span class="cm-number">5</span>});
 <span class="cm-variable">object</span>.<span class="cm-property">value</span> <span class="cm-operator">=</span> <span class="cm-number">10</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">object</span>.<span class="cm-property">value</span>);
 <span class="cm-comment">// → 5</span></pre>
 
-<p><a class="p_ident" id="p_HAywJetNsC" href="#p_HAywJetNsC" tabindex="-1" role="presentation"></a>Why am I going out of my way to not change objects when the language is obviously expecting me to?</p>
+<p><a class="p_ident" id="p_HKdr57hNcU" href="#p_HKdr57hNcU" tabindex="-1" role="presentation"></a>Javascriptはオブジェクトが変更されるものだと想定しているのに、なぜ道を外れて変更しないようにするのか?</p>
 
-<p><a class="p_ident" id="p_OeVgQQywMt" href="#p_OeVgQQywMt" tabindex="-1" role="presentation"></a>Because it helps me understand my programs. This is about complexity management again. When the objects in my system are fixed, stable things, I can consider operations on them in isolation—moving to Alice’s house from a given start state always produces the same new state. When objects change over time, that adds a whole new dimension of complexity to this kind of reasoning.</p>
+<p><a class="p_ident" id="p_NTGCZMmpj6" href="#p_NTGCZMmpj6" tabindex="-1" role="presentation"></a>それがプログラムを理解する助けになるからだ。これもまた複雑さのコントロールに関係する話だ。あるオブジェクトが固定されていて安定したものなら、そのオブジェクトに対する操作を分離して考えることができるんだ。例えば、どんな開始状態でもAliceの家に移動するという操作の結果としては、いつも同じ状態が返ってくるようになる。オブジェクトがその時々で変化するようになってしまうと、この論理に次元の違う複雑性が加わることになる。</p>
 
-<p><a class="p_ident" id="p_/7pvpOtS4H" href="#p_/7pvpOtS4H" tabindex="-1" role="presentation"></a>For a small system like the one we are building in this chapter, we could handle that bit of extra complexity. But the most important limit on what kind of systems we can build is how much we can understand. Anything that makes your code easier to understand makes it possible to build a more ambitious system.</p>
+<p>この章で作ろうとしているような小さいシステムなら、ちょっと複雑性が増したところでコントロールできるだろう。ただ、どんなシステムを作れるかという限界は、それをどれだけ理解できるかで決まる。君のコードを分かりやくすることならどんなことでも、もっと大きなシステムを作る助けになる。</p>
 
-<p><a class="p_ident" id="p_rFxLbiWTcZ" href="#p_rFxLbiWTcZ" tabindex="-1" role="presentation"></a>Unfortunately, although understanding a system built on persistent data structures is easier, <em>designing</em> one, especially when your programming language isn’t helping, can be a little harder. We’ll look for opportunities to use persistent data structures in this book, but we’ll also be using changeable ones.</p>
+<p>永続データ構造の上に組み立てたシステムは理解しやすいけど、残念ながらそういうデータ構造を <em>デザインする</em> のは難しい。特に、使っているプログラミング言語が助けにならなければ。この本ではできるだけ永続データ構造を使っていくけど、変更可能なものも使っていく。</p>
 
-<h2><a class="h_ident" id="h_jjSUPDU+nv" href="#h_jjSUPDU+nv" tabindex="-1" role="presentation"></a>Simulation</h2>
+<h2><a class="h_ident" id="h_OXFJmGIObU" href="#h_OXFJmGIObU" tabindex="-1" role="presentation"></a>シミュレーション</h2>
 
-<p><a class="p_ident" id="p_P+FbwSex0d" href="#p_P+FbwSex0d" tabindex="-1" role="presentation"></a>A delivery robot looks at the world and decides in which direction it wants to move. As such, we could say that a robot is a function that takes a <code>VillageState</code> object and returns the name of a nearby place.</p>
+<p>配達ロボットは、世界を見渡してどちらに行きたいか決める。というわけで、ロボットとは <code>VillageState</code> オブジェクトを受け取って最寄りの場所を返す関数だ、といえる。</p>
 
-<p><a class="p_ident" id="p_d4Z1LYlBJq" href="#p_d4Z1LYlBJq" tabindex="-1" role="presentation"></a>Because we want robots to be able to remember things, so that they can make and execute plans, we also pass them their memory and allow them to return a new memory. Thus, the thing a robot returns is an object containing both the direction it wants to move in and a memory value that will be given back to it the next time it is called.</p>
+<p>ロボットには、ものを覚えて計画を立てたり実行したりして欲しいから、一緒にメモリーを渡すようにして、新しいメモリーを返してもいいようにする。だから、ロボットが返すものは、進みたい方向とメモリーを含んだオブジェクトになる。このメモリーは次にロボットを呼び出すときに渡される。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_PAmfnoCtiQ" href="#c_PAmfnoCtiQ" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">runRobot</span>(<span class="cm-def">state</span>, <span class="cm-def">robot</span>, <span class="cm-def">memory</span>) {
   <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">turn</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;; <span class="cm-variable-2">turn</span><span class="cm-operator">++</span>) {
@@ -162,11 +162,11 @@
   }
 }</pre>
 
-<p><a class="p_ident" id="p_J4CsIfXFJR" href="#p_J4CsIfXFJR" tabindex="-1" role="presentation"></a>Consider what a robot has to do to “solve” a given state. It must pick up all parcels by visiting every location that has a parcel and deliver them by visiting every location that a parcel is addressed to, but only after picking up the parcel.</p>
+<p>ある状態を&quot;解決する&quot;ためにロボットがしなければいけないことを考えよう。荷物が置いてある場所を全て訪れて荷物をピックアップして、その後に届け先になっている場所を全て訪れて配達しないといけない。</p>
 
-<p><a class="p_ident" id="p_g8y41m0ZTO" href="#p_g8y41m0ZTO" tabindex="-1" role="presentation"></a>What is the dumbest strategy that could possibly work? The robot could just walk in a random direction every turn. That means, with great likelihood, it will eventually run into all parcels and then also at some point reach the place where they should be delivered.</p>
+<p>とにかく解決できるだろうけど一番バカらしい戦略はなんだろうか?ロボットがただランダムな方向に動くという方法もあり得る。これならかなり高い確率で、いつかは全ての荷物に出会って、いつかは配達先にたどり着くだろう。</p>
 
-<p><a class="p_ident" id="p_6Z1OgF/YEs" href="#p_6Z1OgF/YEs" tabindex="-1" role="presentation"></a>Here’s what that could look like:</p>
+<p>それはたぶん以下のような感じになるだろう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_eldzpwzhOB" href="#c_eldzpwzhOB" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">randomPick</span>(<span class="cm-def">array</span>) {
   <span class="cm-keyword">let</span> <span class="cm-def">choice</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-variable-2">array</span>.<span class="cm-property">length</span>);
@@ -177,11 +177,11 @@
   <span class="cm-keyword">return</span> {<span class="cm-property">direction</span>: <span class="cm-variable">randomPick</span>(<span class="cm-variable">roadGraph</span>[<span class="cm-variable-2">state</span>.<span class="cm-property">place</span>])};
 }</pre>
 
-<p><a class="p_ident" id="p_2Q7kJZqP+x" href="#p_2Q7kJZqP+x" tabindex="-1" role="presentation"></a>Remember that <code>Math.random()</code> returns a number between zero and one—but always below one. Multiplying such a number by the length of an array and then applying <code>Math.floor</code> to it gives us a random index for the array.</p>
+<p><a class="p_ident" id="p_Yxe+14zZQg" href="#p_Yxe+14zZQg" tabindex="-1" role="presentation"></a><code>Math.random()</code> は0から1の間の数を返すけど、1自体は含まれないことを思いだそう。この数字に配列の長さをかけて、 <code>Math.floor</code> で切り捨てれば、配列のランダムなインデックスになる。</p>
 
-<p><a class="p_ident" id="p_sb9lL4ZUdF" href="#p_sb9lL4ZUdF" tabindex="-1" role="presentation"></a>Since this robot does not need to remember anything, it ignores its second argument (remember that JavaScript functions can be called with extra arguments without ill effects) and omits the <code>memory</code> property in its returned object.</p>
+<p><a class="p_ident" id="p_TkQHxaUQSa" href="#p_TkQHxaUQSa" tabindex="-1" role="presentation"></a>このロボットは何も覚えている必要がないから、2番目の引数 <code>memory</code> は無視して、返すオブジェクトからも <code>memory</code> プロパティを省いている。JavaScriptの関数は、呼び出しの引数が多くても問題ないことを思い出そう。</p>
 
-<p><a class="p_ident" id="p_Q8hya8VsaG" href="#p_Q8hya8VsaG" tabindex="-1" role="presentation"></a>To put this sophisticated robot to work, we’ll first need a way to create a new state with some parcels. A static method (written here by directly adding a property to the constructor) is a good place to put that functionality.</p>
+<p>この洗練されたロボットを働かせるためには、荷物が散らばった村の状態を作り出す必要がある。静的なメソッドはこの機能の置き場に適している。コンストラクターに直接プロパティとして付け加えることで、ここに書いていく。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_oz9CFlpcci" href="#c_oz9CFlpcci" tabindex="-1" role="presentation"></a><span class="cm-variable">VillageState</span>.<span class="cm-property">random</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">parcelCount</span> <span class="cm-operator">=</span> <span class="cm-number">5</span>) {
   <span class="cm-keyword">let</span> <span class="cm-def">parcels</span> <span class="cm-operator">=</span> [];
@@ -196,9 +196,9 @@
   <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">VillageState</span>(<span class="cm-string">&quot;Post Office&quot;</span>, <span class="cm-variable-2">parcels</span>);
 };</pre>
 
-<p><a class="p_ident" id="p_0gS69ySVJ4" href="#p_0gS69ySVJ4" tabindex="-1" role="presentation"></a>We don’t want any parcels that are sent from the same place that they are addressed to. For this reason, the <code>do</code> loop keeps picking new places when it gets one that’s equal to the address.</p>
+<p>配達先と同じ場所から送り出される荷物はほしくない。だから <code>do</code> ループは、配達先と同じ場所が出た場合には、新しい場所を選び続けていく。</p>
 
-<p><a class="p_ident" id="p_eqF9VU0qYO" href="#p_eqF9VU0qYO" tabindex="-1" role="presentation"></a>Let’s start up a virtual world.</p>
+<p>仮想世界を始めてみよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_1SZDRlmBkn" href="#c_1SZDRlmBkn" tabindex="-1" role="presentation"></a><span class="cm-variable">runRobot</span>(<span class="cm-variable">VillageState</span>.<span class="cm-property">random</span>(), <span class="cm-variable">randomRobot</span>);
 <span class="cm-comment">// → Moved to Marketplace</span>
@@ -206,17 +206,17 @@
 <span class="cm-comment">// → …</span>
 <span class="cm-comment">// → Done in 63 turns</span></pre>
 
-<p><a class="p_ident" id="p_BFu/OgG6OM" href="#p_BFu/OgG6OM" tabindex="-1" role="presentation"></a>It takes the robot a lot of turns to deliver the parcels because it isn’t planning ahead very well. We’ll address that soon.</p>
+<p>このロボットは先のことは何も計画していないから、荷物を配達し終わるには相当なターンがかかる。この問題は後回しにしよう。</p>
 
-<p><a class="p_ident" id="p_2yLwjyXxuR" href="#p_2yLwjyXxuR" tabindex="-1" role="presentation"></a>For a more pleasant perspective on the simulation, you can use the <code>runRobotAnimation</code> function that’s available in <a href="https://eloquentjavascript.net/code/#7">this chapter’s programming environment</a>. This runs the simulation, but instead of outputting text, it shows you the robot moving around the village map.</p>
+<p>シミュレーションを楽しくするために、 <code>runRobotAnimation</code> 関数を用意した。<a href="https://eloquentjavascript.net/code/#7">この章のサンドボックス</a>ではどこでも使える。この関数でシミュレーションを走らせると、テキストのアウトプットではなくて、ロボットが村を動き回るのが見られる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_jWQlJ73x2Z" href="#c_jWQlJ73x2Z" tabindex="-1" role="presentation"></a><span class="cm-variable">runRobotAnimation</span>(<span class="cm-variable">VillageState</span>.<span class="cm-property">random</span>(), <span class="cm-variable">randomRobot</span>);</pre>
 
-<p><a class="p_ident" id="p_ID6/NPeNSk" href="#p_ID6/NPeNSk" tabindex="-1" role="presentation"></a>The way <code>runRobotAnimation</code> is implemented will remain a mystery for now, but after you’ve read the <a href="14_dom.html">later chapters</a> of this book, which discuss JavaScript integration in web browsers, you’ll be able to guess how it works.</p>
+<p><code>runRobotAnimation</code> 関数の実装方法は今のところ謎だろうけど、<a href="14_dom.html">後の章</a>でブラウザーに組み込まれているJavaScriptについて知れば、仕組みが推測できるはずだ。</p>
 
-<h2><a class="h_ident" id="h_Lj40iImbWq" href="#h_Lj40iImbWq" tabindex="-1" role="presentation"></a>The mail truck’s route</h2>
+<h2><a class="h_ident" id="h_kN/0XI62fD" href="#h_kN/0XI62fD" tabindex="-1" role="presentation"></a>郵便トラックのルート</h2>
 
-<p><a class="p_ident" id="p_0ChAwB4vGA" href="#p_0ChAwB4vGA" tabindex="-1" role="presentation"></a>We should be able to do a lot better than the random robot. An easy improvement would be to take a hint from the way real-world mail delivery works. If we find a route that passes all places in the village, the robot could run that route twice, at which point it is guaranteed to be done. Here is one such route (starting from the post office):</p>
+<p>ランダムロボットよりは、ずっと上手くやれるはずだ。実際の郵便配達の仕組みからヒントを得て単純な改善をほどこしてみよう。つまり、村の全ての場所を廻るルートがあれば、それを2周すれば確実に配達が終わるはずだ。以下はそのルートの一例だ(郵便局から開始する)。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_smZcG/wBFx" href="#c_smZcG/wBFx" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">mailRoute</span> <span class="cm-operator">=</span> [
   <span class="cm-string">&quot;Alice's House&quot;</span>, <span class="cm-string">&quot;Cabin&quot;</span>, <span class="cm-string">&quot;Alice's House&quot;</span>, <span class="cm-string">&quot;Bob's House&quot;</span>,
@@ -225,7 +225,7 @@
   <span class="cm-string">&quot;Marketplace&quot;</span>, <span class="cm-string">&quot;Post Office&quot;</span>
 ];</pre>
 
-<p><a class="p_ident" id="p_yjFG5x6/qC" href="#p_yjFG5x6/qC" tabindex="-1" role="presentation"></a>To implement the route-following robot, we’ll need to make use of robot memory. The robot keeps the rest of its route in its memory and drops the first element every turn.</p>
+<p>ルートをたどるロボットを実装するには、ロボットのメモリーを使わないといけない。このロボットはメモリーに残りのルートを覚えておいて、動くたびにメモリーの最初の要素を捨てていく。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_FlV5rBgCYM" href="#c_FlV5rBgCYM" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">routeRobot</span>(<span class="cm-def">state</span>, <span class="cm-def">memory</span>) {
   <span class="cm-keyword">if</span> (<span class="cm-variable-2">memory</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
@@ -234,23 +234,23 @@
   <span class="cm-keyword">return</span> {<span class="cm-property">direction</span>: <span class="cm-variable-2">memory</span>[<span class="cm-number">0</span>], <span class="cm-property">memory</span>: <span class="cm-variable-2">memory</span>.<span class="cm-property">slice</span>(<span class="cm-number">1</span>)};
 }</pre>
 
-<p><a class="p_ident" id="p_RfLBkheDsk" href="#p_RfLBkheDsk" tabindex="-1" role="presentation"></a>This robot is a lot faster already. It’ll take a maximum of 26 turns (twice the 13-step route) but usually less.</p>
+<p><a class="p_ident" id="p_S/aRrNXGNE" href="#p_S/aRrNXGNE" tabindex="-1" role="presentation"></a>このロボットは既にランダムロボットよりかなり早い。最大で26ターン(13ステップルートの倍)かかるけど、実際はたいていそれより短い。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_EkwtJVsUrQ" href="#c_EkwtJVsUrQ" tabindex="-1" role="presentation"></a><span class="cm-variable">runRobotAnimation</span>(<span class="cm-variable">VillageState</span>.<span class="cm-property">random</span>(), <span class="cm-variable">routeRobot</span>, []);</pre>
 
-<h2><a class="h_ident" id="h_oTHZwtVfKc" href="#h_oTHZwtVfKc" tabindex="-1" role="presentation"></a>Pathfinding</h2>
+<h2><a class="h_ident" id="h_w4Rqhgnvax" href="#h_w4Rqhgnvax" tabindex="-1" role="presentation"></a>経路探索(Pathfinding)</h2>
 
-<p><a class="p_ident" id="p_zm+XpdJWqT" href="#p_zm+XpdJWqT" tabindex="-1" role="presentation"></a>Still, I wouldn’t really call blindly following a fixed route intelligent behavior. The robot could work more efficiently if it adjusted its behavior to the actual work that needs to be done.</p>
+<p>とはいえ、決まったルートを無闇になぞるのは賢いとはいえない。その時々の仕事に合わせてふるまいを調整できればもっと効率的になるだろう。</p>
 
-<p><a class="p_ident" id="p_I3lgtVYHps" href="#p_I3lgtVYHps" tabindex="-1" role="presentation"></a>To do that, it has to be able to deliberately move toward a given parcel or toward the location where a parcel has to be delivered. Doing that, even when the goal is more than one move away, will require some kind of route-finding function.</p>
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a>そのためには、荷物のある場所や届けるべき場所を狙って動けないといけない。それを実現するには、ゴールは1ターンで行けない場所かもしれないから、道を探す関数が必要になる。</p>
 
-<p><a class="p_ident" id="p_mZLFbUuvec" href="#p_mZLFbUuvec" tabindex="-1" role="presentation"></a>The problem of finding a route through a graph is a typical <em>search problem</em>. We can tell whether a given solution (a route) is a valid solution, but we can’t directly compute the solution the way we could for 2 + 2. Instead, we have to keep creating potential solutions until we find one that works.</p>
+<p><a class="p_ident" id="p_LMFXHO8K9l" href="#p_LMFXHO8K9l" tabindex="-1" role="presentation"></a>グラフ上のルートを探すのは典型的な <em>探索問題</em> だ。ある解(つまりルート)があったとして、それが有効かどうか判断することはできるけど、 2 + 2 のように直接的に解を計算することはできない。だから解の候補をたくさん作って、1番上手く行くものを探すことになる。</p>
 
-<p><a class="p_ident" id="p_RL7DngqE+u" href="#p_RL7DngqE+u" tabindex="-1" role="presentation"></a>The  number of possible routes through a graph is infinite. But when searching for a route from <em>A</em> to <em>B</em>, we are interested only in the ones that start at <em>A</em>. We also don’t care about routes that visit the same place twice—those are definitely not the most efficient route anywhere. So that cuts down on the number of routes that the route finder has to consider.</p>
+<p><a class="p_ident" id="p_Ukg/DzFtWM" href="#p_Ukg/DzFtWM" tabindex="-1" role="presentation"></a>グラフ上のルートには無限の組み合わせがあり得る。でも、 <em>A</em> 地点から <em>B</em> 地点へのルートに注目するなら、 <em>A</em> 地点から始まるものだけ考えればいい。さらに、同じ場所を2度訪れるルートは、どう考えても最適ではないから候補から外れる。そうするとルート探索関数が考えないといけない候補の数はだいぶ少なくなる。</p>
 
-<p><a class="p_ident" id="p_6AAxzrcDxc" href="#p_6AAxzrcDxc" tabindex="-1" role="presentation"></a>In fact, we are mostly interested in the <em>shortest</em> route. So we want to make sure we look at short routes before we look at longer ones. A good approach would be to “grow” routes from the starting point, exploring every reachable place that hasn’t been visited yet, until a route reaches the goal. That way, we’ll only explore routes that are potentially interesting, and we’ll find the shortest route (or one of the shortest routes, if there are more than one) to the goal.</p>
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a>実際のところ、興味があるのは <em>最短の</em> 経路だけだ。だから、長い経路を探索する前に短く経路から確実に検討するようにしないといけない。開始地点から経路を&quot;育てる&quot;、つまりまだ訪れていない到達可能な地点を1つずつたどっていってゴールに達するまで探索していくアプローチが有効だ。そうすれば、無意味なルートを省いて、最短(か最短の内の1つ)のルートを見つけられる。</p>
 
-<p id="findRoute"><a class="p_ident" id="p_cQEEfIe4SC" href="#p_cQEEfIe4SC" tabindex="-1" role="presentation"></a>Here is a function that does this:</p>
+<p id="findRoute">これがそういう探索をする関数だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_qT/+IETEgM" href="#c_qT/+IETEgM" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">findRoute</span>(<span class="cm-def">graph</span>, <span class="cm-def">from</span>, <span class="cm-def">to</span>) {
   <span class="cm-keyword">let</span> <span class="cm-def">work</span> <span class="cm-operator">=</span> [{<span class="cm-property">at</span>: <span class="cm-variable-2">from</span>, <span class="cm-property">route</span>: []}];
@@ -265,15 +265,15 @@
   }
 }</pre>
 
-<p><a class="p_ident" id="p_IIOF6RnmzN" href="#p_IIOF6RnmzN" tabindex="-1" role="presentation"></a>The exploring has to be done in the right order—the places that were reached first have to be explored first. We can’t immediately explore a place as soon as we reach it because that would mean places reached <em>from there</em> would also be explored immediately, and so on, even though there may be other, shorter paths that haven’t yet been explored.</p>
+<p>探索は正しい順序で行わないといけない。つまり、1ターンで到達できる場所が出揃ったら次の探索を始めるというようにだ。ある場所に到達できるとして、 <em>そこから</em> 次に到達できる場所は、直接でも到達できるかもしれないし、もっと短い経路もあるかもしれないからだ。</p>
 
-<p><a class="p_ident" id="p_n9z76d0Ph0" href="#p_n9z76d0Ph0" tabindex="-1" role="presentation"></a>Therefore, the function keeps a <em>work list</em>. This is an array of places that should be explored next, along with the route that got us there. It starts with just the start position and an empty route.</p>
+<p><a class="p_ident" id="p_E7e6aTtnwz" href="#p_E7e6aTtnwz" tabindex="-1" role="presentation"></a>だから <code>findRoute</code> 関数は <em>ワークリスト(work list)</em> を持っている。これは次に探索するべき場所とそこに到達するまでの経路を配列にしたものだ。まずは開始地点と空の経路から始まる。</p>
 
-<p><a class="p_ident" id="p_bijwRAV0uR" href="#p_bijwRAV0uR" tabindex="-1" role="presentation"></a>The search then operates by taking the next item in the list and exploring that, which means all roads going from that place are looked at. If one of them is the goal, a finished route can be returned. Otherwise, if we haven’t looked at this place before, a new item is added to the list. If we have looked at it before, since we are looking at short routes first, we’ve found either a longer route to that place or one precisely as long as the existing one, and we don’t need to explore it.</p>
+<p><a class="p_ident" id="p_PCjQN+Ms0w" href="#p_PCjQN+Ms0w" tabindex="-1" role="presentation"></a>探索はワークリストの次のアイテムから始まる。つまりその場所から伸びる全ての道を検討する。その内の1つがゴールにつながっていれば、完成した経路が返される。どれもゴールしない場合は2通りの処理がある。その場所をまた見ていないなら、新しいアイテムとしてワークリストに加える。もう見た場所だったら、既に見た経路と同じか長いかのどちらかの経路を見つけてしまったことになる。今探しているのは最短の経路だから、それはもう探索する必要がない。</p>
 
-<p><a class="p_ident" id="p_vMO6D/7FJS" href="#p_vMO6D/7FJS" tabindex="-1" role="presentation"></a>You can visually imagine this as a web of known routes crawling out from the start location, growing evenly on all sides (but never tangling back into itself). As soon as the first thread reaches the goal location, that thread is traced back to the start, giving us our route.</p>
+<p>これを視覚的にイメージするなら、既知の経路が網目のように全方向に均等に広がっていくような感じだ(でも絡みあうことはない)。ゴール地点に始めの糸が到達したら、糸を伝って戻ってくれば経路が得られるんだ。</p>
 
-<p><a class="p_ident" id="p_SIkZT2qVfg" href="#p_SIkZT2qVfg" tabindex="-1" role="presentation"></a>Our code doesn’t handle the situation where there are no more work items on the work list because we know that our graph is <em>connected</em>, meaning that every location can be reached from all other locations. We’ll always be able to find a route between two points, and the search can’t fail.</p>
+<p>ワークリストにこれ以上探索するアイテムがなくなってしまうという状況は考慮していない。というのも村のグラフが <em>接続されている</em> ことを知っているからで、全ての場所はどこからでも到達できるからだ。2点間のルートは常に見つかるし、探索が失敗することはない。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_RJgvG9cgxq" href="#c_RJgvG9cgxq" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">goalOrientedRobot</span>({<span class="cm-def">place</span>, <span class="cm-def">parcels</span>}, <span class="cm-def">route</span>) {
   <span class="cm-keyword">if</span> (<span class="cm-variable-2">route</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
@@ -287,24 +287,26 @@
   <span class="cm-keyword">return</span> {<span class="cm-property">direction</span>: <span class="cm-variable-2">route</span>[<span class="cm-number">0</span>], <span class="cm-property">memory</span>: <span class="cm-variable-2">route</span>.<span class="cm-property">slice</span>(<span class="cm-number">1</span>)};
 }</pre>
 
-<p><a class="p_ident" id="p_sH38lI2ayD" href="#p_sH38lI2ayD" tabindex="-1" role="presentation"></a>This robot uses its memory value as a list of directions to move in, just like the route-following robot. Whenever that list is empty, it has to figure out what to do next. It takes the first undelivered parcel in the set and, if that parcel hasn’t been picked up yet, plots a route toward it. If the parcel <em>has</em> been picked up, it still needs to be delivered, so the robot creates a route toward the delivery address instead.</p>
+<p>このロボットは、郵便配達ロボットと同じように、メモリーを次に行くべき方向のリストとして使う。リストが空のときは次に何をするか決めないといけないから、未配達の荷物の中から始めの要素を抜き出す。その荷物がまだピックアップされてなかったら、置き場所までのルートを計算する。その荷物が <em>既に</em> ピックアップされていたら、配達しないといけないから、配達先への経路を計算する。</p>
 
-<p><a class="p_ident" id="p_AA5uJa4YUg" href="#p_AA5uJa4YUg" tabindex="-1" role="presentation"></a>Let’s see how it does.</p>
+<p>どうなるか見てみよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_yYuNlgXLX9" href="#c_yYuNlgXLX9" tabindex="-1" role="presentation"></a><span class="cm-variable">runRobotAnimation</span>(<span class="cm-variable">VillageState</span>.<span class="cm-property">random</span>(),
                   <span class="cm-variable">goalOrientedRobot</span>, []);</pre>
 
-<p><a class="p_ident" id="p_iSOwvxhYMe" href="#p_iSOwvxhYMe" tabindex="-1" role="presentation"></a>This robot usually finishes the task of delivering 5 parcels in about 16 turns. That’s slightly better than <code>routeRobot</code> but still definitely not optimal.</p>
+<p><a class="p_ident" id="p_8cujr+n2Lu" href="#p_8cujr+n2Lu" tabindex="-1" role="presentation"></a>このロボットは5つの荷物を届けるタスクならたいてい16ターン程度で終える。これは <code>routeRobot</code> より少しはいいけど、まだまだ最適とは言えない。</p>
 
 <h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
 
 <h3><a class="i_ident" id="i_JrK0ADjuHH" href="#i_JrK0ADjuHH" tabindex="-1" role="presentation"></a>Measuring a robot</h3>
 
-<p><a class="p_ident" id="p_3o3bz0G4V0" href="#p_3o3bz0G4V0" tabindex="-1" role="presentation"></a>It’s hard to objectively compare robots by just letting them solve a few scenarios. Maybe one robot just happened to get easier tasks or the kind of tasks that it is good at, whereas the other didn’t.</p>
+<p>ロボットの測定</p>
 
-<p><a class="p_ident" id="p_n9CHE7/Lua" href="#p_n9CHE7/Lua" tabindex="-1" role="presentation"></a>Write a function <code>compareRobots</code> that takes two robots (and their starting memory). It should generate 100 tasks and let each of the robots solve each of these tasks. When done, it should output the average number of steps each robot took per task.</p>
+<p>客観的にロボットを比べるなら、少数のシナリオを解かせるだけでは難しい。片方のロボットに、たまたま簡単なタスクや、(他のロボットより)得意なタスクが当たるかもしれないからだ。</p>
 
-<p><a class="p_ident" id="p_O3TPJDzE3I" href="#p_O3TPJDzE3I" tabindex="-1" role="presentation"></a>For the sake of fairness, make sure you give each task to both robots, rather than generating different tasks per robot.</p>
+<p><a class="p_ident" id="p_aCqfgCLBxT" href="#p_aCqfgCLBxT" tabindex="-1" role="presentation"></a>そこで、2種類のロボット(とその初期メモリー)を引数にとる <code>compareRobots</code> 関数を書いてみよう。この関数は、100個のタスクを発生させて、両方のロボットにそれを解決させないといけない。終了したら、両方のロボットがかけたターンの平均を出力しないといけない。</p>
+
+<p>公平のために、ロボットごとに違うタスクを発生させずに、両方のロボットに同じタスクを与えるようにしよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Pif/U+hwqO" href="#c_Pif/U+hwqO" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">compareRobots</span>(<span class="cm-def">robot1</span>, <span class="cm-def">memory1</span>, <span class="cm-def">robot2</span>, <span class="cm-def">memory2</span>) {
   <span class="cm-comment">// Your code here</span>
@@ -314,17 +316,19 @@
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_nI/WAc+Vc2" href="#p_nI/WAc+Vc2" tabindex="-1" role="presentation"></a>You’ll have to write a variant of the <code>runRobot</code> function that, instead of logging the events to the console, returns the number of steps the robot took to complete the task.</p>
+<p><code>runRobot</code> 関数の仲間を書くことになるだろう。コンソールにイベントを出力するのではなくて、ロボットがタスクを終えるのにかかったステップ数を返すようにする。</p>
 
-<p><a class="p_ident" id="p_49cSkm+1VL" href="#p_49cSkm+1VL" tabindex="-1" role="presentation"></a>Your measurement function can then, in a loop, generate new states and count the steps each of the robots takes. When it has generated enough measurements, it can use <code>console.log</code> to output the average for each robot, which is the total number of steps taken divided by the number of measurements.</p>
+<p>君の計測関数は、ループごとに新しい状態を生成して、それぞれのロボットがかけたステップ数を計測する。十分な回数の計測が終わったら <code>console.log</code> でロボットごとに平均値を出力する。これはかかったステップ数の合計を計測の回数で割ったものだ。</p>
 
 </div></div>
 
 <h3><a class="i_ident" id="i_VbBsQJ1lp6" href="#i_VbBsQJ1lp6" tabindex="-1" role="presentation"></a>Robot efficiency</h3>
 
-<p><a class="p_ident" id="p_MjKPE+EDdI" href="#p_MjKPE+EDdI" tabindex="-1" role="presentation"></a>Can you write a robot that finishes the delivery task faster than <code>goalOrientedRobot</code>? If you observe that robot’s behavior, what obviously stupid things does it do? How could those be improved?</p>
+<p>ロボットの効率</p>
 
-<p><a class="p_ident" id="p_qgKBJqRg+r" href="#p_qgKBJqRg+r" tabindex="-1" role="presentation"></a>If you solved the previous exercise, you might want to use your <code>compareRobots</code> function to verify whether you improved the robot.</p>
+<p><code>goalOrientedRobot</code> より速く配達タスクを終えるロボットを書ける?ロボットのふるまいを観察したときに、どんなバカなことをしている?それはどうやったら改善できる?</p>
+
+<p>1つ前のエクササイズを解いたなら <code>compareRobots</code> 関数を使って、ロボットが改善されたかどうか確かめたいはずだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_kgk5f055Ej" href="#c_kgk5f055Ej" tabindex="-1" role="presentation"></a><span class="cm-comment">// Your code here</span>
 
@@ -332,25 +336,27 @@
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_2jYz1tpdHQ" href="#p_2jYz1tpdHQ" tabindex="-1" role="presentation"></a>The main limitation of <code>goalOrientedRobot</code> is that it considers only one parcel at a time. It will often walk back and forth across the village because the parcel it happens to be looking at happens to be at the other side of the map, even if there are others much closer.</p>
+<p><code>goalOrientedRobot</code> のメインの限界は、荷物を1つずつしか考えられないことだ。たまたま今見ている荷物がたまたまマップの反対側にあるというだけで、村を行ったり来たりすることになっている。もっと近くのものだってあるのに。</p>
 
-<p><a class="p_ident" id="p_+dCvWOpolq" href="#p_+dCvWOpolq" tabindex="-1" role="presentation"></a>One possible solution would be to compute routes for all packages and then take the shortest one. Even better results can be obtained, if there are multiple shortest routes, by preferring the ones that go to pick up a package instead of delivering a package.</p>
+<p>1つの解決策は、全ての荷物に対して経路を計算して最短のものを取ることだ。いくつも最短のものがある場合は、荷物を届けるよりもピックアップする方を優先することで、より良い結果になるかもしれない。</p>
 
 </div></div>
 
 <h3><a class="i_ident" id="i_s+ntyh5xrm" href="#i_s+ntyh5xrm" tabindex="-1" role="presentation"></a>Persistent group</h3>
 
-<p><a class="p_ident" id="p_2U3yafqdvH" href="#p_2U3yafqdvH" tabindex="-1" role="presentation"></a>Most data structures provided in a standard JavaScript environment aren’t very well suited for persistent use. Arrays have <code>slice</code> and <code>concat</code> methods, which allow us to easily create new arrays without damaging the old one. But <code>Set</code>, for example, has no methods for creating a new set with an item added or removed.</p>
+<p>(継続グループ)</p>
 
-<p><a class="p_ident" id="p_GJFOUv4fQp" href="#p_GJFOUv4fQp" tabindex="-1" role="presentation"></a>Write a new class <code>PGroup</code>, similar to the <code>Group</code> class from <a href="06_object.html#groups">Chapter 6</a>, which stores a set of values. Like <code>Group</code>, it has <code>add</code>, <code>delete</code>, and <code>has</code> methods.</p>
+<p>標準のJavaScript環境が提供するデータ構造はたいてい、永続的な利用には適していない。配列だったら、 <code>slice</code> と <code>concat</code> メソッドがあって、古い配列を損なわずに新しいものを作れる。でも、例えば <code>Set</code> にはアイテムを加えたり除いたりした新しいセットを作るためのメソッドがない。</p>
 
-<p><a class="p_ident" id="p_CkpHJcowhH" href="#p_CkpHJcowhH" tabindex="-1" role="presentation"></a>Its <code>add</code> method, however, should return a <em>new</em> <code>PGroup</code> instance with the given member added and leave the old one unchanged. Similarly, <code>delete</code> creates a new instance without a given member.</p>
+<p>新しいクラスとして <code>PGroup</code> を書いてみよう。<a href="06_object.html#groups">6</a>章の <code>Group</code> に似て、値のセットを保持するものだ。 <code>Group</code> のように、 <code>add</code> 、 <code>delete</code> 、そして <code>has</code> メソッドを持たせるようにする。</p>
 
-<p><a class="p_ident" id="p_BF2ns3kTIW" href="#p_BF2ns3kTIW" tabindex="-1" role="presentation"></a>The class should work for values of any type, not just strings. It does <em>not</em> have to be efficient when used with large amounts of values.</p>
+<p>ただし、 <code>PGroup</code> の <code>add</code> メソッドでは、引数のメンバーを加えた <em>新しい</em> <code>PGroup</code> のインスタンスを返して、古いものには変更を加えないようにする。同じように、 <code>delete</code> は、引数のメンバーを除いた新しいインスタンスを返すようにする。</p>
 
-<p><a class="p_ident" id="p_WVaFt53GdV" href="#p_WVaFt53GdV" tabindex="-1" role="presentation"></a>The constructor shouldn’t be part of the class’s interface (though you’ll definitely want to use it internally). Instead, there is an empty instance, <code>PGroup.empty</code>, that can be used as a starting value.</p>
+<p><code>PGroup</code> は文字列だけではなく、どんな型の値でも扱えるようにする。大量の値を扱うときに、効率的で <em>なくてもいい</em> 。</p>
 
-<p><a class="p_ident" id="p_pV/91/QIt2" href="#p_pV/91/QIt2" tabindex="-1" role="presentation"></a>Why do you need only one <code>PGroup.empty</code> value, rather than having a function that creates a new, empty map every time?</p>
+<p>コンストラクターはクラスのインターフェイスの一部にしてはいけない(内部では使いたいだろうけど)。その代わり、 <code>PGroup.empty</code> という空のインスタンスを開始の値として使えるようにしよう。</p>
+
+<p>毎回新しい空のマップを作る関数を書くよりも、 <code>PGroup.empty</code> という単一の値がほしいのはなぜだろう?</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_KN+ky/iMYB" href="#c_KN+ky/iMYB" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">PGroup</span> {
   <span class="cm-comment">// Your code here</span>
@@ -369,15 +375,15 @@
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_wJCTKfvlWG" href="#p_wJCTKfvlWG" tabindex="-1" role="presentation"></a>The most convenient way to represent the set of member values is still as an array since arrays are easy to copy.</p>
+<p>メンバー値のセットを表現するのに一番便利な方法は、やっぱり配列だ。配列ならコピーしやすいからだ。</p>
 
-<p><a class="p_ident" id="p_q2TqU7jyKB" href="#p_q2TqU7jyKB" tabindex="-1" role="presentation"></a>When a value is added to the group, you can create a new group with a copy of the original array that has the value added (for example, using <code>concat</code>). When a value is deleted, you filter it from the array.</p>
+<p>グループに値が加える場合は、オリジナルの配列のコピーに値を加えた新しいグループを作る(例えば <code>concat</code> を使う)。値が削除される場合は、配列からフィルターして取り除く。</p>
 
-<p><a class="p_ident" id="p_EbZVh5gTfE" href="#p_EbZVh5gTfE" tabindex="-1" role="presentation"></a>The class’s constructor can take such an array as argument and store it as the instance’s (only) property. This array is never updated.</p>
+<p>コンストラクターは、そうした配列を受け取って、インスタンスの(唯一の)プロパティとして保持する。この配列がアップデートされることはない。</p>
 
-<p><a class="p_ident" id="p_oamLkQ+NjT" href="#p_oamLkQ+NjT" tabindex="-1" role="presentation"></a>To add a property (<code>empty</code>) to a constructor that is not a method, you have to add it to the constructor after the class definition, as a regular property.</p>
+<p>メソッドではない <code>empty</code> プロパティをコンストラクターに加えるには、クラス定義の後に普通のプロパティとして追加しないといけない。</p>
 
-<p><a class="p_ident" id="p_no2z35iuBs" href="#p_no2z35iuBs" tabindex="-1" role="presentation"></a>You need only one <code>empty</code> instance because all empty groups are the same and instances of the class don’t change. You can create many different groups from that single empty group without affecting it.</p>
+<p><code>empty</code> インスタンスが1つだけ必要なのは、全ての空グループは同じもので、クラスのインスタンスが変化することはないからだ。この1つだけの空グループに変更を加えなくても、そこから色々なグループを作れるんだ。</p>
 
 </div></div><nav><a href="06_object.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_error.html" title="next chapter">▶</a></nav>
 </article>
