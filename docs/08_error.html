@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bugs and Errors :: Eloquent JavaScript</title>
+  <title>バグとエラー :: Eloquent JavaScript</title>
   <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
   <script src="js/acorn_codemirror.js"></script>
   <link rel=stylesheet href="css/ejs.css">
@@ -12,35 +12,35 @@
 <article>
 <nav><a href="07_robot.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_regexp.html" title="next chapter">▶</a></nav>
 
-<h1><span class=chap_num>Chapter 8</span>Bugs and Errors</h1>
+<h1><span class=chap_num>Chapter 8</span>バグとエラー</h1>
 
 <blockquote>
 
-<p><a class="p_ident" id="p_tsWlII94Rs" href="#p_tsWlII94Rs" tabindex="-1" role="presentation"></a>Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.</p>
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>デバッグはコードを書くのに比べて倍は難しい。したがって、自分の賢さの限界を尽くして書いたコードは、定義上、デバッグ不可能だ。</p>
 
 <footer>Brian Kernighan and P.J. Plauger, <cite>The Elements of Programming Style</cite></footer>
 
 </blockquote><figure class="chapter framed"><img src="img/chapter_picture_8.jpg" alt="Picture of a collection of bugs"></figure>
 
-<p><a class="p_ident" id="p_O+MttnhYVC" href="#p_O+MttnhYVC" tabindex="-1" role="presentation"></a>Flaws in computer programs are usually called <em>bugs</em>. It makes programmers feel good to imagine them as little things that just happen to crawl into our work. In reality, of course, we put them there ourselves.</p>
+<p>コンピュータプログラムの欠陥のことを <em>バグ</em> と呼ぶ。小虫がプログラムの中にたまたま入り込んだだけだとイメージする方が気楽だからだ。実際には、もちろん、自分でそこに仕込んでいる。</p>
 
-<p><a class="p_ident" id="p_bcWk0EwGpY" href="#p_bcWk0EwGpY" tabindex="-1" role="presentation"></a>If a program is crystallized thought, you can roughly categorize bugs into those caused by the thoughts being confused and those caused by mistakes introduced while converting a thought to code. The former type is generally harder to diagnose and fix than the latter.</p>
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>プログラムは思考が結晶化したものだとすると、バグは2種類に分類できる。思考自体の混乱によってできるものと、思考をコードに変換するときのミスによるものだ。たいていは前者の方が突き止めるのも直すのも難しい。</p>
 
-<h2><a class="h_ident" id="h_ibhqsOZvUn" href="#h_ibhqsOZvUn" tabindex="-1" role="presentation"></a>Language</h2>
+<h2><a class="h_ident" id="h_Me7LPdxtqQ" href="#h_Me7LPdxtqQ" tabindex="-1" role="presentation"></a>言語</h2>
 
-<p><a class="p_ident" id="p_ye1ml09vBV" href="#p_ye1ml09vBV" tabindex="-1" role="presentation"></a>Many mistakes could be pointed out to us automatically by the computer, if it knew enough about what we’re trying to do. But here JavaScript’s looseness is a hindrance. Its concept of bindings and properties is vague enough that it will rarely catch typos before actually running the program. And even then, it allows you to do some clearly nonsensical things without complaint, such as computing <code>true * &quot;monkey&quot;</code>.</p>
+<p><a class="p_ident" id="p_78aDwuALBZ" href="#p_78aDwuALBZ" tabindex="-1" role="presentation"></a>コンピュータが我々を意図を知っていれば、たいていのミスを自動的に指摘してくれるはずだ。だけど、ここでJavaScriptのルーズさが邪魔になる。JavaScriptのバインディングやプロパティの概念はあいまいで、実際にプログラムを走らせてみるまでほとんどタイポを捕まえてもくれない。さらに、明らかに無意味な計算をさせても文句も言わない。例えば、 <code>true * &quot;monkey&quot;</code> のように。</p>
 
-<p><a class="p_ident" id="p_EcSg7P4I9E" href="#p_EcSg7P4I9E" tabindex="-1" role="presentation"></a>There are some things that JavaScript does complain about. Writing a program that does not follow the language’s grammar will immediately make the computer complain. Other things, such as calling something that’s not a function or looking up a property on an undefined value, will cause an error to be reported when the program tries to perform the action.</p>
+<p><a class="p_ident" id="p_6pVXVzGPFJ" href="#p_6pVXVzGPFJ" tabindex="-1" role="presentation"></a>JavaScriptが文句を言う場合もある。文法に従わないプログラムを書けば、すぐにコンピュータが文句を言う。他にも、関数ではないものを呼び出したり、undefined値のプロパティを見ようとしたりすれば、その操作を実行しようとしたときにエラーが起こって報告される。</p>
 
-<p><a class="p_ident" id="p_M/fMASXkeH" href="#p_M/fMASXkeH" tabindex="-1" role="presentation"></a>But often, your nonsense computation will merely produce <code>NaN</code> (not a number) or an undefined value, while the program happily continues, convinced that it’s doing something meaningful. The mistake will manifest itself only later, after the bogus value has traveled through several functions. It might not trigger an error at all but silently cause the program’s output to be wrong. Finding the source of such problems can be difficult.</p>
+<p><a class="p_ident" id="p_1dTNB2FqVC" href="#p_1dTNB2FqVC" tabindex="-1" role="presentation"></a>でもありがちなのは、君のバカげた計算は単に <code>NaN</code> やundefinedを生み出すだけで、プログラムは意味があることをしているつもりで喜んで実行を続ける、ということだ。ミスは後になってから分かる。偽物の値がいくつもの関数を行き渡ってからだ。エラーを起こすこともなく、ひっそりとおかしいアウトプットを返してくるだけかもしれない。こういう問題の元を見つけるのは難しい。</p>
 
-<p><a class="p_ident" id="p_LaAYmHSV12" href="#p_LaAYmHSV12" tabindex="-1" role="presentation"></a>The process of finding mistakes—bugs—in programs is called <em>debugging</em>.</p>
+<p><a class="p_ident" id="p_SAOkiVUG6X" href="#p_SAOkiVUG6X" tabindex="-1" role="presentation"></a>こうしたプログラムのミス(バグ)を見つける作業を <em>デバッグ(debugging)</em> という。</p>
 
-<h2><a class="h_ident" id="h_u1jlTq3i42" href="#h_u1jlTq3i42" tabindex="-1" role="presentation"></a>Strict mode</h2>
+<h2><a class="h_ident" id="h_jZ+IHWqwWn" href="#h_jZ+IHWqwWn" tabindex="-1" role="presentation"></a>ストリクトモード(Strict mode)</h2>
 
-<p><a class="p_ident" id="p_WJCaiNx5iy" href="#p_WJCaiNx5iy" tabindex="-1" role="presentation"></a>JavaScript can be made a <em>little</em> stricter by enabling <em>strict mode</em>. This is done by putting the string <code>&quot;use strict&quot;</code> at the top of a file or a function body. Here’s an example:</p>
+<p><a class="p_ident" id="p_PRgG/j3Efm" href="#p_PRgG/j3Efm" tabindex="-1" role="presentation"></a>JavaScriptは <em>ストリクトモード(strict mode)</em> をオンにすると <em>少し</em> 厳格になる。ファイルや関数の頭に <code>&quot;use strict&quot;</code> を置くだけでオンにできる。以下はその例だ。</p>
 
-<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_tKCBneE0vw" href="#c_tKCBneE0vw" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">canYouSpotTheProblem</span>() {
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_WqVH0qd4aL" href="#c_WqVH0qd4aL" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">canYouSpotTheProblem</span>() {
   <span class="cm-string">&quot;use strict&quot;</span>;
   <span class="cm-keyword">for</span> (<span class="cm-variable">counter</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">counter</span> <span class="cm-operator">&lt;</span> <span class="cm-number">10</span>; <span class="cm-variable">counter</span><span class="cm-operator">++</span>) {
     <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Happy happy&quot;</span>);
@@ -48,65 +48,64 @@
 }
 
 <span class="cm-variable">canYouSpotTheProblem</span>();
-<span class="cm-comment">// → ReferenceError: counter is not defined</span></pre>
+<span class="cm-comment">// → ReferenceError: counter is not defined(counterは定義されていない)</span></pre>
 
-<p><a class="p_ident" id="p_9RL+1s9Y4+" href="#p_9RL+1s9Y4+" tabindex="-1" role="presentation"></a>Normally, when you forget to put <code>let</code> in front of your binding, as with <code>counter</code> in the example, JavaScript quietly creates a global binding and uses that. In strict mode, an error is reported instead. This is very helpful. It should be noted, though, that this doesn’t work when the binding in question already exists as a global binding. In that case, the loop will still quietly overwrite the value of the binding.</p>
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>普通は、 <code>let</code> をバインディングの前に置き忘れると( <code>counter</code> のように)、JavaScriptはひっそりとグローバルバインディングを作って使う。ストリクトモードならそこでエラーが発生する。これはとても便利だ。とはいえ注意しないといけないのは、問題のバインディングがすでにグローバルバインディングとして存在する場合だ。その場合は、やっぱり上のループはひっそりとグローバルバインディングを上書きする。</p>
 
-<p><a class="p_ident" id="p_WqXHKWNRd1" href="#p_WqXHKWNRd1" tabindex="-1" role="presentation"></a>Another change in strict mode is that the <code>this</code> binding holds the value <code>undefined</code> in functions that are not called as methods. When making such a call outside of strict mode, <code>this</code> refers to the global scope object, which is an object whose properties are the global bindings. So if you accidentally call a method or constructor incorrectly in strict mode, JavaScript will produce an error as soon as it tries to read something from <code>this</code>, rather than happily writing to the global scope.</p>
+<p>その他のストリクトモードの効果は、関数がメソッドとして呼び出されない限り <code>this</code> バインディングが <code>undefined</code> になることだ。ストリクトモード外でそういう呼び出しをした場合には、 <code>this</code> はグローバルオブジェクトを参照する。グローバルオブジェクトは、そのプロパティがグローバルバインディングになっているオブジェクトだ。もしストリクトモード内でメソッドやコンストラクターにおかしい呼び出し方をした場合は、JavaScriptが <code>this</code> のプロパティを読もうとしたときにエラーが起こるようになる。そして喜んでグローバルスコープに書き込むこともなくなる。</p>
 
-<p><a class="p_ident" id="p_eZSU5aTSD4" href="#p_eZSU5aTSD4" tabindex="-1" role="presentation"></a>For example, consider the following code, which calls a constructor function without the <code>new</code> keyword so that its <code>this</code> will <em>not</em> refer to a newly constructed object:</p>
+<p>例えば、以下のコードについて考えてみよう。コンストラクター関数を <code>new</code> キーワードなしで呼び出しているから <code>this</code> は新しくできるオブジェクトを参照 <em>しない</em> 。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_FPKrb2F1C3" href="#c_FPKrb2F1C3" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">Person</span>(<span class="cm-def">name</span>) { <span class="cm-keyword">this</span>.<span class="cm-property">name</span> <span class="cm-operator">=</span> <span class="cm-variable-2">name</span>; }
 <span class="cm-keyword">let</span> <span class="cm-def">ferdinand</span> <span class="cm-operator">=</span> <span class="cm-variable">Person</span>(<span class="cm-string">&quot;Ferdinand&quot;</span>); <span class="cm-comment">// oops</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">name</span>);
 <span class="cm-comment">// → Ferdinand</span></pre>
 
-<p><a class="p_ident" id="p_Tv3LlrrZaj" href="#p_Tv3LlrrZaj" tabindex="-1" role="presentation"></a>So the bogus call to <code>Person</code> succeeded but returned an undefined value and created the global binding <code>name</code>. In strict mode, the result is different.</p>
+<p><a class="p_ident" id="p_H7eBqJVJCK" href="#p_H7eBqJVJCK" tabindex="-1" role="presentation"></a>Personの間違った呼び出しが成功して、undefinedが返ってくる上に <code>name</code> というグローバルバインディングができてしまう。ストリクトモードでは結果が変わってくる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_HFy5dGOOh4" href="#c_HFy5dGOOh4" tabindex="-1" role="presentation"></a><span class="cm-string">&quot;use strict&quot;</span>;
 <span class="cm-keyword">function</span> <span class="cm-def">Person</span>(<span class="cm-def">name</span>) { <span class="cm-keyword">this</span>.<span class="cm-property">name</span> <span class="cm-operator">=</span> <span class="cm-variable-2">name</span>; }
 <span class="cm-keyword">let</span> <span class="cm-def">ferdinand</span> <span class="cm-operator">=</span> <span class="cm-variable">Person</span>(<span class="cm-string">&quot;Ferdinand&quot;</span>); <span class="cm-comment">// forgot new</span>
 <span class="cm-comment">// → TypeError: Cannot set property 'name' of undefined</span></pre>
 
-<p><a class="p_ident" id="p_0eYPyoGi1l" href="#p_0eYPyoGi1l" tabindex="-1" role="presentation"></a>We are immediately told that something is wrong. This is helpful.</p>
+<p>すぐに何かがおかしいと教えてもらえる。これは便利だ。</p>
 
-<p><a class="p_ident" id="p_WGJIyAOZ/i" href="#p_WGJIyAOZ/i" tabindex="-1" role="presentation"></a>Fortunately, constructors created with the <code>class</code> notation will always complain if they are called without <code>new</code>, making this less of a problem even in non-strict mode.</p>
+<p>幸い、 <code>class</code> 記法で作られたコンストラクターなら、 <code>new</code> なしで呼び出されると文句を言うからストリクトモードでなくてもあまり問題にならない。</p>
 
-<p><a class="p_ident" id="p_qlYTT6nRD4" href="#p_qlYTT6nRD4" tabindex="-1" role="presentation"></a>Strict mode does a few more things. It disallows giving a function multiple parameters with the same name and removes certain problematic language features entirely (such as the <code>with</code> statement, which is so wrong it is not further discussed in this book).</p>
+<p>ストリクトモードには他にもいくつか機能がある。関数に複数の同名のパラメーターを付けられないようにする。いくつかの問題があるJavaScriptの機能を取り去ってくれる( <code>with</code> など。これはあまりにも間違っているのでこの本ではもう扱わない)。</p>
 
-<p><a class="p_ident" id="p_kIUErMqROW" href="#p_kIUErMqROW" tabindex="-1" role="presentation"></a>In short, putting <code>&quot;use strict&quot;</code> at the top of your program rarely hurts and might help you spot a problem.</p>
+<p>簡単にいえば、 <code>&quot;use strict&quot;</code> をプログラムの先頭におけば、邪魔になることはほとんどないし、問題を発見する手助けになるかもしれない。</p>
 
-<h2><a class="h_ident" id="h_k7niieKEJG" href="#h_k7niieKEJG" tabindex="-1" role="presentation"></a>Types</h2>
+<h2><a class="h_ident" id="h_MQ8yNG/gKK" href="#h_MQ8yNG/gKK" tabindex="-1" role="presentation"></a>型(Types)</h2>
 
-<p><a class="p_ident" id="p_YhTIyNZyz8" href="#p_YhTIyNZyz8" tabindex="-1" role="presentation"></a>Some languages want to know the types of all your bindings and expressions before even running a program. They will tell you right away when a type is used in an inconsistent way. JavaScript considers types only when actually running the program, and even there often tries to implicitly convert values to the type it expects, so it’s not much help.</p>
+<p>言語によってはプログラム実行前にバインディングや式の型を知りたがるものもある。そういう言語は型が間違った使い方をされてるとすぐに教えてくれる。JavaScriptは実行するときだけ型について考えるし、その時にもこっそり値を予想する型に変換しようとするから、あまり助けにならない。</p>
 
-<p><a class="p_ident" id="p_YdtQydcPrv" href="#p_YdtQydcPrv" tabindex="-1" role="presentation"></a>Still, types provide a useful framework for talking about programs. A lot of mistakes come from being confused about the kind of value that goes into or comes out of a function. If you have that information written down, you’re less likely to get confused.</p>
+<p>とはいえ、型はプログラムについて語るときには便利なフレームワークだ。ミスの多くは、関数に入れる値や出てくる値の種類についての混乱から起こるんだ。その情報を書いておけば、混乱する可能性は減るだろう。</p>
 
-<p><a class="p_ident" id="p_YSuG1qtqyR" href="#p_YSuG1qtqyR" tabindex="-1" role="presentation"></a>You could add a comment like the following before the <code>goalOrientedRobot</code> function from the previous chapter to describe its type:</p>
+<p>前の章の <code>goalOrientedRobot</code> 関数に、次のようなコメントを書いて型について説明することもできるだろう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_30eJTz3eQP" href="#c_30eJTz3eQP" tabindex="-1" role="presentation"></a><span class="cm-comment">// (VillageState, Array) → {direction: string, memory: Array}</span>
 <span class="cm-keyword">function</span> <span class="cm-def">goalOrientedRobot</span>(<span class="cm-def">state</span>, <span class="cm-def">memory</span>) {
   <span class="cm-comment">// ...</span>
 }</pre>
 
-<p><a class="p_ident" id="p_wRx2hJtLds" href="#p_wRx2hJtLds" tabindex="-1" role="presentation"></a>There are a number of different conventions for annotating JavaScript programs with types.</p>
+<p>JavaScriptのプログラムに型で注釈を付ける方法にはいろいろな習慣がある。</p>
 
-<p><a class="p_ident" id="p_K+Rg+L+z0T" href="#p_K+Rg+L+z0T" tabindex="-1" role="presentation"></a>One thing about types is that they need to introduce their own complexity to be able to describe enough code to be useful. What do you think would be the type of the <code>randomPick</code> function that returns a random element from an array? You’d need to introduce a <em>type
-variable</em>, <em>T</em>, which can stand in for any type, so that you can give <code>randomPick</code> a type like <code>([T]) → T</code> (function from an array of <em>T</em>s to a <em>T</em>).</p>
+<p><a class="p_ident" id="p_FrxCjnDf90" href="#p_FrxCjnDf90" tabindex="-1" role="presentation"></a>型について1つ言えることは、それ自体が複雑さを持ち込むということだ。これはコードが使いやすくなるように十分な説明をするためなんだ。 配列からランダムな要素を返す <code>randomPick</code> 関数の型は何になるだろうか?君は <em>型変数(type variable)</em> , <em>T</em> を導入する必要があるかもしれない。 <em>T</em> はどんな型の代わりにもなる。だから、 <code>randomPick</code> の型は <code>([T]) -&gt; T</code> になるんだ(<em>T</em>の配列から<em>T</em>を1つ返す関数という意味になる)。</p>
 
-<p id="typing"><a class="p_ident" id="p_eztjw3zFDU" href="#p_eztjw3zFDU" tabindex="-1" role="presentation"></a>When the types of a program are known, it is possible for the computer to <em>check</em> them for you, pointing out mistakes before the program is run. There are several JavaScript dialects that add types to the language and check them. The most popular one is called <a href="https://www.typescriptlang.org/">TypeScript</a>. If you are interested in adding more rigor to your programs, I recommend you give it a try.</p>
+<p id="typing"><a class="p_ident" id="p_JRyNyt+XY4" href="#p_JRyNyt+XY4" tabindex="-1" role="presentation"></a>プログラムの型が分かっているなら、コンピュータが <em>チェック</em> できるし、実行の前にミスを指摘することもできる。JavaScriptに型を加えてチェックできるようにした方言がいろいろある。一番有名なのは<a href="https://www.typescriptlang.org/">TypeScript</a>だ。これに興味があって、もっとプログラムを強固にしたかったら、試してみるといいだろう。</p>
 
-<p><a class="p_ident" id="p_t8esQrTIP9" href="#p_t8esQrTIP9" tabindex="-1" role="presentation"></a>In this book, we’ll continue using raw, dangerous, untyped JavaScript code.</p>
+<p>この本では、生の、危険な、型のないJavaScriptコードを使っていく。</p>
 
-<h2><a class="h_ident" id="h_CCCzKyBrc1" href="#h_CCCzKyBrc1" tabindex="-1" role="presentation"></a>Testing</h2>
+<h2><a class="h_ident" id="h_Y7Vg24hJ4I" href="#h_Y7Vg24hJ4I" tabindex="-1" role="presentation"></a>テスト</h2>
 
-<p><a class="p_ident" id="p_cfHj2WfM1O" href="#p_cfHj2WfM1O" tabindex="-1" role="presentation"></a>If the language is not going to do much to help us find mistakes, we’ll have to find them the hard way: by running the program and seeing whether it does the right thing.</p>
+<p>言語がミスの発見を助けてくれないなら、地道に探していくしかない。つまりプログラムを実行して、正しい動作をしているか見ていくんだ。</p>
 
-<p><a class="p_ident" id="p_8W1dLTf8k6" href="#p_8W1dLTf8k6" tabindex="-1" role="presentation"></a>Doing this by hand, again and again, is a really bad idea. Not only is it annoying, it also tends to be ineffective since it takes too much time to exhaustively test everything every time you make a change.</p>
+<p>これを何度も何度も手でやっていくのは、とても悪いアイデアだ。面倒くさいだけではなく、変更の度に徹底的に全てをテストするのは時間がかかりすぎるから、効率も悪い。</p>
 
-<p><a class="p_ident" id="p_ngk+1LWoAU" href="#p_ngk+1LWoAU" tabindex="-1" role="presentation"></a>Computers are good at repetitive tasks, and testing is the ideal repetitive task. Automated testing is the process of writing a program that tests another program. Writing tests is a bit more work than testing manually, but once you’ve done it, you gain a kind of superpower: it takes you only a few seconds to verify that your program still behaves properly in all the situations you wrote tests for. When you break something, you’ll immediately notice, rather than randomly running into it at some later time.</p>
+<p>コンピュータは繰返しのタスクが得意で、テストは理想的な繰返しタスクだ。テストの自動化というのは、他のプログラムをテストするプログラムを書く、ということだ。テストを書くのは手動テストよりひと手間かかるけど、一度書いてしまえばちょっとした超能力が手に入ることになる。まず、テストで想定した状況に関してはプログラムがちゃんと動いていることが数秒で確認できるようになる。さらに、何かを壊してしまったらすぐに気づけるようになって、後になってみて問題に出くわすことがない。</p>
 
-<p><a class="p_ident" id="p_S/z0iwnHlS" href="#p_S/z0iwnHlS" tabindex="-1" role="presentation"></a>Tests usually take the form of little labeled programs that verify some aspect of your code. For example, a set of tests for the (standard, probably already tested by someone else) <code>toUpperCase</code> method might look like this:</p>
+<p>テストはたいていラベル付きのプログラムの形式になっていて、コードの何かしらを確認する。例えば、 <code>toUpperCase</code> メソッド(標準のもの。たぶん誰かにテストされているだろう)のテストセットはこんな感じになるだろう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_WrGyqyPbp3" href="#c_WrGyqyPbp3" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">test</span>(<span class="cm-def">label</span>, <span class="cm-def">body</span>) {
   <span class="cm-keyword">if</span> (<span class="cm-operator">!</span><span class="cm-variable-2">body</span>()) <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">`Failed: ${</span><span class="cm-variable-2">label</span><span class="cm-string-2">}</span><span class="cm-string-2">`</span>);
@@ -122,19 +121,19 @@ variable</em>, <em>T</em>, which can stand in for any type, so that you can give
   <span class="cm-keyword">return</span> <span class="cm-string">&quot;مرحبا&quot;</span>.<span class="cm-property">toUpperCase</span>() <span class="cm-operator">==</span> <span class="cm-string">&quot;مرحبا&quot;</span>;
 });</pre>
 
-<p><a class="p_ident" id="p_Gyas+RfY6l" href="#p_Gyas+RfY6l" tabindex="-1" role="presentation"></a>Writing tests like this tends to produce rather repetitive, awkward code. Fortunately, there exist pieces of software that help you build and run collections of tests (<em>test suites</em>) by providing a language (in the form of functions and methods) suited to expressing tests and by outputting informative information when a test fails. These are usually called <em>test runners</em>.</p>
+<p>こんな風にテストを書くと、むしろしつこくてぎこちないコードになってしまう。幸い、テストの集合( <em>テストスイート</em> )を組み立てて実行するソフトウェアが存在する。それを使えば、テストを表現するのに適した言葉(関数やメソッドの形)で書けて、テストが失敗したときには意味のある情報をアウトプットしてくれる。これはたいてい <em>テストランナー</em> と呼ばれる。</p>
 
-<p><a class="p_ident" id="p_zmvP6RI0eK" href="#p_zmvP6RI0eK" tabindex="-1" role="presentation"></a>Some code is easier to test than other code. Generally, the more external objects that the code interacts with, the harder it is to set up the context in which to test it. The style of programming shown in the <a href="07_robot.html">previous chapter</a>, which uses self-contained persistent values rather than changing objects, tends to be easy to test.</p>
+<p>あるコードが、他のコードよりテストしやすい、ということがある。一般的に、外部のオブジェクトとの関わりが多いコードほど、テストのための文脈のセットアップが大変になる。<a href="07_robot.html">前の章</a>で示したプログラミングのスタイル、つまり外部のオブジェクトを変更せずに自己完結した永続データを使うスタイルでは、テストが簡単になりやすい。</p>
 
-<h2><a class="h_ident" id="h_iVsnyIAWUT" href="#h_iVsnyIAWUT" tabindex="-1" role="presentation"></a>Debugging</h2>
+<h2><a class="h_ident" id="h_k2QNrTrtgz" href="#h_k2QNrTrtgz" tabindex="-1" role="presentation"></a>デバッグ</h2>
 
-<p><a class="p_ident" id="p_5mME8LB07m" href="#p_5mME8LB07m" tabindex="-1" role="presentation"></a>Once you notice there is something wrong with your program because it misbehaves or produces errors, the next step is to figure out <em>what</em> the problem is.</p>
+<p>プログラムの挙動が変だったりエラーが出たりして、何かがおかしいと気づいたら、次のステップはその <em>何か</em> をつきとめることだ。</p>
 
-<p><a class="p_ident" id="p_CJKevweHV6" href="#p_CJKevweHV6" tabindex="-1" role="presentation"></a>Sometimes it is obvious. The error message will point at a specific line of your program, and if you look at the error description and that line of code, you can often see the problem.</p>
+<p>それが簡単な場合もある。エラーメッセージがプログラムのある行を指していて、エラーの説明とプログラムのその行を読めば分かってしまうような場合だ。</p>
 
-<p><a class="p_ident" id="p_5SwXZX1qh1" href="#p_5SwXZX1qh1" tabindex="-1" role="presentation"></a>But not always. Sometimes the line that triggered the problem is simply the first place where a flaky value produced elsewhere gets used in an invalid way. If you have been solving the exercises in earlier chapters, you will probably have already experienced such situations.</p>
+<p>でも、いつでもそうなるとは限らない。問題が起こった行は、どこかで作られた壊れた値が、単に初めて使われただけの場合があるからだ。これまでの章のエクササイズを解いてきたなら、そういう状況を経験したことがあるだろう。</p>
 
-<p><a class="p_ident" id="p_rsq5hJyXKX" href="#p_rsq5hJyXKX" tabindex="-1" role="presentation"></a>The following example program tries to convert a whole number to a string in a given base (decimal, binary, and so on) by repeatedly picking out the last digit and then dividing the number to get rid of this digit. But the strange output that it currently produces suggests that it has a bug.</p>
+<p><a class="p_ident" id="p_AGHCaI1vIH" href="#p_AGHCaI1vIH" tabindex="-1" role="presentation"></a>次の関数は、整数を、与えられた底(10進数、2進数などなど)で文字列に変換しようとする。繰返し最後の桁の数を取り出して、入力の数字を底で割ることでこの桁を捨てる。はずだけど、おかしな出力がバグの存在を示している。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_8tOR9x4PzT" href="#c_8tOR9x4PzT" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">numberToString</span>(<span class="cm-def">n</span>, <span class="cm-def">base</span> <span class="cm-operator">=</span> <span class="cm-number">10</span>) {
   <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;&quot;</span>, <span class="cm-def">sign</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;&quot;</span>;
@@ -151,11 +150,11 @@ variable</em>, <em>T</em>, which can stand in for any type, so that you can give
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">numberToString</span>(<span class="cm-number">13</span>, <span class="cm-number">10</span>));
 <span class="cm-comment">// → 1.5e-3231.3e-3221.3e-3211.3e-3201.3e-3191.3e-3181.3…</span></pre>
 
-<p><a class="p_ident" id="p_KiDfjUS51F" href="#p_KiDfjUS51F" tabindex="-1" role="presentation"></a>Even if you see the problem already, pretend for a moment that you don’t. We know that our program is malfunctioning, and we want to find out why.</p>
+<p>既に問題が分かっていてもしばらく知らないフリをしてほしい。このプログラムが機能していないことは分かるけど、なぜかをつきとめていこう。</p>
 
-<p><a class="p_ident" id="p_2OJsjnmKOW" href="#p_2OJsjnmKOW" tabindex="-1" role="presentation"></a>This is where you must resist the urge to start making random changes to the code to see whether that makes it better. Instead, <em>think</em>. Analyze what is happening and come up with a theory of why it might be happening. Then, make additional observations to test this theory—or, if you don’t yet have a theory, make additional observations to help you come up with one.</p>
+<p>ここでランダムな変更を加えてよくなるかどうか見てみたい衝動に抵抗しよう。その代りに、 <em>考えるんだ</em> 。何が起こっているが分析して、どうしてそうなるのか理論を思いついてみよう。それから、その理論をテストするために追加で観察をしよう。あるいはまだ理論がないなら追加の観察によって何か思いつくかもしれない。</p>
 
-<p><a class="p_ident" id="p_HuAniqpAd5" href="#p_HuAniqpAd5" tabindex="-1" role="presentation"></a>Putting a few strategic <code>console.log</code> calls into the program is a good way to get additional information about what the program is doing. In this case, we want <code>n</code> to take the values <code>13</code>, <code>1</code>, and then <code>0</code>. Let’s write out its value at the start of the loop.</p>
+<p>プログラムに戦略的に <code>console.log</code> を置いていくのも、プログラムの動作の情報を得るのにはいい戦略だ。この場合、 <code>n</code> の値が <code>13</code> , <code>1</code> , <code>0</code> と変化してほしい。ループの始めで <code>n</code> の値を書かせてみよう。</p>
 
 <pre class="snippet cm-s-default" data-language="null" ><a class="c_ident" id="c_nB/OeL8UNa" href="#c_nB/OeL8UNa" tabindex="-1" role="presentation"></a>13
 1.3
@@ -164,22 +163,21 @@ variable</em>, <em>T</em>, which can stand in for any type, so that you can give
 …
 1.5e-323</pre>
 
-<p><a class="p_ident" id="p_I+PNN6aJ0e" href="#p_I+PNN6aJ0e" tabindex="-1" role="presentation"></a><em>Right</em>. Dividing 13 by 10 does not produce a whole number. Instead of <code>n /= base</code>, what we actually want is <code>n = Math.<wbr>floor(n /<wbr> base)</code> so that the number is properly “shifted” to the right.</p>
+<p><a class="p_ident" id="p_7GJjl4AIi9" href="#p_7GJjl4AIi9" tabindex="-1" role="presentation"></a><em>なるほど</em> 。13割る10が整数になっていない。 <code>n /= base</code> ではなくて、本当にほしいのは <code>n = Math.<wbr>floor(n /<wbr> base)</code> だ。こうすれば、桁がちゃんと右に &quot;シフトする&quot;。</p>
 
-<p><a class="p_ident" id="p_0eFcPpir7M" href="#p_0eFcPpir7M" tabindex="-1" role="presentation"></a>An alternative to using <code>console.log</code> to peek into the program’s behavior is to use the <em>debugger</em> capabilities of your browser. Browsers come with the ability to set a <em>breakpoint</em> on a specific line of your code. When the execution of the program reaches a line with a breakpoint, it is paused, and you can inspect the values of bindings at that point. I won’t go into details, as debuggers differ from browser to browser, but look in your browser’s developer
-tools or search the Web for more information.</p>
+<p><a class="p_ident" id="p_qDI6Kps0rn" href="#p_qDI6Kps0rn" tabindex="-1" role="presentation"></a><code>console.log</code> 以外で、プログラムの挙動を調べる方法には、ブラウザーのデバッガー機能がある。ブラウザーには、コードの指定した場所にブレイクポイントを仕込む機能があるんだ。プログラムはブレイクポイントの行に達したら、一旦実行を停止するから、その時点でのバインディングの値を調べられる。デバッガーはブラウザーによってまちまちだからここでは詳しい話はしない。使っているブラウザーの開発者ツールを見たりやWebで調べてみたりするといい。</p>
 
-<p><a class="p_ident" id="p_h2R9jlfw7o" href="#p_h2R9jlfw7o" tabindex="-1" role="presentation"></a>Another way to set a breakpoint is to include a <code>debugger</code> statement (consisting of simply that keyword) in your program. If the developer tools of your browser are active, the program will pause whenever it reaches such a statement.</p>
+<p>他にも <code>debugger</code> 宣言(単にこのキーワードだけの文)をプログラムに含めるとブレイクポイントを仕込むことができる。ブラウザーの開発者ツールがアクティブになっていれば、プログラムは <code>debugger</code> に到達したところで停止する。</p>
 
-<h2><a class="h_ident" id="h_iwwPbaBjJD" href="#h_iwwPbaBjJD" tabindex="-1" role="presentation"></a>Error propagation</h2>
+<h2><a class="h_ident" id="h_xV7f6EgZbK" href="#h_xV7f6EgZbK" tabindex="-1" role="presentation"></a>エラーの伝搬</h2>
 
-<p><a class="p_ident" id="p_cHc7tL2ujS" href="#p_cHc7tL2ujS" tabindex="-1" role="presentation"></a>Not all problems can be prevented by the programmer, unfortunately. If your program communicates with the outside world in any way, it is possible to get malformed input, to become overloaded with work, or to have the network fail.</p>
+<p>全ての問題がプログラマーによって防止できるわけではない、残念ながら。プログラムが外の世界とやりとりするなら、入力の形式がおかしいかもしれないし、過負荷状態になるかもしれないし、ネットワークの障害があるかもしれない。</p>
 
-<p><a class="p_ident" id="p_zy372pQBzA" href="#p_zy372pQBzA" tabindex="-1" role="presentation"></a>If you’re programming only for yourself, you can afford to just ignore such problems until they occur. But if you build something that is going to be used by anybody else, you usually want the program to do better than just crash. Sometimes the right thing to do is take the bad input in stride and continue running. In other cases, it is better to report to the user what went wrong and then give up. But in either situation, the program has to actively do something in response to the problem.</p>
+<p>プログラムが自分だけのものなら、そういう問題が起こるまで無視していてもいい。でも他の人も使うようなものを作るなら、単にクラッシュするよりはマシな対応をしたい。間違った入力を受け取ったとき、何も気にせず実行が続いた方がいい場合もあれば、ユーザーに問題を報告してギブアップした方がいい場合もある。ただ、どちらにしろプログラムは問題に対して主体的に対処するべきだ。</p>
 
-<p><a class="p_ident" id="p_ZrDi3JVFsJ" href="#p_ZrDi3JVFsJ" tabindex="-1" role="presentation"></a>Say you have a function <code>promptNumber</code> that asks the user for a number and returns it. What should it return if the user inputs “orange”?</p>
+<p><a class="p_ident" id="p_7w67t3KY4f" href="#p_7w67t3KY4f" tabindex="-1" role="presentation"></a>ユーザーに数字を要求して、それを返り値にする <code>promptNumber</code> という関数があるとしよう。ユーザーの入力が“orange”だったら何を返すべきだろう。</p>
 
-<p><a class="p_ident" id="p_ee4d/K1Bh5" href="#p_ee4d/K1Bh5" tabindex="-1" role="presentation"></a>One option is to make it return a special value. Common choices for such values are <code>null</code>, <code>undefined</code>, or -1.</p>
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a>1つの選択肢としては、特別な値を返すことだ。一般的なのは <code>null</code> , <code>undefined</code> あるいは-1だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ssOc2pf47/" href="#c_ssOc2pf47/" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">promptNumber</span>(<span class="cm-def">question</span>) {
   <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-variable">Number</span>(<span class="cm-variable">prompt</span>(<span class="cm-variable-2">question</span>));
@@ -189,9 +187,9 @@ tools or search the Web for more information.</p>
 
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">promptNumber</span>(<span class="cm-string">&quot;How many trees do you see?&quot;</span>));</pre>
 
-<p><a class="p_ident" id="p_8/CuHXN0/U" href="#p_8/CuHXN0/U" tabindex="-1" role="presentation"></a>Now any code that calls <code>promptNumber</code> must check whether an actual number was read and, failing that, must somehow recover—maybe by asking again or by filling in a default value. Or it could again return a special value to <em>its</em> caller to indicate that it failed to do what it was asked.</p>
+<p><code>promptNumber</code> を呼び出す関数は、本当の数字が返ってきたかチェックして、失敗だったらなんとかリカバーしないといけない。また聞いたり、デフォルト値で埋めたりすることになるだろう。もしくは、さらに <em>その</em> 呼び出し元に特別な値を返して、要求に失敗したと伝えるかだ。</p>
 
-<p><a class="p_ident" id="p_5MsTIzo4xf" href="#p_5MsTIzo4xf" tabindex="-1" role="presentation"></a>In many situations, mostly when errors are common and the caller should be explicitly taking them into account, returning a special value is a good way to indicate an error. It does, however, have its downsides. First, what if the function can already return every possible kind of value? In such a function, you’ll have to do something like wrap the result in an object to be able to distinguish success from failure.</p>
+<p>たいていの状況で、特にエラーが起こりやすく呼び出し元がそれを計算に入れるべきときには、特別な値を返す事がエラーを示すには良い方法だ。とはいえ、ここには欠点もある。まず、そもそもの関数がどんな値でも返し得るものだったらどうだろう?そういう関数では成功と失敗を見分けるために、結果をオブジェクトに包むようなことをしないといけない。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_aQW8dfZcRx" href="#c_aQW8dfZcRx" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">lastElement</span>(<span class="cm-def">array</span>) {
   <span class="cm-keyword">if</span> (<span class="cm-variable-2">array</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
@@ -201,18 +199,17 @@ tools or search the Web for more information.</p>
   }
 }</pre>
 
-<p><a class="p_ident" id="p_+E9fllIVBt" href="#p_+E9fllIVBt" tabindex="-1" role="presentation"></a>The second issue with returning special values is that it can lead to awkward code. If a piece of code calls <code>promptNumber</code> 10 times, it has to check 10 times whether <code>null</code> was returned. And if its response to finding <code>null</code> is to simply return <code>null</code> itself, callers of the function will in turn have to check for it, and so on.</p>
+<p><a class="p_ident" id="p_96uAUcJUq/" href="#p_96uAUcJUq/" tabindex="-1" role="presentation"></a>特別な値を返すことの2つ目の問題は、わずらわしいコードになりかねないことだ。あるコードが <code>promptNumber</code> を10回呼び出すなら <code>null</code> が返されていないか10回チェックすることになる。その上、 <code>null</code> を見つけたときの反応として、そのコードもまた <code>null</code> を返すなら、その呼び出し元がまたチェックしないといけない。</p>
 
-<h2><a class="h_ident" id="h_zT3755/aOp" href="#h_zT3755/aOp" tabindex="-1" role="presentation"></a>Exceptions</h2>
+<h2><a class="h_ident" id="h_j415hnLO9o" href="#h_j415hnLO9o" tabindex="-1" role="presentation"></a>例外(Exceptions)</h2>
 
-<p><a class="p_ident" id="p_ZBsTKhGA4i" href="#p_ZBsTKhGA4i" tabindex="-1" role="presentation"></a>When a function cannot proceed normally, what we would <em>like</em> to do is just stop what we are doing and immediately jump to a place that knows how to handle the problem. This is what <em>exception handling</em> does.</p>
+<p><a class="p_ident" id="p_inz/P47QgH" href="#p_inz/P47QgH" tabindex="-1" role="presentation"></a>ある関数が通常通り実行を続けていけないときには、実行を止めて問題への対処方法が分かっている場所へすぐにジャンプできれば <em>うれしい</em> 。これが <em>例外処理(exception handling)</em> のすることだ。</p>
 
-<p><a class="p_ident" id="p_kjXcPy8jGf" href="#p_kjXcPy8jGf" tabindex="-1" role="presentation"></a>Exceptions are a mechanism that makes it possible for code that runs into a problem to <em>raise</em> (or <em>throw</em>) an exception. An exception can be any value. Raising one somewhat resembles a super-charged return from a function: it jumps out of not just the current function but also its callers, all the way down to the first call that started the current execution. This is called <em>unwinding the
-stack</em>. You may remember the stack of function calls that was mentioned in <a href="03_functions.html#stack">Chapter 3</a>. An exception zooms down this stack, throwing away all the call contexts it encounters.</p>
+<p><a class="p_ident" id="p_Z9GcELQVxl" href="#p_Z9GcELQVxl" tabindex="-1" role="presentation"></a>例外とは、コードが問題にぶつかったときに例外を <em>発生させる(raise)</em> (もしくは <em>投げる(throw)</em> )メカニズムのことだ。例外はどういう値でも取り得る。例外を発生させるのは、関数からの超強力なreturnみたいなものだ。現在の関数だけではなく、その呼び出し元も飛び出して、実行が始まった初めの呼び出しまで戻る。これを <em>スタックの巻き戻し</em> という。<a href="03_functions.html#stack">3</a>章での関数呼び出しのスタックを覚えているだろう。例外はこのスタックを急降下していって、呼び出しのコンテキストを全て捨てていく。</p>
 
-<p><a class="p_ident" id="p_giUX2OynLm" href="#p_giUX2OynLm" tabindex="-1" role="presentation"></a>If exceptions always zoomed right down to the bottom of the stack, they would not be of much use. They’d just provide a novel way to blow up your program. Their power lies in the fact that you can set “obstacles” along the stack to <em>catch</em> the exception as it is zooming down. Once you’ve caught an exception, you can do something with it to address the problem and then continue to run the program.</p>
+<p>もし例外が常にスタックの一番下まで急降下していくなら、あまり使い道はないだろう。ただプログラムの壊れ方が新しくなっただけだ。例外のパワーは、例外を <em>キャッチする</em> ためにスタックに障害物を置けるところにある。例外をキャッチしてしまえば、問題に対処するために何かしらできるし、プログラムの実行を継続できる。</p>
 
-<p><a class="p_ident" id="p_DQmDywMub9" href="#p_DQmDywMub9" tabindex="-1" role="presentation"></a>Here’s an example:</p>
+<p>これがその例だ。</p>
 
 <pre id="look" class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_0VA94HjY2e" href="#c_0VA94HjY2e" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">promptDirection</span>(<span class="cm-def">question</span>) {
   <span class="cm-keyword">let</span> <span class="cm-def">result</span> <span class="cm-operator">=</span> <span class="cm-variable">prompt</span>(<span class="cm-variable-2">question</span>);
@@ -235,21 +232,21 @@ stack</em>. You may remember the stack of function calls that was mentioned in <
   <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Something went wrong: &quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">error</span>);
 }</pre>
 
-<p><a class="p_ident" id="p_bbpj24fusK" href="#p_bbpj24fusK" tabindex="-1" role="presentation"></a>The <code>throw</code> keyword is used to raise an exception. Catching one is done by wrapping a piece of code in a <code>try</code> block, followed by the keyword <code>catch</code>. When the code in the <code>try</code> block causes an exception to be raised, the <code>catch</code> block is evaluated, with the name in parentheses bound to the exception value. After the <code>catch</code> block finishes—or if the <code>try</code> block finishes without problems—the program proceeds beneath the entire <code>try/catch</code> statement.</p>
+<p><code>throw</code> キーワードは例外を発生させるために使われる。例外をキャッチするにはコードを <code>try</code> ブロックで囲んで、 <code>catch</code> キーワードを続ければいい。 <code>try</code> ブロック内で例外が発生すれば、 <code>catch</code> ブロックが評価される。このとき、カッコ内の名前に例外値がバインドされる。 <code>catch</code> ブロックが終わるか、 <code>try</code> ブロックが問題なく終わるかすれば、 <code>try/catch</code> 宣言の次へプログラムは進んでいく。</p>
 
-<p><a class="p_ident" id="p_lP6PP0CCrB" href="#p_lP6PP0CCrB" tabindex="-1" role="presentation"></a>In this case, we used the <code>Error</code> constructor to create our exception value. This is a standard JavaScript constructor that creates an object with a <code>message</code> property. In most JavaScript environments, instances of this constructor also gather information about the call stack that existed when the exception was created, a so-called <em>stack trace</em>. This information is stored in the <code>stack</code> property and can be helpful when trying to debug a problem: it tells us the function where the problem occurred and which functions made the failing call.</p>
+<p>上の例では <code>Error</code> コンストラクターでオリジナルの例外の値を作っている。これはJavaScript標準のコンストラクターで、 <code>message</code> プロパティを持つオブジェクトを作る。たいていのJavaScript実行環境では、このコンストラクターは例外が作られた瞬間のコールスタックの情報( <em>スタックトレース</em> )も収集する。この情報は <code>stack</code> プロパティに保存されて、デバッグの助けになる。問題の起こった関数や呼び出しを失敗した関数を教えてくれるからだ。</p>
 
-<p><a class="p_ident" id="p_BYCPINQ0h5" href="#p_BYCPINQ0h5" tabindex="-1" role="presentation"></a>Note that the <code>look</code> function completely ignores the possibility that <code>promptDirection</code> might go wrong. This is the big advantage of exceptions: error-handling code is necessary only at the point where the error occurs and at the point where it is handled. The functions in between can forget all about it.</p>
+<p><code>look</code> 関数では <code>promptDirection</code> が失敗する可能性を完全に無視しているしていることに注目してほしい。これが例外の大きなアドバンテージだ。エラーを処理するコードは、エラーが起こる場所とエラーを処理する場所でだけ必要になる。間にある関数はエラー処理のことはすっかり忘れていい。</p>
 
-<p><a class="p_ident" id="p_deFX/IC34y" href="#p_deFX/IC34y" tabindex="-1" role="presentation"></a>Well, almost...</p>
+<p>いや、ほとんど忘れていい...</p>
 
-<h2><a class="h_ident" id="h_cgoP7o2fe9" href="#h_cgoP7o2fe9" tabindex="-1" role="presentation"></a>Cleaning up after exceptions</h2>
+<h2><a class="h_ident" id="h_rLog8qsr3q" href="#h_rLog8qsr3q" tabindex="-1" role="presentation"></a>例外後の片付け</h2>
 
-<p><a class="p_ident" id="p_lHGW1D9KYW" href="#p_lHGW1D9KYW" tabindex="-1" role="presentation"></a>The effect of an exception is another kind of control flow. Every action that might cause an exception, which is pretty much every function call and property access, might cause control to suddenly leave your code.</p>
+<p>例外の効果は新しい種類の制御フローともいえる。例外を起こしかねないコードは全て、その時点のコードから制御を離脱させてしまうかもしれないからだ。ほとんど全ての関数の呼び出しやプロパティへのアクセスも例外を起こしかねないのだけど。</p>
 
-<p><a class="p_ident" id="p_Mqr7VzgCYa" href="#p_Mqr7VzgCYa" tabindex="-1" role="presentation"></a>This means when code has several side effects, even if its “regular” control flow looks like they’ll always all happen, an exception might prevent some of them from taking place.</p>
+<p>これは、コードにいくつか副作用がある場合には、一見その&quot;普通&quot;の制御フローが全て実行されるように見えても、例外がどこかで実行を妨げるかもしれないということだ。</p>
 
-<p><a class="p_ident" id="p_V7nPGHDnR1" href="#p_V7nPGHDnR1" tabindex="-1" role="presentation"></a>Here is some really bad banking code.</p>
+<p>以下はひどい銀行口座のコードだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_e3XosnGG47" href="#c_e3XosnGG47" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">accounts</span> <span class="cm-operator">=</span> {
   <span class="cm-property">a</span>: <span class="cm-number">100</span>,
