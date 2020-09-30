@@ -240,7 +240,7 @@
 
 <p>いや、ほとんど忘れていい...</p>
 
-<h2><a class="h_ident" id="h_rLog8qsr3q" href="#h_rLog8qsr3q" tabindex="-1" role="presentation"></a>例外後の片付け</h2>
+<h2><a class="h_ident" id="h_SjKwbWeEmn" href="#h_SjKwbWeEmn" tabindex="-1" role="presentation"></a>例外の後片付け</h2>
 
 <p>例外の効果は新しい種類の制御フローともいえる。例外を起こしかねないコードは全て、その時点のコードから制御を離脱させてしまうかもしれないからだ。ほとんど全ての関数の呼び出しやプロパティへのアクセスも例外を起こしかねないのだけど。</p>
 
@@ -268,15 +268,15 @@
   <span class="cm-variable">accounts</span>[<span class="cm-variable">getAccount</span>()] <span class="cm-operator">+=</span> <span class="cm-variable-2">amount</span>;
 }</pre>
 
-<p><a class="p_ident" id="p_lj3bgLcO/p" href="#p_lj3bgLcO/p" tabindex="-1" role="presentation"></a>The <code>transfer</code> function transfers a sum of money from a given account to another, asking for the name of the other account in the process. If given an invalid account name, <code>getAccount</code> throws an exception.</p>
+<p><code>transfer</code> 関数は引数の銀行口座から、もう一方の口座にお金を移す。もう一方の口座は実行の途中に聞く。聞いた名前が無効な口座名だったら <code>getAccount</code> 関数は例外を発生させる。</p>
 
-<p><a class="p_ident" id="p_IvzAvOGwRo" href="#p_IvzAvOGwRo" tabindex="-1" role="presentation"></a>But <code>transfer</code> <em>first</em> removes the money from the account and <em>then</em> calls <code>getAccount</code> before it adds it to another account. If it is broken off by an exception at that point, it’ll just make the money disappear.</p>
+<p>ここで <code>transfer</code> 関数は <em>最初に</em> 口座からお金を引き出して、 <em>その後で</em> もう一方に移す前に <code>getAccount</code> 関数を呼び出している。 <code>getAccount</code> 関数が例外を発生してしまうと、ただお金が消滅するだけになる。</p>
 
-<p><a class="p_ident" id="p_vSkNwpOGmb" href="#p_vSkNwpOGmb" tabindex="-1" role="presentation"></a>That code could have been written a little more intelligently, for example by calling <code>getAccount</code> before it starts moving money around. But often problems like this occur in more subtle ways. Even functions that don’t look like they will throw an exception might do so in exceptional circumstances or when they contain a programmer mistake.</p>
+<p>上のコードはもう少し賢く書くことができるだろう。例えば、お金を移動する前に <code>getAccount</code> 関数を呼ぶとか。でも、こういう問題は実際にはもっとひっそりと起こる。例外を投げなさそうな関数が、例外的な状況やプログラマーのミスのせいで例外を発生させる。</p>
 
-<p><a class="p_ident" id="p_6ijkWjygkN" href="#p_6ijkWjygkN" tabindex="-1" role="presentation"></a>One way to address this is to use fewer side effects. Again, a programming style that computes new values instead of changing existing data helps. If a piece of code stops running in the middle of creating a new value, no one ever sees the half-finished value, and there is no problem.</p>
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a>1つの対処方は、副作用をなるべく使わないことだ。ここでも、元のデータを変更せずに新しい値を計算するというプログラミングスタイルが助けになるんだ。新しいコードを作っている最中にコードの実行が停止しても、誰もその中途半端な値を見なければ、何も問題はない。</p>
 
-<p><a class="p_ident" id="p_lhrnmP99dZ" href="#p_lhrnmP99dZ" tabindex="-1" role="presentation"></a>But that isn’t always practical. So there is another feature that <code>try</code> statements have. They may be followed by a <code>finally</code> block either instead of or in addition to a <code>catch</code> block. A <code>finally</code> block says “no matter <em>what</em> happens, run this code after trying to run the code in the <code>try</code> block.”</p>
+<p>とはいえ、そのスタイルがいつでも実践できるとは限らない。そこで <code>try</code> 文のもう1つの機能がある。 <code>try</code> ブロックには、 <code>catch</code> ブロックに置き換えて(もしくは後に加えるか、どちらでもいい)、 <code>finally</code> ブロックを続けることができる。 <code>finally</code> ブロックの主張は、&quot; <code>try</code> ブロックのコードを実行しようとした後で、 <em>何が起きても</em> このコードを実行しろ&quot;、ということだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_brWpzDAy4+" href="#c_brWpzDAy4+" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">transfer</span>(<span class="cm-def">from</span>, <span class="cm-def">amount</span>) {
   <span class="cm-keyword">if</span> (<span class="cm-variable">accounts</span>[<span class="cm-variable-2">from</span>] <span class="cm-operator">&lt;</span> <span class="cm-variable-2">amount</span>) <span class="cm-keyword">return</span>;
@@ -293,27 +293,27 @@
   }
 }</pre>
 
-<p><a class="p_ident" id="p_LvvK85Vh5F" href="#p_LvvK85Vh5F" tabindex="-1" role="presentation"></a>This version of the function tracks its progress, and if, when leaving, it notices that it was aborted at a point where it had created an inconsistent program state, it repairs the damage it did.</p>
+<p>今度の <code>transfer</code> 関数は、進行を追跡する。そしてもし、終了するときに、おかしい状態を作ってしまったことに気づけば、作ってしまったダメージを修復する。</p>
 
-<p><a class="p_ident" id="p_Gs19OQg3TY" href="#p_Gs19OQg3TY" tabindex="-1" role="presentation"></a>Note that even though the <code>finally</code> code is run when an exception is thrown in the <code>try</code> block, it does not interfere with the exception. After the <code>finally</code> block runs, the stack continues unwinding.</p>
+<p><code>try</code> ブロックで例外が発生した後に、 <code>finally</code> コードが実行されるとしてもそこで例外の処理を行っていないことに注目してほしい。 <code>finally</code> の実行が終わった後で、スタックの巻き戻しが続く。</p>
 
-<p><a class="p_ident" id="p_yZkXySCQHr" href="#p_yZkXySCQHr" tabindex="-1" role="presentation"></a>Writing programs that operate reliably even when exceptions pop up in unexpected places is hard. Many people simply don’t bother, and because exceptions are typically reserved for exceptional circumstances, the problem may occur so rarely that it is never even noticed. Whether that is a good thing or a really bad thing depends on how much damage the software will do when it fails.</p>
+<p>例外が予想もしないところで起こるようなときにも確実に動作するプログラムを書くのは難しい。例外が起きるのはあくまで例外的な状況だから、問題が起こるのは気づかれもしないし、手当てもされないことも多い。これが良い事か悪い事かはソフトウェアの障害がどんなダメージを起こすかによる。</p>
 
-<h2><a class="h_ident" id="h_vfoJqEDazI" href="#h_vfoJqEDazI" tabindex="-1" role="presentation"></a>Selective catching</h2>
+<h2><a class="h_ident" id="h_HGrxZvwS3K" href="#h_HGrxZvwS3K" tabindex="-1" role="presentation"></a>選択的エラー処理</h2>
 
-<p><a class="p_ident" id="p_HUJ9GRG1jC" href="#p_HUJ9GRG1jC" tabindex="-1" role="presentation"></a>When an exception makes it all the way to the bottom of the stack without being caught, it gets handled by the environment. What this means differs between environments. In browsers, a description of the error typically gets written to the JavaScript console (reachable through the browser’s Tools or Developer menu). Node.js, the browserless JavaScript environment we will discuss in <a href="20_node.html">Chapter 20</a>, is more careful about data corruption. It aborts the whole process when an unhandled exception occurs.</p>
+<p><a class="p_ident" id="p_PMsZnbelwD" href="#p_PMsZnbelwD" tabindex="-1" role="presentation"></a>例外がキャッチされずにスタックの一番下まで行ってしまうと、環境によって処理される。何か起こるかは環境によって違う。ブラウザーではだいたいエラーはJavaScriptコンソールに表示される(ブラウザーの開発者ツールでアクセスできる)。Node.jsはブラウザ外のJavaScript環境で、詳しくは<a href="20_node.html">20</a>章で扱うが、データの漏れ出しについてはもう少し注意深い。処理されない例外が起こったときにはプログラム全体の実行を止めるんだ。</p>
 
-<p><a class="p_ident" id="p_9JOlpepKZE" href="#p_9JOlpepKZE" tabindex="-1" role="presentation"></a>For programmer mistakes, just letting the error go through is often the best you can do. An unhandled exception is a reasonable way to signal a broken program, and the JavaScript console will, on modern browsers, provide you with some information about which function calls were on the stack when the problem occurred.</p>
+<p>プログラマーのミスに関しては、エラーが環境まで達するのを黙って見ているしかない。処理されていない例外はプログラムが壊れているシグナルで、モダンブラウザーのJavaScriptコンソールは、どの関数の呼び出しで問題が起こったか教えてくれる。</p>
 
-<p><a class="p_ident" id="p_KGWPPf4CcF" href="#p_KGWPPf4CcF" tabindex="-1" role="presentation"></a>For problems that are <em>expected</em> to happen during routine use, crashing with an unhandled exception is a terrible strategy.</p>
+<p>ルーティーンでの使用で発生が <em>予想できる</em> 問題では、例外を処理しないでクラッシュするのはひどい戦略だ。</p>
 
-<p><a class="p_ident" id="p_ZkwQ40b3to" href="#p_ZkwQ40b3to" tabindex="-1" role="presentation"></a>Invalid uses of the language, such as referencing a nonexistent binding, looking up a property on <code>null</code>, or calling something that’s not a function, will also result in exceptions being raised. Such exceptions can also be caught.</p>
+<p>存在しないバインディングを参照しようとする、 <code>null</code> のプロパティを見ようとする、関数ではないのに呼び出そうとする、など言語の使い方が間違っている場合にも例外は発生する。この例外もキャッチできるはずだ。</p>
 
-<p><a class="p_ident" id="p_8IwJJBHBTh" href="#p_8IwJJBHBTh" tabindex="-1" role="presentation"></a>When a <code>catch</code> body is entered, all we know is that <em>something</em> in our <code>try</code> body caused an exception. But we don’t know <em>what</em> did or <em>which</em> exception it caused.</p>
+<p><code>catch</code> ブロックに入ったとき、分かることは <code>try</code> ブロックで何かが例外を起こしたことだけだ。しかし、何がどの例外を起こしたかは分からない。</p>
 
-<p><a class="p_ident" id="p_3umLtBJgPo" href="#p_3umLtBJgPo" tabindex="-1" role="presentation"></a>JavaScript (in a rather glaring omission) doesn’t provide direct support for selectively catching exceptions: either you catch them all or you don’t catch any. This makes it tempting to <em>assume</em> that the exception you get is the one you were thinking about when you wrote the <code>catch</code> block.</p>
+<p>JavaScriptは(明白な欠陥で)、例外の種類を選んでキャッチする方法を(直接は)持っていない。全てキャッチするか、どれもしないかなんだ。このせいで、実際にキャッチする例外が、 <code>catch</code> ブロックを書いているときに <em>想定している</em> 例外だと思いたくなる。</p>
 
-<p><a class="p_ident" id="p_O9bj9nd33p" href="#p_O9bj9nd33p" tabindex="-1" role="presentation"></a>But it might not be. Some other assumption might be violated, or you might have introduced a bug that is causing an exception. Here is an example that <em>attempts</em> to keep on calling <code>promptDirection</code> until it gets a valid answer:</p>
+<p>でも、そうではないかもしれない。他の部分で想定が崩れるかもしれないし、他に例外を発生させるバグを仕込んでしまっているかもしれない。以下は、有効な回答を得るまで <code>promptDirection</code> 関数を呼び出し続け <em>ようとする</em> 例だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ZxDKrGLCQ3" href="#c_ZxDKrGLCQ3" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (;;) {
   <span class="cm-keyword">try</span> {
@@ -325,15 +325,15 @@
   }
 }</pre>
 
-<p><a class="p_ident" id="p_pdL8VKiwnf" href="#p_pdL8VKiwnf" tabindex="-1" role="presentation"></a>The <code>for (;;)</code> construct is a way to intentionally create a loop that doesn’t terminate on its own. We break out of the loop only when a valid direction is given. <em>But</em> we misspelled <code>promptDirection</code>, which will result in an “undefined variable” error. Because the <code>catch</code> block completely ignores its exception value (<code>e</code>), assuming it knows what the problem is, it wrongly treats the binding error as indicating bad input. Not only does this cause an infinite loop, it “buries” the useful error message about the misspelled binding.</p>
+<p><a class="p_ident" id="p_+OpeYcr13V" href="#p_+OpeYcr13V" tabindex="-1" role="presentation"></a>ここで <code>for (;;)</code> はあえて無限ループを作っている。有効な方向が入力された場合だけ、ループを抜けるようにしているんだ。 <em>だけど</em> 、 <code>promptDirection</code> をスペルミスしているせいで、“undefined variable”エラーが起こってしまう。 <code>catch</code> ブロックは例外の値( <code>e</code> )を完全に無視しているから、バインディングに関するエラーをインプットの間違いとして扱ってしまう。これでは無限ループを起こす上に、バインディングのスペルミスに関する有効なエラーメッセージを埋もれさせてしまう。</p>
 
-<p><a class="p_ident" id="p_hk/lwBIhah" href="#p_hk/lwBIhah" tabindex="-1" role="presentation"></a>As a general rule, don’t blanket-catch exceptions unless it is for the purpose of “routing” them somewhere—for example, over the network to tell another system that our program crashed. And even then, think carefully about how you might be hiding information.</p>
+<p>一般的なルールとして、例外をどこかに&quot;中継する&quot;目的ではない限り無闇にキャッチするのはやめよう。中継とは例えば、ネットワーク上の他のシステムにプログラムがクラッシュしたことを伝えるようなことだ。そうするとしても情報を隠してしまっていないか注意するようにしよう。</p>
 
-<p><a class="p_ident" id="p_o1E5pkUD5g" href="#p_o1E5pkUD5g" tabindex="-1" role="presentation"></a>So we want to catch a <em>specific</em> kind of exception. We can do this by checking in the <code>catch</code> block whether the exception we got is the one we are interested in and rethrowing it otherwise. But how do we recognize an exception?</p>
+<p>というわけで <em>特定の</em> 種類の例外をキャッチするようにしたい。 <code>catch</code> ブロックで、その例外が興味を持っているものかどうかチェックして、違ったらまた放り投げてしまおう。だけど、どうすれば例外を認識できる?</p>
 
-<p><a class="p_ident" id="p_qurSIk3pjE" href="#p_qurSIk3pjE" tabindex="-1" role="presentation"></a>We could compare its <code>message</code> property against the error message we happen to expect. But that’s a shaky way to write code—we’d be using information that’s intended for human consumption (the message) to make a programmatic decision. As soon as someone changes (or translates) the message, the code will stop working.</p>
+<p>例外の <code>message</code> プロパティと、発生が予測できるエラーメッセージと比べてもいいだろう。ただ、これはあやういコードだ。人間が読むための情報(メッセージ)でプログラム上の決定をすることになる。だれかがメッセージを変えた(あるいは翻訳した)途端に、そのコードは動かなくなる。</p>
 
-<p><a class="p_ident" id="p_Pml4dAzuT1" href="#p_Pml4dAzuT1" tabindex="-1" role="presentation"></a>Rather, let’s define a new type of error and use <code>instanceof</code> to identify it.</p>
+<p>それよりは新しいタイプのエラーを定義して、 <code>instanceof</code> でそれを識別するようにしよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_miFD8lvrWj" href="#c_miFD8lvrWj" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">InputError</span> <span class="cm-keyword">extends</span> <span class="cm-variable">Error</span> {}
 
@@ -344,9 +344,9 @@
   <span class="cm-keyword">throw</span> <span class="cm-keyword">new</span> <span class="cm-variable">InputError</span>(<span class="cm-string">&quot;Invalid direction: &quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">result</span>);
 }</pre>
 
-<p><a class="p_ident" id="p_/YM4ZmoOGt" href="#p_/YM4ZmoOGt" tabindex="-1" role="presentation"></a>The new error class extends <code>Error</code>. It doesn’t define its own constructor, which means that it inherits the <code>Error</code> constructor, which expects a string message as argument. In fact, it doesn’t define anything at all—the class is empty. <code>InputError</code> objects behave like <code>Error</code> objects, except that they have a different class by which we can recognize them.</p>
+<p>新しいエラークラスは <code>Error</code> を継承している。このクラスにはコンストラクターさえ定義しないで、文字列を引数にとる <code>Error</code> コンストラクターを継承する。実際のところ、このクラスは何も定義していない空のクラスだ。 <code>InputError</code> オブジェクトは <code>Error</code> オブジェクトと同じふるまいをする。ただ、クラスだけが違っていて、それで識別することができるんだ。</p>
 
-<p><a class="p_ident" id="p_JqyLwQxCGY" href="#p_JqyLwQxCGY" tabindex="-1" role="presentation"></a>Now the loop can catch these more carefully.</p>
+<p>上のループの例ではもっと注意深くキャッチできるようになった。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ab/mR1C1nr" href="#c_ab/mR1C1nr" tabindex="-1" role="presentation"></a><span class="cm-keyword">for</span> (;;) {
   <span class="cm-keyword">try</span> {
@@ -362,13 +362,13 @@
   }
 }</pre>
 
-<p><a class="p_ident" id="p_N4ExnmZrQ/" href="#p_N4ExnmZrQ/" tabindex="-1" role="presentation"></a>This will catch only instances of <code>InputError</code> and let unrelated exceptions through. If you reintroduce the typo, the undefined binding error will be properly reported.</p>
+<p>ここでは <code>InputError</code> のインスタンスだけがキャッチされて、関係ない例外は素通りする。タイプミスしたとしても、undefinedバインディングのエラーはしっかりと報告される。</p>
 
-<h2><a class="h_ident" id="h_Sb9V3BEus1" href="#h_Sb9V3BEus1" tabindex="-1" role="presentation"></a>Assertions</h2>
+<h2><a class="h_ident" id="h_PZtfqmRphE" href="#h_PZtfqmRphE" tabindex="-1" role="presentation"></a>アサーション(Assertions)</h2>
 
-<p><a class="p_ident" id="p_Is9Zkz2o9G" href="#p_Is9Zkz2o9G" tabindex="-1" role="presentation"></a><em>Assertions</em> are checks inside a program that verify that something is the way it is supposed to be. They are used not to handle situations that can come up in normal operation but to find programmer mistakes.</p>
+<p><a class="p_ident" id="p_Sb9V3BEus1" href="#p_Sb9V3BEus1" tabindex="-1" role="presentation"></a><em>アサーション(Assertions)</em> とは、プログラム中の何かが、あるべき形をとっているか確認することだ。普通の操作で出会う状況を処理するためにではなく、プログラマーのミスを見つけるために使われる。</p>
 
-<p><a class="p_ident" id="p_uMhd4mC7ZW" href="#p_uMhd4mC7ZW" tabindex="-1" role="presentation"></a>If, for example, <code>firstElement</code> is described as a function that should never be called on empty arrays, we might write it like this:</p>
+<p>もし、例えば <code>firstElement</code> 関数を空の配列に対して呼び出すべきではない関数として定義するなら、以下のように書けるだろう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_gRlHo3tyh8" href="#c_gRlHo3tyh8" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">firstElement</span>(<span class="cm-def">array</span>) {
   <span class="cm-keyword">if</span> (<span class="cm-variable-2">array</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
@@ -377,25 +377,27 @@
   <span class="cm-keyword">return</span> <span class="cm-variable-2">array</span>[<span class="cm-number">0</span>];
 }</pre>
 
-<p><a class="p_ident" id="p_MOw81C4a4b" href="#p_MOw81C4a4b" tabindex="-1" role="presentation"></a>Now, instead of silently returning undefined (which you get when reading an array property that does not exist), this will loudly blow up your program as soon as you misuse it. This makes it less likely for such mistakes to go unnoticed and easier to find their cause when they occur.</p>
+<p>これでこの関数は使い方を間違えたときに、ひっそりとundefinedを返すのはなく、音を立てて吹き飛ぶようになった。こうすれば、ミスが気づかれないままになりづらく、起こったときには原因を見つけやすい。</p>
 
-<p><a class="p_ident" id="p_bFN2bXWxAz" href="#p_bFN2bXWxAz" tabindex="-1" role="presentation"></a>I do not recommend trying to write assertions for every possible kind of bad input. That’d be a lot of work and would lead to very noisy code. You’ll want to reserve them for mistakes that are easy to make (or that you find yourself making).</p>
+<p>全ての可能性に対してアサーションを書こうとするのはオススメしない。大変な作業だし、ひどく雑然としたコードができるだろう。アサーションは、犯しがちなミスにとっておこう(あるいは実際にしたこと)。</p>
 
-<h2><a class="h_ident" id="h_ErccPg/l98" href="#h_ErccPg/l98" tabindex="-1" role="presentation"></a>Summary</h2>
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
 
-<p><a class="p_ident" id="p_rD8/ab0/w4" href="#p_rD8/ab0/w4" tabindex="-1" role="presentation"></a>Mistakes and bad input are facts of life. An important part of programming is finding, diagnosing, and fixing bugs. Problems can become easier to notice if you have an automated test suite or add assertions to your programs.</p>
+<p>ミスや間違った入力は、生活の現実だ。プログラミングの重要な部分はバグを見つけ、診断し、直すことだ。自動化されたテストスイートやアサーションを導入すれば、問題に気づくのが簡単になる。</p>
 
-<p><a class="p_ident" id="p_8tal4BvCRU" href="#p_8tal4BvCRU" tabindex="-1" role="presentation"></a>Problems caused by factors outside the program’s control should usually be handled gracefully. Sometimes, when the problem can be handled locally, special return values are a good way to track them. Otherwise, exceptions may be preferable.</p>
+<p>プログラム制御の外部要因が起こす問題には、優雅に対処しないといけない。問題がローカルに処理できるときには、特別な返り値を使うと分かりやすいときもある。そうでなければ、たぶん例外を使うといいだろう。</p>
 
-<p><a class="p_ident" id="p_ZJkq9NFh8W" href="#p_ZJkq9NFh8W" tabindex="-1" role="presentation"></a>Throwing an exception causes the call stack to be unwound until the next enclosing <code>try/catch</code> block or until the bottom of the stack. The exception value will be given to the <code>catch</code> block that catches it, which should verify that it is actually the expected kind of exception and then do something with it. To help address the unpredictable control flow caused by exceptions, <code>finally</code> blocks can be used to ensure that a piece of code <em>always</em> runs when a block finishes.</p>
+<p>例外を発生させるとコールスタックは次の <code>try/catch</code> ブロックかスタックの最底辺まで巻き戻ってしまう。 <code>catch</code> ブロックには例外の値が渡されて、そこで予想された種類の例外かどうかチェックされて、それから対処されないといけない。例外によって起こされる予測不能な制御フローに対処するために、 <code>finally</code> ブロックを使えば、あるコードを <em>常に</em> 実行することができる。</p>
 
 <h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
 
 <h3><a class="i_ident" id="i_n1zYouiAfX" href="#i_n1zYouiAfX" tabindex="-1" role="presentation"></a>Retry</h3>
 
-<p><a class="p_ident" id="p_oAuWXajIJA" href="#p_oAuWXajIJA" tabindex="-1" role="presentation"></a>Say you have a function <code>primitiveMultiply</code> that in 20 percent of cases multiplies two numbers and in the other 80 percent of cases raises an exception of type <code>MultiplicatorUnitFailure</code>. Write a function that wraps this clunky function and just keeps trying until a call succeeds, after which it returns the result.</p>
+<p>リトライ</p>
 
-<p><a class="p_ident" id="p_FfNd4pOv0L" href="#p_FfNd4pOv0L" tabindex="-1" role="presentation"></a>Make sure you handle only the exceptions you are trying to handle.</p>
+<p><a class="p_ident" id="p_Wx0K5jjW/Z" href="#p_Wx0K5jjW/Z" tabindex="-1" role="presentation"></a><code>primitiveMultiply</code> という関数があって、20パーセントの確立で2つの数をかけて、80パーセントの確立で <code>MultiplicatorUnitFailure</code> というエラーを発生させるとしよう。このブサイクな関数をラップして、成功するまで呼び出しを続けてから、結果を返す関数を書こう。</p>
+
+<p>処理しようとする例外だけを扱うようにしよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_E1Acr2VS8k" href="#c_E1Acr2VS8k" tabindex="-1" role="presentation"></a><span class="cm-keyword">class</span> <span class="cm-def">MultiplicatorUnitFailure</span> <span class="cm-keyword">extends</span> <span class="cm-variable">Error</span> {}
 
@@ -416,15 +418,17 @@
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_ChowJFeR1F" href="#p_ChowJFeR1F" tabindex="-1" role="presentation"></a>The call to <code>primitiveMultiply</code> should definitely happen in a <code>try</code> block. The corresponding <code>catch</code> block should rethrow the exception when it is not an instance of <code>MultiplicatorUnitFailure</code> and ensure the call is retried when it is.</p>
+<p><code>primitiveMultiply</code> 関数の呼び出しは絶対に <code>try</code> ブロックの中で起こるべきだ。対応する <code>catch</code> ブロックは、例外が <code>MultiplicatorUnitFailure</code> のインスタンスの場合には、さらに例外を発生させる。このエラーだった場合には、呼び出しにリトライする。</p>
 
-<p><a class="p_ident" id="p_2LqwPbYM+K" href="#p_2LqwPbYM+K" tabindex="-1" role="presentation"></a>To do the retrying, you can either use a loop that stops only when a call succeeds—as in the <a href="08_error.html#look"><code>look</code> example</a> earlier in this chapter—or use recursion and hope you don’t get a string of failures so long that it overflows the stack (which is a pretty safe bet).</p>
+<p>リトライのためには、呼び出しが成功した場合にだけ停止するループを書いてもいい(この章の<a href="08_error.html#look"> <code>look</code> の例</a>のように)。または、失敗が続きすぎてスタックがオーバーフローしないことを願いながら(実際には安全な賭けだ)、再帰を使ってもいい。</p>
 
 </div></div>
 
 <h3><a class="i_ident" id="i_iGlwnUbkRs" href="#i_iGlwnUbkRs" tabindex="-1" role="presentation"></a>The locked box</h3>
 
-<p><a class="p_ident" id="p_uGznOGuYh8" href="#p_uGznOGuYh8" tabindex="-1" role="presentation"></a>Consider the following (rather contrived) object:</p>
+<p>ロックされた箱</p>
+
+<p>次のような(わざとらしい)オブジェクトを考えてみよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_X963W9SHCK" href="#c_X963W9SHCK" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">box</span> <span class="cm-operator">=</span> {
   <span class="cm-property">locked</span>: <span class="cm-atom">true</span>,
@@ -437,9 +441,9 @@
   }
 };</pre>
 
-<p><a class="p_ident" id="p_PPjq8MDhzp" href="#p_PPjq8MDhzp" tabindex="-1" role="presentation"></a>It is a box with a lock. There is an array in the box, but you can get at it only when the box is unlocked. Directly accessing the private <code>_content</code> property is forbidden.</p>
+<p>これはロックのかかった箱だ。箱の中には配列があるけど、ロックが外れているときしかアクセスできないんだ。プライベートの <code>_content</code> プロパティに直接アクセスするのは禁止されている。</p>
 
-<p><a class="p_ident" id="p_KI+tJ+amDX" href="#p_KI+tJ+amDX" tabindex="-1" role="presentation"></a>Write a function called <code>withBoxUnlocked</code> that takes a function value as argument, unlocks the box, runs the function, and then ensures that the box is locked again before returning, regardless of whether the argument function returned normally or threw an exception.</p>
+<p><code>withBoxUnlocked</code> という関数を書いてみよう。この関数は、引数として関数値を受け取って、箱のロックを外してから、受け取った関数を実行して、実行を終える前には箱がまた確実にロックされているようにする。引数の関数が普通に終わっても例外を発生させてもだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_EPN4Aey63n" href="#c_EPN4Aey63n" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">box</span> <span class="cm-operator">=</span> {
   <span class="cm-property">locked</span>: <span class="cm-atom">true</span>,
@@ -470,13 +474,13 @@
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">box</span>.<span class="cm-property">locked</span>);
 <span class="cm-comment">// → true</span></pre>
 
-<p><a class="p_ident" id="p_X5dxXtnN4l" href="#p_X5dxXtnN4l" tabindex="-1" role="presentation"></a>For extra points, make sure that if you call <code>withBoxUnlocked</code> when the box is already unlocked, the box stays unlocked.</p>
+<p>おまけとして、 <code>withBoxUnlocked</code> 関数を呼び出したときに、すでに箱のロックが外れているなら、外れたままにしておこう。</p>
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_4MxgD1VcbV" href="#p_4MxgD1VcbV" tabindex="-1" role="presentation"></a>This exercise calls for a <code>finally</code> block. Your function should first unlock the box and then call the argument function from inside a <code>try</code> body. The <code>finally</code> block after it should lock the box again.</p>
+<p>このエクササイズには <code>finally</code> ブロックが必要になる。君の関数は、まず箱のロックを外して、それから <code>try</code> ブロックの中で引数の関数を呼び出す。その後に続く <code>finally</code> ブロックで、箱にロックをかけないといけない。</p>
 
-<p><a class="p_ident" id="p_PvZL0oQnMG" href="#p_PvZL0oQnMG" tabindex="-1" role="presentation"></a>To make sure we don’t lock the box when it wasn’t already locked, check its lock at the start of the function and unlock and lock it only when it started out locked.</p>
+<p>箱がロックされていない場合に、箱をロックしないようにするためには、関数の始めでロックをチェックして、ロックされている場合にだけ、外してからまたかけることにすればいい。</p>
 
 </div></div><nav><a href="07_robot.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_regexp.html" title="next chapter">▶</a></nav>
 </article>
