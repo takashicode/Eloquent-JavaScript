@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Regular Expressions :: Eloquent JavaScript</title>
+  <title>正規表現 :: Eloquent JavaScript</title>
   <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
   <script src="js/acorn_codemirror.js"></script>
   <link rel=stylesheet href="css/ejs.css">
@@ -12,11 +12,11 @@
 <article>
 <nav><a href="08_error.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="10_modules.html" title="next chapter">▶</a></nav>
 
-<h1><span class=chap_num>Chapter 9</span>Regular Expressions</h1>
+<h1><span class=chap_num>Chapter 9</span>正規表現</h1>
 
 <blockquote>
 
-<p><a class="p_ident" id="p_MWUwIAb0uO" href="#p_MWUwIAb0uO" tabindex="-1" role="presentation"></a>Some people, when confronted with a problem, think ‘I know, I’ll use regular expressions.’ Now they have two problems.</p>
+<p><a class="p_ident" id="p_2kuSN7rMzf" href="#p_2kuSN7rMzf" tabindex="-1" role="presentation"></a>ある問題にぶつかったときに、こう考える人がいる。「分かってる、正規表現を使おう。」今や問題は2つだ。</p>
 
 <footer>Jamie Zawinski</footer>
 
@@ -24,95 +24,94 @@
 
 <blockquote>
 
-<p><a class="p_ident" id="p_icxlw7+18l" href="#p_icxlw7+18l" tabindex="-1" role="presentation"></a>Yuan-Ma said, ‘When you cut against the grain of the wood, much strength is needed. When you program against the grain of the problem, much code is needed.’</p>
+<p><a class="p_ident" id="p_vFulIihdz0" href="#p_vFulIihdz0" tabindex="-1" role="presentation"></a>Yuan-Maが言った。「木目に沿って逆らって切ろうとすれば、さらに力が必要じゃ。お主のプログラムが問題の木目に逆らっておれば、より多くのコードが必要じゃ。」</p>
 
 <footer>Master Yuan-Ma, <cite>The Book of Programming</cite></footer>
 
 </blockquote><figure class="chapter square-framed"><img src="img/chapter_picture_9.jpg" alt="A railroad diagram"></figure>
 
-<p><a class="p_ident" id="p_mYvGNMWwx9" href="#p_mYvGNMWwx9" tabindex="-1" role="presentation"></a>Programming tools and techniques survive and spread in a chaotic, evolutionary way. It’s not always the pretty or brilliant ones that win but rather the ones that function well enough within the right niche or that happen to be integrated with another successful piece of technology.</p>
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>プログラミングツールや技術は、カオス的に、進化のように生き延びて増殖していく。素晴らしい技術がいつも勝つとは限らず、ニッチな分野で上手く機能したものや、たまたま他の成功した技術に組み込まれたものが生き延びていく。</p>
 
-<p><a class="p_ident" id="p_iH3Aqi6y2A" href="#p_iH3Aqi6y2A" tabindex="-1" role="presentation"></a>In this chapter, I will discuss one such tool, <em>regular
-expressions</em>. Regular expressions are a way to describe patterns in string data. They form a small, separate language that is part of JavaScript and many other languages and systems.</p>
+<p><a class="p_ident" id="p_EeDCEUkIAR" href="#p_EeDCEUkIAR" tabindex="-1" role="presentation"></a>この章では、そうしたツールの1つ、 <em>正規表現(regular expression)</em> について扱う。正規表現とは、文字列データのパターンを表記する方式だ。正規表現は、JavaScript(や他の言語やシステム)の一部に組み込まれた別の小さい言語のようなものだ。</p>
 
-<p><a class="p_ident" id="p_cxbejyPUGl" href="#p_cxbejyPUGl" tabindex="-1" role="presentation"></a>Regular expressions are both terribly awkward and extremely useful. Their syntax is cryptic, and the programming interface JavaScript provides for them is clumsy. But they are a powerful tool for inspecting and processing strings. Properly understanding regular expressions will make you a more effective programmer.</p>
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>正規表現はひどくわずらわしいけど、とんでもなく便利だ。文法は暗号のようだし、JavaScriptが提供するプログラミングインターフェイスはぎこちないものだ。それでも正規表現は文字列を検査したり生成したりする強力なツールで、きちんと理解すれば君はより効率的なプログラマーになれるだろう。</p>
 
-<h2><a class="h_ident" id="h_5w4yGFJRYl" href="#h_5w4yGFJRYl" tabindex="-1" role="presentation"></a>Creating a regular expression</h2>
+<h2><a class="h_ident" id="h_09XYO8/Xd8" href="#h_09XYO8/Xd8" tabindex="-1" role="presentation"></a>正規表現の生成</h2>
 
-<p><a class="p_ident" id="p_u/9SKAI2Yi" href="#p_u/9SKAI2Yi" tabindex="-1" role="presentation"></a>A regular expression is a type of object. It can be either constructed with the <code>RegExp</code> constructor or written as a literal value by enclosing a pattern in forward slash (<code>/</code>) characters.</p>
+<p>正規表現はオブジェクトの一種だ。 <code>RegExp</code> コンスラクターで生成するか、スラッシュ( <code>/</code> )文字でパターンを囲むかすればいい。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_O1I2rl+HTy" href="#c_O1I2rl+HTy" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">re1</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">RegExp</span>(<span class="cm-string">&quot;abc&quot;</span>);
 <span class="cm-keyword">let</span> <span class="cm-def">re2</span> <span class="cm-operator">=</span> <span class="cm-string-2">/abc/</span>;</pre>
 
-<p><a class="p_ident" id="p_dviEva2QQM" href="#p_dviEva2QQM" tabindex="-1" role="presentation"></a>Both of those regular expression objects represent the same pattern: an <em>a</em> character followed by a <em>b</em> followed by a <em>c</em>.</p>
+<p><a class="p_ident" id="p_az8znGe7A9" href="#p_az8znGe7A9" tabindex="-1" role="presentation"></a>この正規表現オブジェクトはどちらも同じパターンを表している。文字 <em>a</em> に <em>b</em> が続いて、その次に <em>c</em> がくる。</p>
 
-<p><a class="p_ident" id="p_qv8UWLVrTv" href="#p_qv8UWLVrTv" tabindex="-1" role="presentation"></a>When using the <code>RegExp</code> constructor, the pattern is written as a normal string, so the usual rules apply for backslashes.</p>
+<p><code>RegExp</code> コンストラクターを使うとパターンは普通の文字列として書かれることになる。だからバックスラッシュ()に関するルールもいつも通りだ。</p>
 
-<p><a class="p_ident" id="p_0mNIcPpslS" href="#p_0mNIcPpslS" tabindex="-1" role="presentation"></a>The second notation, where the pattern appears between slash characters, treats backslashes somewhat differently. First, since a forward slash ends the pattern, we need to put a backslash before any forward slash that we want to be <em>part</em> of the pattern. In addition, backslashes that aren’t part of special character codes (like <code>\n</code>) will be <em>preserved</em>, rather than ignored as they are in strings, and change the meaning of the pattern. Some characters, such as question marks and plus signs, have special meanings in regular expressions and must be preceded by a backslash if they are meant to represent the character itself.</p>
+<p>スラッシュの間にパターンを書く2番目の記法では、バックスラッシュの扱いが違う。まず、パターン内にそのままスラッシュを書くと終了と解釈されるから、スラッシュの前にはバックスラッシュを置かないといけない。さらに特別な文字コード( <code>\n</code> のように)の一部ではないバックスラッシュは <em>保存される</em> 。文字列でのようには無視されないで、パターンの意味を変えてしまう。クエスチョンマークやプラス記号には正規表現では特別な意味があるから、その文字自体を表現したい場合には前にバックスラッシュを置かないといけない。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_uRzUiBSrul" href="#c_uRzUiBSrul" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">eighteenPlus</span> <span class="cm-operator">=</span> <span class="cm-string-2">/eighteen\+/</span>;</pre>
 
-<h2><a class="h_ident" id="h_vPyyYjMEtz" href="#h_vPyyYjMEtz" tabindex="-1" role="presentation"></a>Testing for matches</h2>
+<h2><a class="h_ident" id="h_SmcdGEBy3Q" href="#h_SmcdGEBy3Q" tabindex="-1" role="presentation"></a>マッチのテスト</h2>
 
-<p><a class="p_ident" id="p_SHaMWlzFzk" href="#p_SHaMWlzFzk" tabindex="-1" role="presentation"></a>Regular expression objects have a number of methods. The simplest one is <code>test</code>. If you pass it a string, it will return a Boolean telling you whether the string contains a match of the pattern in the expression.</p>
+<p>正規表現オブジェクトにはいくつかのメソッドがある。一番単純なのは <code>test</code> だ。 <code>test</code> に文字列を渡すと、文字列がパターンにマッチするかどうか真偽値で教えてくれる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Szn1CmrIV5" href="#c_Szn1CmrIV5" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/abc/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;abcde&quot;</span>));
 <span class="cm-comment">// → true</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/abc/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;abxde&quot;</span>));
 <span class="cm-comment">// → false</span></pre>
 
-<p><a class="p_ident" id="p_YGcbMDV493" href="#p_YGcbMDV493" tabindex="-1" role="presentation"></a>A regular expression consisting of only nonspecial characters simply represents that sequence of characters. If <em>abc</em> occurs anywhere in the string we are testing against (not just at the start), <code>test</code> will return <code>true</code>.</p>
+<p><a class="p_ident" id="p_qZk+NkcGgW" href="#p_qZk+NkcGgW" tabindex="-1" role="presentation"></a>特別な記号を含まない正規表現は単に文字の並びを表現するだけだ。もし <em>abc</em> がテストしようとする文字列に含まれていたら(このとき始まりだけとは限らない)、 <code>true</code> が返される。</p>
 
-<h2><a class="h_ident" id="h_8EFR0DU1xd" href="#h_8EFR0DU1xd" tabindex="-1" role="presentation"></a>Sets of characters</h2>
+<h2><a class="h_ident" id="h_1F+QStyA3B" href="#h_1F+QStyA3B" tabindex="-1" role="presentation"></a>文字のセット</h2>
 
-<p><a class="p_ident" id="p_ZyB7HeLr75" href="#p_ZyB7HeLr75" tabindex="-1" role="presentation"></a>Finding out whether a string contains <em>abc</em> could just as well be done with a call to <code>indexOf</code>. Regular expressions allow us to express more complicated patterns.</p>
+<p>文字列が <em>abc</em> を含むか知りたいだけなら <code>indexOf</code> でも十分だ。正規表現を使えばもっと複雑なパターンを表現できるんだ。</p>
 
-<p><a class="p_ident" id="p_i/99SEfu9y" href="#p_i/99SEfu9y" tabindex="-1" role="presentation"></a>Say we want to match any number. In a regular expression, putting a set of characters between square brackets makes that part of the expression match any of the characters between the brackets.</p>
+<p>全ての数字に対してマッチさせたいとしよう。正規表現では、角カッコの間に文字のセットを置くと、その部分はセット内のどの文字でもマッチするようになる。</p>
 
-<p><a class="p_ident" id="p_sC+2E08KnL" href="#p_sC+2E08KnL" tabindex="-1" role="presentation"></a>Both of the following expressions match all strings that contain a digit:</p>
+<p><a class="p_ident" id="p_sdV4ERHYT3" href="#p_sdV4ERHYT3" tabindex="-1" role="presentation"></a>次の表現は、どちらも10進数を含む全ての文字列とマッチする。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Z3UJdL//cY" href="#c_Z3UJdL//cY" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/[0123456789]/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;in 1992&quot;</span>));
 <span class="cm-comment">// → true</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/[0-9]/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;in 1992&quot;</span>));
 <span class="cm-comment">// → true</span></pre>
 
-<p><a class="p_ident" id="p_i0WYLVUede" href="#p_i0WYLVUede" tabindex="-1" role="presentation"></a>Within square brackets, a hyphen (<code>-</code>) between two characters can be used to indicate a range of characters, where the ordering is determined by the character’s Unicode number. Characters 0 to 9 sit right next to each other in this ordering (codes 48 to 57), so <code>[0-9]</code> covers all of them and matches any digit.</p>
+<p><a class="p_ident" id="p_5hECt86hEv" href="#p_5hECt86hEv" tabindex="-1" role="presentation"></a>角カッコの中では、2つの文字とその間のハイフン( <code>-</code> )は、文字の範囲を表現する。ここで、順序は文字のUnicode数で決まる。この順序では0から9までの文字は隣り合っていて(コード48から57)、 <code>[0-9]</code> は全ての10進数にマッチするんだ。</p>
 
-<p><a class="p_ident" id="p_1qtYlDfA/1" href="#p_1qtYlDfA/1" tabindex="-1" role="presentation"></a>A number of common character groups have their own built-in shortcuts. Digits are one of them: <code>\d</code> means the same thing as <code>[0-9]</code>.</p>
+<p><a class="p_ident" id="p_C9mp4xxEGU" href="#p_C9mp4xxEGU" tabindex="-1" role="presentation"></a>一般的によく使われる文字のグループには、ショートカット版の書き方がある。10進数もその1つで、 <code>\d</code> が <code>[0-9]</code> と同じ意味になる。</p>
 
 <table>
 
-<tr><td><code>\d</code></td><td>Any digit character</td>
+<tr><td><code>\d</code></td><td>10進数の文字全て</td>
 
 </tr>
 
-<tr><td><code>\w</code></td><td>An alphanumeric character (“word character”)</td>
+<tr><td><code>\w</code></td><td>英数字 (“単語(word)の文字”)</td>
 
 </tr>
 
-<tr><td><code>\s</code></td><td>Any whitespace character (space, tab, newline, and similar)</td>
+<tr><td><code>\s</code></td><td>全てのホワイトスペース文字 (スペース, タブ, 改行など)</td>
 
 </tr>
 
-<tr><td><code>\D</code></td><td>A character that is <em>not</em> a digit</td>
+<tr><td><code>\D</code></td><td>10進数 <em>ではない</em> もの全て</td>
 
 </tr>
 
-<tr><td><code>\W</code></td><td>A nonalphanumeric character</td>
+<tr><td><code>\W</code></td><td>英数字ではないもの全て</td>
 
 </tr>
 
-<tr><td><code>\S</code></td><td>A nonwhitespace character</td>
+<tr><td><code>\S</code></td><td>ホワイトスペース文字ではないもの全て</td>
 
 </tr>
 
-<tr><td><code>.</code></td><td>Any character except for newline</td>
+<tr><td><code>.</code></td><td>改行文字以外の全て</td>
 
 </tr>
 
 </table>
 
-<p><a class="p_ident" id="p_yXMUKEYpwG" href="#p_yXMUKEYpwG" tabindex="-1" role="presentation"></a>So you could match a date and time format like 01-30-2003 15:20 with the following expression:</p>
+<p><a class="p_ident" id="p_R7LsTWMTK8" href="#p_R7LsTWMTK8" tabindex="-1" role="presentation"></a>これで、01-30-2003 15:20のような日時のフォーマットは、以下のような正規表現でマッチできるはずだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Y0e7M8nAL0" href="#c_Y0e7M8nAL0" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">dateTime</span> <span class="cm-operator">=</span> <span class="cm-string-2">/\d\d-\d\d-\d\d\d\d \d\d:\d\d/</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">dateTime</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;01-30-2003 15:20&quot;</span>));
@@ -120,11 +119,11 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">dateTime</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;30-jan-2003 15:20&quot;</span>));
 <span class="cm-comment">// → false</span></pre>
 
-<p><a class="p_ident" id="p_gdY0EhLXlE" href="#p_gdY0EhLXlE" tabindex="-1" role="presentation"></a>That looks completely awful, doesn’t it? Half of it is backslashes, producing a background noise that makes it hard to spot the actual pattern expressed. We’ll see a slightly improved version of this expression <a href="09_regexp.html#date_regexp_counted">later</a>.</p>
+<p>ひどい見た目でしょ?パターンの半分がバックスラッシュなのがノイズになって、本当に表現したいパターンを分かりづらくしてしまっている。<a href="09_regexp.html#date_regexp_counted">後で</a>もう少しマシなバージョンを見ていくことにしよう。</p>
 
-<p><a class="p_ident" id="p_P0qAMYu0C/" href="#p_P0qAMYu0C/" tabindex="-1" role="presentation"></a>These backslash codes can also be used inside square brackets. For example, <code>[\d.]</code> means any digit or a period character. But the period itself, between square brackets, loses its special meaning. The same goes for other special characters, such as <code>+</code>.</p>
+<p>このバックスラッシュを使ったコードは、角カッコの中でも使える。例えば、 <code>[\d.]</code> は全ての10進数かピリオドという意味だ。だけどピリオド自体も、角カッコの中では、特別な意味を失うんだ。その他の特別な文字( <code>+</code> など)にも同じことがいえる。</p>
 
-<p><a class="p_ident" id="p_HqQEZsitdl" href="#p_HqQEZsitdl" tabindex="-1" role="presentation"></a>To <em>invert</em> a set of characters—that is, to express that you want to match any character <em>except</em> the ones in the set—you can write a caret (<code>^</code>) character after the opening bracket.</p>
+<p>文字のセットを <em>反転させる</em> 、つまりセット <em>以外の</em> 文字にマッチさせたいと表現するには、キャレット( <code>^</code> )文字を開き角カッコの次に書けばいい。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_XH8deAcckk" href="#c_XH8deAcckk" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">notBinary</span> <span class="cm-operator">=</span> <span class="cm-string-2">/[^01]/</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">notBinary</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;1100100010100110&quot;</span>));
@@ -132,11 +131,11 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">notBinary</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;1100100010200110&quot;</span>));
 <span class="cm-comment">// → true</span></pre>
 
-<h2><a class="h_ident" id="h_iFI1qvUwY9" href="#h_iFI1qvUwY9" tabindex="-1" role="presentation"></a>Repeating parts of a pattern</h2>
+<h2><a class="h_ident" id="h_4TyiD/EcbH" href="#h_4TyiD/EcbH" tabindex="-1" role="presentation"></a>部分パターンの繰り返し</h2>
 
-<p><a class="p_ident" id="p_crYiu/oAUM" href="#p_crYiu/oAUM" tabindex="-1" role="presentation"></a>We now know how to match a single digit. What if we want to match a whole number—a sequence of one or more digits?</p>
+<p><a class="p_ident" id="p_chfZtQL2DE" href="#p_chfZtQL2DE" tabindex="-1" role="presentation"></a>十進数1文字とマッチさせる方法は分かった。整数(つまり1つ以上の10進数文字のシーケンス)とマッチさせたいなら?</p>
 
-<p><a class="p_ident" id="p_B4wupHzbR+" href="#p_B4wupHzbR+" tabindex="-1" role="presentation"></a>When you put a plus sign (<code>+</code>) after something in a regular expression, it indicates that the element may be repeated more than once. Thus, <code>/\d+/</code> matches one or more digit characters.</p>
+<p><a class="p_ident" id="p_pD/MhHwik3" href="#p_pD/MhHwik3" tabindex="-1" role="presentation"></a>正規表現の中でプラス記号( <code>+</code> )を何かの次に置けば、その要素が1回以上表れるという意味になる。つまり、 <code>/\d+/</code> は、1つ以上の十進数文字とマッチするんだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_9/5mFF4Ih4" href="#c_9/5mFF4Ih4" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/'\d+'/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;'123'&quot;</span>));
 <span class="cm-comment">// → true</span>
@@ -147,9 +146,9 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/'\d*'/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;''&quot;</span>));
 <span class="cm-comment">// → true</span></pre>
 
-<p><a class="p_ident" id="p_/oNBIVm41F" href="#p_/oNBIVm41F" tabindex="-1" role="presentation"></a>The star (<code>*</code>) has a similar meaning but also allows the pattern to match zero times. Something with a star after it never prevents a pattern from matching—it’ll just match zero instances if it can’t find any suitable text to match.</p>
+<p><a class="p_ident" id="p_tlifxqsNyC" href="#p_tlifxqsNyC" tabindex="-1" role="presentation"></a>星( <code>*</code> )も同じような意味を持つけど、こちらはゼロ回でも許容する。星が後ろについたものは、テストする文字列に存在しなくても、パターンがマッチするのを妨げることはないんだ。ただ、マッチするテキストがなければ、0個の文字とマッチするだけだ。</p>
 
-<p><a class="p_ident" id="p_77Y5t9C8NV" href="#p_77Y5t9C8NV" tabindex="-1" role="presentation"></a>A question mark makes a part of a pattern <em>optional</em>, meaning it may occur zero times or one time. In the following example, the <em>u</em> character is allowed to occur, but the pattern also matches when it is missing.</p>
+<p><a class="p_ident" id="p_lPCzYnHv+a" href="#p_lPCzYnHv+a" tabindex="-1" role="presentation"></a>クエスチョンマークはパターンの一部を <em>オプション</em> にする。つまり、0回でも1回でも良いということになるんだ。次の例では <em>u</em> 文字は存在してもいいけど、なくてもパターンはマッチする。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_EiCIowdq+d" href="#c_EiCIowdq+d" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">neighbor</span> <span class="cm-operator">=</span> <span class="cm-string-2">/neighbou?r/</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">neighbor</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;neighbour&quot;</span>));
@@ -157,31 +156,31 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">neighbor</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;neighbor&quot;</span>));
 <span class="cm-comment">// → true</span></pre>
 
-<p><a class="p_ident" id="p_B4ikd8xN8i" href="#p_B4ikd8xN8i" tabindex="-1" role="presentation"></a>To indicate that a pattern should occur a precise number of times, use braces. Putting <code>{4}</code> after an element, for example, requires it to occur exactly four times. It is also possible to specify a range this way: <code>{2,4}</code> means the element must occur at least twice and at most four times.</p>
+<p><a class="p_ident" id="p_Qxu7AWyp2A" href="#p_Qxu7AWyp2A" tabindex="-1" role="presentation"></a>パターンが正確に何回表れるか指定したいなら波カッコを使おう。例えば、ある要素の後に <code>{4}</code> を置けば、4回現れるという意味になる。また、回数の範囲を指定することもできる。 <code>{2,4}</code> はある要素が最低2回、最大4回現れるという意味だ。</p>
 
-<p id="date_regexp_counted"><a class="p_ident" id="p_a1yNHuI+49" href="#p_a1yNHuI+49" tabindex="-1" role="presentation"></a>Here is another version of the date and time pattern that allows both single- and double-digit days, months, and hours. It is also slightly easier to decipher.</p>
+<p id="date_regexp_counted"><a class="p_ident" id="p_PCjQN+Ms0w" href="#p_PCjQN+Ms0w" tabindex="-1" role="presentation"></a>以下は、日時のパターンの別のバージョンで、日、月、時が1桁でも2桁でも受け入れる。さらに解読するのも少し簡単になった。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Tw+K6Mxe45" href="#c_Tw+K6Mxe45" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">dateTime</span> <span class="cm-operator">=</span> <span class="cm-string-2">/\d{1,2}-\d{1,2}-\d{4} \d{1,2}:\d{2}/</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">dateTime</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;1-30-2003 8:45&quot;</span>));
 <span class="cm-comment">// → true</span></pre>
 
-<p><a class="p_ident" id="p_RjqN6VMQIa" href="#p_RjqN6VMQIa" tabindex="-1" role="presentation"></a>You can also specify open-ended ranges when using braces by omitting the number after the comma. So, <code>{5,}</code> means five or more times.</p>
+<p><a class="p_ident" id="p_rDR41po8gf" href="#p_rDR41po8gf" tabindex="-1" role="presentation"></a>終わりに制限がない範囲を書くこともできる。波カッコの中でコンマの後の数字を省略して、 <code>{5,}</code> のように書けば5回以上という意味になるんだ。</p>
 
-<h2><a class="h_ident" id="h_uICSDspz1I" href="#h_uICSDspz1I" tabindex="-1" role="presentation"></a>Grouping subexpressions</h2>
+<h2><a class="h_ident" id="h_jLE38Ms1gL" href="#h_jLE38Ms1gL" tabindex="-1" role="presentation"></a>部分表現のグループ化</h2>
 
-<p><a class="p_ident" id="p_pKTOYUDGIr" href="#p_pKTOYUDGIr" tabindex="-1" role="presentation"></a>To use an operator like <code>*</code> or <code>+</code> on more than one element at a time, you have to use parentheses. A part of a regular expression that is enclosed in parentheses counts as a single element as far as the operators following it are concerned.</p>
+<p><a class="p_ident" id="p_5z5wa++8Y+" href="#p_5z5wa++8Y+" tabindex="-1" role="presentation"></a><code>*</code> や <code>+</code> を2つ以上の要素に一度に使いたかったら、カッコで囲めばいい。カッコで囲まれた正規表現は、その後に続く演算子からは1つの要素として扱われるんだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_P/f6a65XwI" href="#c_P/f6a65XwI" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">cartoonCrying</span> <span class="cm-operator">=</span> <span class="cm-string-2">/boo+(hoo+)+/i</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">cartoonCrying</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;Boohoooohoohooo&quot;</span>));
 <span class="cm-comment">// → true</span></pre>
 
-<p><a class="p_ident" id="p_S5jkv2dMC+" href="#p_S5jkv2dMC+" tabindex="-1" role="presentation"></a>The first and second <code>+</code> characters apply only to the second <em>o</em> in <em>boo</em> and <em>hoo</em>, respectively. The third <code>+</code> applies to the whole group <code>(hoo+)</code>, matching one or more sequences like that.</p>
+<p><a class="p_ident" id="p_e6Za7n1jp4" href="#p_e6Za7n1jp4" tabindex="-1" role="presentation"></a>1つ目と2つ目の <code>+</code> 文字は、 <em>boo</em> と <em>hoo</em> の2文字目の <em>o</em> だけに作用する。3つ目の <code>+</code> は <code>(hoo+)</code> というグループまるごとに作用して、この並びが1つ以上あればマッチする。</p>
 
-<p><a class="p_ident" id="p_c4RlIM4/HI" href="#p_c4RlIM4/HI" tabindex="-1" role="presentation"></a>The <code>i</code> at the end of the expression in the example makes this regular expression case insensitive, allowing it to match the uppercase <em>B</em> in the input string, even though the pattern is itself all lowercase.</p>
+<p><a class="p_ident" id="p_rk8oHfWl0P" href="#p_rk8oHfWl0P" tabindex="-1" role="presentation"></a>この例の最後の <code>i</code> は、正規表現を大文字小文字を区別しないようにする。パターンが全て小文字で書かれていても、大文字の <em>B</em> がマッチするようになるんだ。</p>
 
-<h2><a class="h_ident" id="h_CV5XL/TADP" href="#h_CV5XL/TADP" tabindex="-1" role="presentation"></a>Matches and groups</h2>
+<h2><a class="h_ident" id="h_gK3RiBVobR" href="#h_gK3RiBVobR" tabindex="-1" role="presentation"></a>マッチとグループ</h2>
 
-<p><a class="p_ident" id="p_K3KRDzatsp" href="#p_K3KRDzatsp" tabindex="-1" role="presentation"></a>The <code>test</code> method is the absolute simplest way to match a regular expression. It tells you only whether it matched and nothing else. Regular expressions also have an <code>exec</code> (execute) method that will return <code>null</code> if no match was found and return an object with information about the match otherwise.</p>
+<p><a class="p_ident" id="p_Oa6J4KE1lF" href="#p_Oa6J4KE1lF" tabindex="-1" role="presentation"></a><code>test</code> メソッドは正規表現をマッチさせるには、間違いなく一番単純なやり方だ。ただマッチしたかどうか教えてくれるだけで、それ以外には何もしない。正規表現には <code>exec</code> (execute)メソッドもあって、マッチしなければ <code>null</code> を返し、そうでなければマッチに関する情報を持ったオブジェクトを返す。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_JJMWZpk0iD" href="#c_JJMWZpk0iD" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">match</span> <span class="cm-operator">=</span> <span class="cm-string-2">/\d+/</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;one two 100&quot;</span>);
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">match</span>);
@@ -189,60 +188,60 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">match</span>.<span class="cm-property">index</span>);
 <span class="cm-comment">// → 8</span></pre>
 
-<p><a class="p_ident" id="p_fJSwbQyG6w" href="#p_fJSwbQyG6w" tabindex="-1" role="presentation"></a>An object returned from <code>exec</code> has an <code>index</code> property that tells us <em>where</em> in the string the successful match begins. Other than that, the object looks like (and in fact is) an array of strings, whose first element is the string that was matched. In the previous example, this is the sequence of digits that we were looking for.</p>
+<p><code>exec</code> が返すオブジェクトは <code>index</code> プロパティを持っていて、成功したマッチが始まった <em>場所</em> を教えてくれる。それを除けば、このオブジェクトは文字列を保持する配列に見える(実際のところ、その通りだ)。この配列の最初の要素はマッチした文字列で、上の例では探していた通り、十進数のシーケンスだった。</p>
 
-<p><a class="p_ident" id="p_VT4fpht7D7" href="#p_VT4fpht7D7" tabindex="-1" role="presentation"></a>String values have a <code>match</code> method that behaves similarly.</p>
+<p>文字列値にも同じようにふるまう <code>match</code> メソッドがある。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_uAkAqNYx+q" href="#c_uAkAqNYx+q" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;one two 100&quot;</span>.<span class="cm-property">match</span>(<span class="cm-string-2">/\d+/</span>));
 <span class="cm-comment">// → [&quot;100&quot;]</span></pre>
 
-<p><a class="p_ident" id="p_/9rdcJO9zZ" href="#p_/9rdcJO9zZ" tabindex="-1" role="presentation"></a>When the regular expression contains subexpressions grouped with parentheses, the text that matched those groups will also show up in the array. The whole match is always the first element. The next element is the part matched by the first group (the one whose opening parenthesis comes first in the expression), then the second group, and so on.</p>
+<p><a class="p_ident" id="p_wwW0b1Mdqm" href="#p_wwW0b1Mdqm" tabindex="-1" role="presentation"></a>正規表現がカッコでグループ化された部分表現を持っている場合には、そのグループとマッチしたテキストも、返ってくる配列に含まれる。マッチしたテキスト全体は常に最初の要素になる。2番目の要素は、最初のグループ(開きカッコが正規表現の始めに現れるもの)にマッチした部分で、それから2つ目のグループとマッチしたもの、というように続く。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_5E2M1BBsUm" href="#c_5E2M1BBsUm" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">quotedText</span> <span class="cm-operator">=</span> <span class="cm-string-2">/'([^']*)'/</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">quotedText</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;she said 'hello'&quot;</span>));
 <span class="cm-comment">// → [&quot;'hello'&quot;, &quot;hello&quot;]</span></pre>
 
-<p><a class="p_ident" id="p_f4bciMASJ1" href="#p_f4bciMASJ1" tabindex="-1" role="presentation"></a>When a group does not end up being matched at all (for example, when followed by a question mark), its position in the output array will hold <code>undefined</code>. Similarly, when a group is matched multiple times, only the last match ends up in the array.</p>
+<p>あるグループが全くマッチしなかった場合には(例えばクエスチョンマークが付いているとき)、返り値の配列でそのグループが占めるはずの場所には <code>undefined</code> が置かれる。同じように、あるグループが何度もマッチすると、最後のマッチだけが配列に残る。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_j9t+gn+1eT" href="#c_j9t+gn+1eT" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/bad(ly)?/</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;bad&quot;</span>));
 <span class="cm-comment">// → [&quot;bad&quot;, undefined]</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/(\d)+/</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;123&quot;</span>));
 <span class="cm-comment">// → [&quot;123&quot;, &quot;3&quot;]</span></pre>
 
-<p><a class="p_ident" id="p_GvLofvnQnz" href="#p_GvLofvnQnz" tabindex="-1" role="presentation"></a>Groups can be useful for extracting parts of a string. If we don’t just want to verify whether a string contains a date but also extract it and construct an object that represents it, we can wrap parentheses around the digit patterns and directly pick the date out of the result of <code>exec</code>.</p>
+<p>グループは文字列の一部を取り出すのに便利だ。例えば文字列が日付を含んでいるかテストするだけではなく、それを取り出して日付のオブジェクトを作りたいなら、十進数のパターンをカッコで囲めば、 <code>exec</code> の結果から日付を直接取り出せる。</p>
 
-<p><a class="p_ident" id="p_DzNUSBaBZb" href="#p_DzNUSBaBZb" tabindex="-1" role="presentation"></a>But first we’ll take a brief detour, in which we discuss the built-in way to represent date and time values in JavaScript.</p>
+<p>でも、その前に少し遠回りをして、日付や時間を表すJavaScriptの組込みオブジェクトについて見てみよう。</p>
 
-<h2><a class="h_ident" id="h_8U7L7LCU27" href="#h_8U7L7LCU27" tabindex="-1" role="presentation"></a>The Date class</h2>
+<h2><a class="h_ident" id="h_58J8RjR7HI" href="#h_58J8RjR7HI" tabindex="-1" role="presentation"></a>Dateクラス</h2>
 
-<p><a class="p_ident" id="p_2NeTRvucQq" href="#p_2NeTRvucQq" tabindex="-1" role="presentation"></a>JavaScript has a standard class for representing dates—or, rather, points in time. It is called <code>Date</code>. If you simply create a date object using <code>new</code>, you get the current date and time.</p>
+<p>JavaScriptには日付を表す(というよりむしろ時間を指す)標準クラスが備わっている。それは <code>Date</code> オブジェクトで、単に <code>new</code> キーワードで呼びだせば現在の日付と時間が得られる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_AjgqFetryg" href="#c_AjgqFetryg" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Date</span>());
 <span class="cm-comment">// → Mon Nov 13 2017 16:19:11 GMT+0100 (CET)</span></pre>
 
-<p><a class="p_ident" id="p_IcV7kv3B1y" href="#p_IcV7kv3B1y" tabindex="-1" role="presentation"></a>You can also create an object for a specific time.</p>
+<p>指定した時間でオブジェクトを作ることもできる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_2VCU0f4HsQ" href="#c_2VCU0f4HsQ" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Date</span>(<span class="cm-number">2009</span>, <span class="cm-number">11</span>, <span class="cm-number">9</span>));
 <span class="cm-comment">// → Wed Dec 09 2009 00:00:00 GMT+0100 (CET)</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Date</span>(<span class="cm-number">2009</span>, <span class="cm-number">11</span>, <span class="cm-number">9</span>, <span class="cm-number">12</span>, <span class="cm-number">59</span>, <span class="cm-number">59</span>, <span class="cm-number">999</span>));
 <span class="cm-comment">// → Wed Dec 09 2009 12:59:59 GMT+0100 (CET)</span></pre>
 
-<p><a class="p_ident" id="p_cYaexzwHiw" href="#p_cYaexzwHiw" tabindex="-1" role="presentation"></a>JavaScript uses a convention where month numbers start at zero (so December is 11), yet day numbers start at one. This is confusing and silly. Be careful.</p>
+<p><a class="p_ident" id="p_Yz13KNNolE" href="#p_Yz13KNNolE" tabindex="-1" role="presentation"></a>JavaScriptでは、月は0からの数で表し(12月は11だ)、日付は1からの数字で表す。これは混乱を招くし、バカげている。気をつけよう。</p>
 
-<p><a class="p_ident" id="p_gVdQSb0Lv9" href="#p_gVdQSb0Lv9" tabindex="-1" role="presentation"></a>The last four arguments (hours, minutes, seconds, and milliseconds) are optional and taken to be zero when not given.</p>
+<p><a class="p_ident" id="p_MRQRpXOQNK" href="#p_MRQRpXOQNK" tabindex="-1" role="presentation"></a>後ろから4つの引数(時、分、秒、ミリ秒)はオプションで、省略すれば0が割当てられる。</p>
 
-<p><a class="p_ident" id="p_1mIMU5T5MA" href="#p_1mIMU5T5MA" tabindex="-1" role="presentation"></a>Timestamps are stored as the number of milliseconds since the start of 1970, in the UTC time zone. This follows a convention set by “Unix time”, which was invented around that time. You can use negative numbers for times before 1970. The <code>getTime</code> method on a date object returns this number. It is big, as you can imagine.</p>
+<p><a class="p_ident" id="p_Z7ft6fVZs6" href="#p_Z7ft6fVZs6" tabindex="-1" role="presentation"></a>タイプスタンプは協定世界時の1970年の始めから数えたミリ秒の数字として保存される。これはその時代に開発された“Unix time”と呼ばれる習慣に従っている。1970年以前の日時には負の数を使う。 <code>Date</code> オブジェクトの <code>getTime</code> メソッドはこのミリ秒を返す。想像のとおり、大きな数字だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_lMlCuckMIc" href="#c_lMlCuckMIc" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Date</span>(<span class="cm-number">2013</span>, <span class="cm-number">11</span>, <span class="cm-number">19</span>).<span class="cm-property">getTime</span>());
 <span class="cm-comment">// → 1387407600000</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Date</span>(<span class="cm-number">1387407600000</span>));
 <span class="cm-comment">// → Thu Dec 19 2013 00:00:00 GMT+0100 (CET)</span></pre>
 
-<p><a class="p_ident" id="p_Cn9WUyCZhq" href="#p_Cn9WUyCZhq" tabindex="-1" role="presentation"></a>If you give the <code>Date</code> constructor a single argument, that argument is treated as such a millisecond count. You can get the current millisecond count by creating a new <code>Date</code> object and calling <code>getTime</code> on it or by calling the <code>Date.now</code> function.</p>
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a><code>Date</code> コンストラクターに引数を1つだけ渡した場合には、そうしたミリ秒として扱われる。現在を表すミリ秒を得るには、 <code>Date</code> オブジェクトを作って <code>getTime</code> メソッドを呼び出すか、 <code>Date.now</code> 関数を呼び出すかすればいい。</p>
 
-<p><a class="p_ident" id="p_iqL2Ehg9D4" href="#p_iqL2Ehg9D4" tabindex="-1" role="presentation"></a>Date objects provide methods such as <code>getFullYear</code>, <code>getMonth</code>, <code>getDate</code>, <code>getHours</code>, <code>getMinutes</code>, and <code>getSeconds</code> to extract their components. Besides <code>getFullYear</code> there’s also <code>getYear</code>, which gives you the year minus 1900 (<code>98</code> or <code>119</code>) and is mostly useless.</p>
+<p><a class="p_ident" id="p_hc88qHyaE+" href="#p_hc88qHyaE+" tabindex="-1" role="presentation"></a><code>Date</code> オブジェクトから一部を取り出すには <code>getFullYear</code> や <code>getMonth</code> , <code>getDate</code> , <code>getHours</code> , <code>getMinutes</code> そして <code>getSeconds</code> メソッドを使えばいい。 <code>getFullYear</code> だけではなく <code>getYear</code> メソッドも存在していて、これは年から1900を引いた数字(98や119)を返すけど、使い道はほとんどない。</p>
 
-<p><a class="p_ident" id="p_/RCtQyD3w/" href="#p_/RCtQyD3w/" tabindex="-1" role="presentation"></a>Putting parentheses around the parts of the expression that we are interested in, we can now create a date object from a string.</p>
+<p>これで、正規表現の一部をカッコで囲んで、文字列からほしい部分を取り出して、 <code>Date</code> オブジェクトを作れるようになった。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_xW0xfMnpiZ" href="#c_xW0xfMnpiZ" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">getDate</span>(<span class="cm-def">string</span>) {
   <span class="cm-keyword">let</span> [<span class="cm-def">_</span>, <span class="cm-def">month</span>, <span class="cm-def">day</span>, <span class="cm-def">year</span>] <span class="cm-operator">=</span>
@@ -252,28 +251,28 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">getDate</span>(<span class="cm-string">&quot;1-30-2003&quot;</span>));
 <span class="cm-comment">// → Thu Jan 30 2003 00:00:00 GMT+0100 (CET)</span></pre>
 
-<p><a class="p_ident" id="p_YUOJEGEtSI" href="#p_YUOJEGEtSI" tabindex="-1" role="presentation"></a>The <code>_</code> (underscore) binding is ignored and used only to skip the full match element in the array returned by <code>exec</code>.</p>
+<p>ここで <code>_</code> (アンダースコア)バインディングは無視されている。 <code>exec</code> の返り値の配列から、全体のマッチをスキップするためだけに置かれているんだ。</p>
 
-<h2><a class="h_ident" id="h_26ixny78VY" href="#h_26ixny78VY" tabindex="-1" role="presentation"></a>Word and string boundaries</h2>
+<h2><a class="h_ident" id="h_UbmXLm8kYt" href="#h_UbmXLm8kYt" tabindex="-1" role="presentation"></a>単語と文字列の境界</h2>
 
-<p><a class="p_ident" id="p_xdYJVr9vlf" href="#p_xdYJVr9vlf" tabindex="-1" role="presentation"></a>Unfortunately, <code>getDate</code> will also happily extract the nonsensical date 00-1-3000 from the string <code>&quot;100-1-30000&quot;</code>. A match may happen anywhere in the string, so in this case, it’ll just start at the second character and end at the second-to-last character.</p>
+<p><a class="p_ident" id="p_QdTo8t44X5" href="#p_QdTo8t44X5" tabindex="-1" role="presentation"></a>残念ながら、上の <code>getDate</code> 関数は、 <code>&quot;100-1-30000&quot;</code> の文字列から、00-1-3000のようなナンセンスな日付を取り出してしまう。マッチは文字列のどこで起こってもいいから、この場合には2番目の文字から始まって、最後の文字までで終わっている。</p>
 
-<p><a class="p_ident" id="p_kLS7rqRrqG" href="#p_kLS7rqRrqG" tabindex="-1" role="presentation"></a>If we want to enforce that the match must span the whole string, we can add the markers <code>^</code> and <code>$</code>. The caret matches the start of the input string, whereas the dollar sign matches the end. So, <code>/^\d+$/</code> matches a string consisting entirely of one or more digits, <code>/^!/</code> matches any string that starts with an exclamation mark, and <code>/x^/</code> does not match any string (there cannot be an <em>x</em> before the start of the string).</p>
+<p><a class="p_ident" id="p_rpLkKHVReN" href="#p_rpLkKHVReN" tabindex="-1" role="presentation"></a>マッチが文字列全体をカバーするようにしたいなら <code>^</code> と <code>$</code> を加えればいい。 <code>^</code> は入力文字列の開始に、 <code>$</code> は末尾にマッチする。例えば <code>/^\d+$/</code> は全てが十進数でできた1文字以上の文字列にマッチする。 <code>/^!/</code> は!で始まる全ての文字列にマッチする。 <code>/x^/</code> はどんな文字列にもマッチしない(文字列の始まる前に <em>x</em> が存在することはあり得ないからだ)。</p>
 
-<p><a class="p_ident" id="p_fEYS5Ev94W" href="#p_fEYS5Ev94W" tabindex="-1" role="presentation"></a>If, on the other hand, we just want to make sure the date starts and ends on a word boundary, we can use the marker <code>\b</code>. A word boundary can be the start or end of the string or any point in the string that has a word character (as in <code>\w</code>) on one side and a nonword character on the other.</p>
+<p>もし日付の始まりと終わりが単語の境界になるようにしたかったら、 <code>\b</code> を使えばいい。これは単語の境界の意味で、文字列のどこでも使えて、片側に単語文字( <code>\w</code> で表されるようなもの)がきて、片側にそれ以外がくるようなパターンにマッチする。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_6U0b866tUk" href="#c_6U0b866tUk" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/cat/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;concatenate&quot;</span>));
 <span class="cm-comment">// → true</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/\bcat\b/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;concatenate&quot;</span>));
 <span class="cm-comment">// → false</span></pre>
 
-<p><a class="p_ident" id="p_btxd6luedx" href="#p_btxd6luedx" tabindex="-1" role="presentation"></a>Note that a boundary marker doesn’t match an actual character. It just enforces that the regular expression matches only when a certain condition holds at the place where it appears in the pattern.</p>
+<p><code>\b</code> は実際の文字にはマッチしないことに注意しよう。ただ正規表現がある条件に則っている場合だけマッチするように強制するだけだ。</p>
 
-<h2><a class="h_ident" id="h_In3b+t6uOO" href="#h_In3b+t6uOO" tabindex="-1" role="presentation"></a>Choice patterns</h2>
+<h2><a class="h_ident" id="h_fGcmLFuG3n" href="#h_fGcmLFuG3n" tabindex="-1" role="presentation"></a>選択パターン</h2>
 
-<p><a class="p_ident" id="p_G5RTt0AFku" href="#p_G5RTt0AFku" tabindex="-1" role="presentation"></a>Say we want to know whether a piece of text contains not only a number but a number followed by one of the words <em>pig</em>, <em>cow</em>, or <em>chicken</em>, or any of their plural forms.</p>
+<p><a class="p_ident" id="p_RPL9YC3XKT" href="#p_RPL9YC3XKT" tabindex="-1" role="presentation"></a>あるテキストが、数字の後に <em>pig</em> , <em>cow</em> , <em>chicken</em> のうちのどれか(もしくはその複数形)が続くパターンを含んでいるか知りたいとしよう。</p>
 
-<p><a class="p_ident" id="p_GcEbQJT+nS" href="#p_GcEbQJT+nS" tabindex="-1" role="presentation"></a>We could write three regular expressions and test them in turn, but there is a nicer way. The pipe character (<code>|</code>) denotes a choice between the pattern to its left and the pattern to its right. So I can say this:</p>
+<p><a class="p_ident" id="p_d95o2uzYI7" href="#p_d95o2uzYI7" tabindex="-1" role="presentation"></a>3つの正規表現を書いて順番にテストすることもできるけど、もっと良いやり方がある。パイプ( <code>|</code> )文字は、その左右にくるパターンのどちらかを選択するという意味を表す。以下のように使える。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_z0soEIN8RB" href="#c_z0soEIN8RB" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">animalCount</span> <span class="cm-operator">=</span> <span class="cm-string-2">/\b\d+ (pig|cow|chicken)s?\b/</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">animalCount</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;15 pigs&quot;</span>));
@@ -281,77 +280,77 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">animalCount</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;15 pigchickens&quot;</span>));
 <span class="cm-comment">// → false</span></pre>
 
-<p><a class="p_ident" id="p_bPWKulKcxf" href="#p_bPWKulKcxf" tabindex="-1" role="presentation"></a>Parentheses can be used to limit the part of the pattern that the pipe operator applies to, and you can put multiple such operators next to each other to express a choice between more than two alternatives.</p>
+<p>カッコを使えばパイプ演算子が適用される範囲を制限できる。パイプを複数置けば、2つ以上の選択肢を表現できる。</p>
 
-<h2><a class="h_ident" id="h_AzxCBCKdvY" href="#h_AzxCBCKdvY" tabindex="-1" role="presentation"></a>The mechanics of matching</h2>
+<h2><a class="h_ident" id="h_c8PkGE7nmH" href="#h_c8PkGE7nmH" tabindex="-1" role="presentation"></a>マッチングのメカニズム</h2>
 
-<p><a class="p_ident" id="p_SXQOi9ZwwH" href="#p_SXQOi9ZwwH" tabindex="-1" role="presentation"></a>Conceptually, when you use <code>exec</code> or <code>test</code>, the regular expression engine looks for a match in your string by trying to match the expression first from the start of the string, then from the second character, and so on, until it finds a match or reaches the end of the string. It’ll either return the first match that can be found or fail to find any match at all.</p>
+<p><code>exec</code> や <code>test</code> を使うと正規表現エンジンは文字列からマッチする部分を探す。このとき、1文字目から2文字目と見ていき、マッチする部分が見つかるか文字列の終わりにたどり着くまで続ける。そうして見つかった最初のマッチする部分を返すか、失敗に終わるかどちらかだ。</p>
 
-<p><a class="p_ident" id="p_HJjJAo8dQp" href="#p_HJjJAo8dQp" tabindex="-1" role="presentation"></a>To do the actual matching, the engine treats a regular expression something like a flow diagram. This is the diagram for the livestock expression in the previous example:</p><figure><img src="img/re_pigchickens.svg" alt="Visualization of /\b\d+ (pig|cow|chicken)s?\b/"></figure>
+<p>実際のマッチングでは、正規表現エンジンは正規表現をフロー図のように扱っている。以下の図は前に見た家畜の数を表現するものだ。</p><figure><img src="img/re_pigchickens.svg" alt="Visualization of /\b\d+ (pig|cow|chicken)s?\b/"></figure>
 
-<p><a class="p_ident" id="p_SNiUdMyezk" href="#p_SNiUdMyezk" tabindex="-1" role="presentation"></a>Our expression matches if we can find a path from the left side of the diagram to the right side. We keep a current position in the string, and every time we move through a box, we verify that the part of the string after our current position matches that box.</p>
+<p>正規表現は図の左側から右側への道を見つけられればマッチすることになる。文字列の中での現在のポジションを保持していて、図の箱を通り抜けるたびに、現在のポジション以降の文字列がその箱にマッチするか確認していく。</p>
 
-<p><a class="p_ident" id="p_MB99a8uIlE" href="#p_MB99a8uIlE" tabindex="-1" role="presentation"></a>So if we try to match <code>&quot;the 3 pigs&quot;</code> from position 4, our progress through the flow chart would look like this:</p>
+<p><a class="p_ident" id="p_G2RTiSRzpG" href="#p_G2RTiSRzpG" tabindex="-1" role="presentation"></a><code>&quot;the 3 pigs&quot;</code> をポジション4からマッチさせようとすれば、フロー図での進み方は以下のようになるだろう。</p>
 
 <ul>
 
 <li>
 
-<p><a class="p_ident" id="p_bgxoerTVW4" href="#p_bgxoerTVW4" tabindex="-1" role="presentation"></a>At position 4, there is a word boundary, so we can move past the first box.</p></li>
+<p><a class="p_ident" id="p_Ltg3xZaKpU" href="#p_Ltg3xZaKpU" tabindex="-1" role="presentation"></a>ポジション4で、単語の境界がある。1番目の箱を通過できる。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_YCV1/H+Rbe" href="#p_YCV1/H+Rbe" tabindex="-1" role="presentation"></a>Still at position 4, we find a digit, so we can also move past the second box.</p></li>
+<p><a class="p_ident" id="p_FW7buSu4sm" href="#p_FW7buSu4sm" tabindex="-1" role="presentation"></a>まだポジション4のままで、十進数を見つける。2番目の箱も通過できる。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_fQdWHxKgCF" href="#p_fQdWHxKgCF" tabindex="-1" role="presentation"></a>At position 5, one path loops back to before the second (digit) box, while the other moves forward through the box that holds a single space character. There is a space here, not a digit, so we must take the second path.</p></li>
+<p><a class="p_ident" id="p_d7Qm5HcD+7" href="#p_d7Qm5HcD+7" tabindex="-1" role="presentation"></a>ポジション5で一方の道はループで2番目の(十進数の)箱の前に戻り、 もう一方はスペース文字1つの箱へ進む。ポジション5にはスペースがあって、 十進数ではないから、2つ目の道を進む。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_KItk5iNp9m" href="#p_KItk5iNp9m" tabindex="-1" role="presentation"></a>We are now at position 6 (the start of <em>pigs</em>) and at the three-way branch in the diagram. We don’t see <em>cow</em> or <em>chicken</em> here, but we do see <em>pig</em>, so we take that branch.</p></li>
+<p><a class="p_ident" id="p_z1EMlg+ogm" href="#p_z1EMlg+ogm" tabindex="-1" role="presentation"></a>ポジション6( <em>pigs</em> の始まり)に至って、図では3分岐に差し掛かる。 <em>cow</em> , <em>chicken</em> はないけど、 <em>pig</em> があるからその道を進む。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_SowlGZC6lM" href="#p_SowlGZC6lM" tabindex="-1" role="presentation"></a>At position 9, after the three-way branch, one path skips the <em>s</em> box and goes straight to the final word boundary, while the other path matches an <em>s</em>. There is an <em>s</em> character here, not a word boundary, so we go through the <em>s</em> box.</p></li>
+<p><a class="p_ident" id="p_sEh+XmrT8x" href="#p_sEh+XmrT8x" tabindex="-1" role="presentation"></a>ポジション9で、つまり3分岐の後で、一方は <em>s</em> の箱をスキップして最後の境界へ 進む道、もう一方は <em>s</em> とマッチする道になっている。ここにs文字があるから (単語の境界ではなく)、 <em>s</em> の箱を通っていく。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_oJRMcnDoAt" href="#p_oJRMcnDoAt" tabindex="-1" role="presentation"></a>We’re at position 10 (the end of the string) and can match only a word boundary. The end of a string counts as a word boundary, so we go through the last box and have successfully matched this string.</p></li></ul>
+<p>ポジション10で(文字列の終端)まで来て、単語の境界しかマッチできない。 文字列の終端は単語の境界として扱われるから、最後の箱を通り抜けて、 文字列のマッチングは成功だ。</p></li></ul>
 
-<h2 id="backtracking"><a class="h_ident" id="h_NFMtGK0tD3" href="#h_NFMtGK0tD3" tabindex="-1" role="presentation"></a>Backtracking</h2>
+<h2 id="backtracking"><a class="h_ident" id="h_Y3TmW/Kkef" href="#h_Y3TmW/Kkef" tabindex="-1" role="presentation"></a>引き返し(Backtracking)</h2>
 
-<p><a class="p_ident" id="p_tCd15MFAty" href="#p_tCd15MFAty" tabindex="-1" role="presentation"></a>The regular expression <code>/<wbr>\b([01]+b|[\da-f]+h|\d+)\b/<wbr></code> matches either a binary number followed by a <em>b</em>, a hexadecimal number (that is, base 16, with the letters <em>a</em> to <em>f</em> standing for the digits 10 to 15) followed by an <em>h</em>, or a regular decimal number with no suffix character. This is the corresponding diagram:</p><figure><img src="img/re_number.svg" alt="Visualization of /\b([01]+b|\d+|[\da-f]+h)\b/"></figure>
+<p><a class="p_ident" id="p_VIOQs0a8sv" href="#p_VIOQs0a8sv" tabindex="-1" role="presentation"></a>正規表現 <code>/<wbr>\b([01]+b|[\da-f]+h|\d+)\b/<wbr></code> は、二進数の後に <em>b</em> がついたもの、十六進数の後に <em>h</em> がついたもの、普通の十進数のいずれかにマッチする。以下は、対応する図だ。</p><figure><img src="img/re_number.svg" alt="Visualization of /\b([01]+b|\d+|[\da-f]+h)\b/"></figure>
 
-<p><a class="p_ident" id="p_MypvfTaiTG" href="#p_MypvfTaiTG" tabindex="-1" role="presentation"></a>When matching this expression, it will often happen that the top (binary) branch is entered even though the input does not actually contain a binary number. When matching the string <code>&quot;103&quot;</code>, for example, it becomes clear only at the 3 that we are in the wrong branch. The string <em>does</em> match the expression, just not the branch we are currently in.</p>
+<p>上の正規表現をマッチングするときに、二進数の分岐にまず入るということがよく起こる。実際には入力の数字が二進数でなくても、例えば <code>&quot;103&quot;</code> は3が現れて初めて違った分岐だと分かる。この文字列は上の正規表現と <em>マッチする</em> けど、二進数の分岐が間違いだっただけだ。</p>
 
-<p><a class="p_ident" id="p_SjTCKE9hvf" href="#p_SjTCKE9hvf" tabindex="-1" role="presentation"></a>So the matcher <em>backtracks</em>. When entering a branch, it remembers its current position (in this case, at the start of the string, just past the first boundary box in the diagram) so that it can go back and try another branch if the current one does not work out. For the string <code>&quot;103&quot;</code>, after encountering the 3 character, it will start trying the branch for hexadecimal numbers, which fails again because there is no <em>h</em> after the number. So it tries the decimal number branch. This one fits, and a match is reported after all.</p>
+<p><a class="p_ident" id="p_jLPR/55tnK" href="#p_jLPR/55tnK" tabindex="-1" role="presentation"></a>つまり、マッチャーは <em>引き返す(backtrack)</em> 。ある分岐に入るときに、マッチャーはその時のポジションを覚えている(この場合には文字列の始まり、境界の箱を通過したところだ)。だから進んだ分岐の先でマッチしなければ、一旦戻って他の分岐を試すことができる。 <code>&quot;103&quot;</code> という文字列の場合には、3という文字に出くわした後に十六進数の分岐を試すけど、それも数字の後に <em>h</em> がないから失敗する。というわけで、十進数の分岐を進むことになって、マッチングの成功が報告される。</p>
 
-<p><a class="p_ident" id="p_VymH7raTcU" href="#p_VymH7raTcU" tabindex="-1" role="presentation"></a>The matcher stops as soon as it finds a full match. This means that if multiple branches could potentially match a string, only the first one (ordered by where the branches appear in the regular expression) is used.</p>
+<p>マッチャーはフルにマッチしたところで動作を終える。複数の分岐がマッチするかもしれない場合でも、(正規表現に現れる順番で)始めのものが使われるということだ。</p>
 
-<p><a class="p_ident" id="p_zEBIV8lYeb" href="#p_zEBIV8lYeb" tabindex="-1" role="presentation"></a>Backtracking also happens for repetition operators like + and <code>*</code>. If you match <code>/^.*x/</code> against <code>&quot;abcxe&quot;</code>, the <code>.*</code> part will first try to consume the whole string. The engine will then realize that it needs an <em>x</em> to match the pattern. Since there is no <em>x</em> past the end of the string, the star operator tries to match one character less. But the matcher doesn’t find an <em>x</em> after <code>abcx</code> either, so it backtracks again, matching the star operator to just <code>abc</code>. <em>Now</em> it finds an <em>x</em> where it needs it and reports a successful match from positions 0 to 4.</p>
+<p><a class="p_ident" id="p_CrZumjj7py" href="#p_CrZumjj7py" tabindex="-1" role="presentation"></a>引き返しは、 <code>+</code> や <code>*</code> のような繰返し演算子でも発生する <code>/^.*x/</code> というパターンを <code>&quot;abcxe&quot;</code> とマッチさせようとすると、 <code>*</code> はまず全ての文字列を食べ尽くそうとする。その後エンジンはパターンとマッチするには <em>x</em> が必要だと気づく。文字列の終了まで進んでしまえば、もう <em>x</em> はないから <code>*</code> 演算子はマッチする文字を1文字減らそうとする。でも、 <em>abcx</em> の後にも <em>x</em> はないからこれでもまだマッチしない。そこでもう1文字引き返して、 <code>*</code> 演算子が <em>abc</em> とマッチするようになれば、 <em>x</em> が必要な場所に見つかるようになって、ポジション0から4にかけてマッチが成功したと報告される。</p>
 
-<p><a class="p_ident" id="p_0MBBMH8aI2" href="#p_0MBBMH8aI2" tabindex="-1" role="presentation"></a>It is possible to write regular expressions that will do a <em>lot</em> of backtracking. This problem occurs when a pattern can match a piece of input in many different ways. For example, if we get confused while writing a binary-number regular expression, we might accidentally write something like <code>/([01]+)+b/</code>.</p><figure><img src="img/re_slow.svg" alt="Visualization of /([01]+)+b/"></figure>
+<p>引き返しが <em>多すぎる</em> 正規表現を書いてしまうこともあり得る。パターンがインプットにマッチする方法が多すぎるときにこの問題が起こる。例えば二進数にマッチする正規表現を書こうとして、間違って <code>/([01]+)+b/</code> と書いてしまうかもしれない。</p><figure><img src="img/re_slow.svg" alt="Visualization of /([01]+)+b/"></figure>
 
-<p><a class="p_ident" id="p_5cI0Ma3Wy8" href="#p_5cI0Ma3Wy8" tabindex="-1" role="presentation"></a>If that tries to match some long series of zeros and ones with no trailing <em>b</em> character, the matcher first goes through the inner loop until it runs out of digits. Then it notices there is no <em>b</em>, so it backtracks one position, goes through the outer loop once, and gives up again, trying to backtrack out of the inner loop once more. It will continue to try every possible route through these two loops. This means the amount of work <em>doubles</em> with each additional character. For even just a few dozen characters, the resulting match will take practically forever.</p>
+<p><a class="p_ident" id="p_9FrngKVTly" href="#p_9FrngKVTly" tabindex="-1" role="presentation"></a>このパターンを、0と1が長く続いて最後に <em>b</em> がない、という文字列とマッチさせようとすると、マッチャーはまず内側のループを進んで、数字を食べつくす。そこで <em>b</em> がないことに気づいて1文字引き返して、外側のループに入って、またギブアップする。それからまた内側のループに入る、というように全ての可能なルートを試そうとする。これは作業の量が1文字ごとに <em>倍になる</em> ということだ。数ダースの文字に対してマッチングにするのに、実質的に永遠の時間がかかるようになる。</p>
 
-<h2><a class="h_ident" id="h_k0YuTOu54D" href="#h_k0YuTOu54D" tabindex="-1" role="presentation"></a>The replace method</h2>
+<h2><a class="h_ident" id="h_zFQI1ZDyWM" href="#h_zFQI1ZDyWM" tabindex="-1" role="presentation"></a>replaceメソッド</h2>
 
-<p><a class="p_ident" id="p_HMQv5qrs78" href="#p_HMQv5qrs78" tabindex="-1" role="presentation"></a>String values have a <code>replace</code> method that can be used to replace part of the string with another string.</p>
+<p>文字列値には、 <code>replace</code> というメソッドがあって、文字列の一部を他の文字列で置き換えるために使う。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_dPdIdK/Wyi" href="#c_dPdIdK/Wyi" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;papa&quot;</span>.<span class="cm-property">replace</span>(<span class="cm-string">&quot;p&quot;</span>, <span class="cm-string">&quot;m&quot;</span>));
 <span class="cm-comment">// → mapa</span></pre>
 
-<p><a class="p_ident" id="p_jjBKX9l81o" href="#p_jjBKX9l81o" tabindex="-1" role="presentation"></a>The first argument can also be a regular expression, in which case the first match of the regular expression is replaced. When a <code>g</code> option (for <em>global</em>) is added to the regular expression, <em>all</em> matches in the string will be replaced, not just the first.</p>
+<p><code>replace</code> の1つ目の引数は正規表現でもよくて、その場合には最初にマッチした部分が置き換えられる。オプション <code>g</code> (グローバル)が正規表現に加えられていれば、最初だけではなくて文字列の <em>全ての</em> マッチした部分が置き換えられる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_ztGnSKyKy1" href="#c_ztGnSKyKy1" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Borobudur&quot;</span>.<span class="cm-property">replace</span>(<span class="cm-string-2">/[ou]/</span>, <span class="cm-string">&quot;a&quot;</span>));
 <span class="cm-comment">// → Barobudur</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Borobudur&quot;</span>.<span class="cm-property">replace</span>(<span class="cm-string-2">/[ou]/g</span>, <span class="cm-string">&quot;a&quot;</span>));
 <span class="cm-comment">// → Barabadar</span></pre>
 
-<p><a class="p_ident" id="p_BTzyExrWv3" href="#p_BTzyExrWv3" tabindex="-1" role="presentation"></a>It would have been sensible if the choice between replacing one match or all matches was made through an additional argument to <code>replace</code> or by providing a different method, <code>replaceAll</code>. But for some unfortunate reason, the choice relies on a property of the regular expression instead.</p>
+<p>全て置き換えるか最初のマッチだけ置き換えるかは、 <code>replace</code> メソッドに追加で引数を与えるとか、 <code>replaceAll</code> のようなメソッドを使うとかで選べた方が自然だ。だけど、残念なことに、正規表現のプロパティによって選択するしかない。</p>
 
-<p><a class="p_ident" id="p_/5YU/Qo2Np" href="#p_/5YU/Qo2Np" tabindex="-1" role="presentation"></a>The real power of using regular expressions with <code>replace</code> comes from the fact that we can refer to matched groups in the replacement string. For example, say we have a big string containing the names of people, one name per line, in the format <code>Lastname, Firstname</code>. If we want to swap these names and remove the comma to get a <code>Firstname Lastname</code> format, we can use the following code:</p>
+<p>正規表現と <code>replace</code> メソッドを組み合わせる本当のパワーは、マッチしたグループを置き換え用の文字列で参照できることだ。例えば、1行ずつ人の名前を <code>Lastname</code> ,  <code>Firstname</code> のフォーマットで持った長い文字列があるとしよう。姓と名を入れ替えて、コンマを削除したいとしたら、次のコードが使える。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_5P5aZAbVLL" href="#c_5P5aZAbVLL" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(
   <span class="cm-string">&quot;Liskov, Barbara\nMcCarthy, John\nWadler, Philip&quot;</span>
@@ -360,18 +359,18 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-comment">//   John McCarthy</span>
 <span class="cm-comment">//   Philip Wadler</span></pre>
 
-<p><a class="p_ident" id="p_sEudLRqyzC" href="#p_sEudLRqyzC" tabindex="-1" role="presentation"></a>The <code>$1</code> and <code>$2</code> in the replacement string refer to the parenthesized groups in the pattern. <code>$1</code> is replaced by the text that matched against the first group, <code>$2</code> by the second, and so on, up to <code>$9</code>. The whole match can be referred to with <code>$&amp;</code>.</p>
+<p>ここで、置き換え用の文字列の <code>$1</code> と <code>$2</code> は、パターンの中のカッコで囲まれたグループを指している。 <code>$1</code> は最初のグループにマッチしたテキストと置き換えられ、 <code>$2</code> は二番目のグループと、というように続き <code>$9</code> まで使える。マッチ全体は <code>$&amp;</code> で参照できる。</p>
 
-<p><a class="p_ident" id="p_BpgnqwKFHn" href="#p_BpgnqwKFHn" tabindex="-1" role="presentation"></a>It is possible to pass a function—rather than a string—as the second argument to <code>replace</code>. For each replacement, the function will be called with the matched groups (as well as the whole match) as arguments, and its return value will be inserted into the new string.</p>
+<p><code>replace</code> の2番目の引数には、文字列ではなくて関数を渡すこともできる。置き換えるごとに、その関数がマッチしたグループを引数にして呼び出される。そして返り値が新しい文字列に挿入される。</p>
 
-<p><a class="p_ident" id="p_GbNoBizUD+" href="#p_GbNoBizUD+" tabindex="-1" role="presentation"></a>Here’s a small example:</p>
+<p>これはちょっとした例だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_fwgl3+oeyX" href="#c_fwgl3+oeyX" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">s</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;the cia and fbi&quot;</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">s</span>.<span class="cm-property">replace</span>(<span class="cm-string-2">/\b(fbi|cia)\b/g</span>,
             <span class="cm-def">str</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">str</span>.<span class="cm-property">toUpperCase</span>()));
 <span class="cm-comment">// → the CIA and FBI</span></pre>
 
-<p><a class="p_ident" id="p_EXxvdgdiP1" href="#p_EXxvdgdiP1" tabindex="-1" role="presentation"></a>Here’s a more interesting one:</p>
+<p>これはさらに面白い例だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Zo/y2Vv93l" href="#c_Zo/y2Vv93l" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">stock</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;1 lemon, 2 cabbages, and 101 eggs&quot;</span>;
 <span class="cm-keyword">function</span> <span class="cm-def">minusOne</span>(<span class="cm-def">match</span>, <span class="cm-def">amount</span>, <span class="cm-def">unit</span>) {
@@ -386,13 +385,13 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">stock</span>.<span class="cm-property">replace</span>(<span class="cm-string-2">/(\d+) (\w+)/g</span>, <span class="cm-variable">minusOne</span>));
 <span class="cm-comment">// → no lemon, 1 cabbage, and 100 eggs</span></pre>
 
-<p><a class="p_ident" id="p_bv4e/DVilz" href="#p_bv4e/DVilz" tabindex="-1" role="presentation"></a>This takes a string, finds all occurrences of a number followed by an alphanumeric word, and returns a string wherein every such occurrence is decremented by one.</p>
+<p>この関数は文字列を引数に取って、数字に英数字が続くパターンを探して、その数字から1引いた値を挿入して文字列を返す。</p>
 
-<p><a class="p_ident" id="p_H94SX/MJX8" href="#p_H94SX/MJX8" tabindex="-1" role="presentation"></a>The <code>(\d+)</code> group ends up as the <code>amount</code> argument to the function, and the <code>(\w+)</code> group gets bound to <code>unit</code>. The function converts <code>amount</code> to a number—which always works since it matched <code>\d+</code>—and makes some adjustments in case there is only one or zero left.</p>
+<p><a class="p_ident" id="p_U9mavMZxuB" href="#p_U9mavMZxuB" tabindex="-1" role="presentation"></a>関数の中では、 <code>(\d+)</code> のグループが <code>amount</code> に、 <code>(\w+)</code> が <code>unit</code> にバインドされる。関数の中では <code>amount</code> は数字に変換されるけど、 <code>\d+</code> にマッチしたのだからこの変換は常に成功する。そして <code>amount</code> が1か0の場合には少し修正を加える。</p>
 
-<h2><a class="h_ident" id="h_kiECehz+i+" href="#h_kiECehz+i+" tabindex="-1" role="presentation"></a>Greed</h2>
+<h2><a class="h_ident" id="h_8ratxQ3o8H" href="#h_8ratxQ3o8H" tabindex="-1" role="presentation"></a>貪欲(Greed)</h2>
 
-<p><a class="p_ident" id="p_VccKwuX/1m" href="#p_VccKwuX/1m" tabindex="-1" role="presentation"></a>It is possible to use <code>replace</code> to write a function that removes all comments from a piece of JavaScript code. Here is a first attempt:</p>
+<p><code>replace</code> を使ってJavaScriptのコードからコメントを削除する関数を書くことができる。以下が最初の試みだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_u0oKSJTOA2" href="#c_u0oKSJTOA2" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">stripComments</span>(<span class="cm-def">code</span>) {
   <span class="cm-keyword">return</span> <span class="cm-variable-2">code</span>.<span class="cm-property">replace</span>(<span class="cm-string-2">/\/\/.*|\/\*[^]*\*\//g</span>, <span class="cm-string">&quot;&quot;</span>);
@@ -404,15 +403,15 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">stripComments</span>(<span class="cm-string">&quot;1 /* a */+/* b */ 1&quot;</span>));
 <span class="cm-comment">// → 1  1</span></pre>
 
-<p><a class="p_ident" id="p_DkzBCJQQdu" href="#p_DkzBCJQQdu" tabindex="-1" role="presentation"></a>The part before the <em>or</em> operator matches two slash characters followed by any number of non-newline characters. The part for multiline comments is more involved. We use <code>[^]</code> (any character that is not in the empty set of characters) as a way to match any character. We cannot just use a period here because block comments can continue on a new line, and the period character does not match newline characters.</p>
+<p><a class="p_ident" id="p_ov8tYGKzyK" href="#p_ov8tYGKzyK" tabindex="-1" role="presentation"></a><em>or</em> 演算子(<code>|</code>) の前の部分は、スラッシュ文字2つに改行文字以外が続いたパターンとマッチする。複数行のコメントとマッチする部分はもっと複雑だ。ここで <code>[^]</code> は、何もない文字以外という意味になるので、全ての文字にマッチする。コメントは行をまたいで続くかも知れなくて、ピリオドは改行にはマッチしないからだ。</p>
 
-<p><a class="p_ident" id="p_s9E9JYjAYp" href="#p_s9E9JYjAYp" tabindex="-1" role="presentation"></a>But the output for the last line appears to have gone wrong. Why?</p>
+<p>でも、最後の文字列への結果はおかしくなってしまった。なぜだろう?</p>
 
-<p><a class="p_ident" id="p_atS1ERkauC" href="#p_atS1ERkauC" tabindex="-1" role="presentation"></a>The <code>[^]*</code> part of the expression, as I described in the section on backtracking, will first match as much as it can. If that causes the next part of the pattern to fail, the matcher moves back one character and tries again from there. In the example, the matcher first tries to match the whole rest of the string and then moves back from there. It will find an occurrence of <code>*/</code> after going back four characters and match that. This is not what we wanted—the intention was to match a single comment, not to go all the way to the end of the code and find the end of the last block comment.</p>
+<p><a class="p_ident" id="p_TUjUGk8Fbx" href="#p_TUjUGk8Fbx" tabindex="-1" role="presentation"></a>正規表現の <code>[^]*</code> の部分は、引き返しのセクションで説明したように、まずはできるだけ多くマッチしようとする。もし、それ以降のパターンがマッチしなくなるなら、マッチャーは1文字引き返してリトライするはずだ。この例では、 <code>[^]*</code> の部分は、まずは文字列を最後までマッチしようとして、そこから引き返していく。文字列の最後から4文字引き返したところで、 <code>*/</code> が発見されるからマッチする。これは意図したこととは違う。1つずつのコメントにマッチさせるつもりが、文字列の最後まで見て、1つ目の始まりと2つ目の終わりがマッチしてしまった。</p>
 
-<p><a class="p_ident" id="p_eNtLSVH65f" href="#p_eNtLSVH65f" tabindex="-1" role="presentation"></a>Because of this behavior, we say the repetition operators (<code>+</code>, <code>*</code>, <code>?</code>, and <code>{}</code>) are <em>greedy</em>, meaning they match as much as they can and backtrack from there. If you put a question mark after them (<code>+?</code>, <code>*?</code>, <code>??</code>, <code>{}?</code>), they become nongreedy and start by matching as little as possible, matching more only when the remaining pattern does not fit the smaller match.</p>
+<p><a class="p_ident" id="p_B5O3ddT6qG" href="#p_B5O3ddT6qG" tabindex="-1" role="presentation"></a>このふるまいから、繰返し演算子( <code>+</code> , <code>*</code> , <code>?</code> , <code>{}</code> )を <em>貪欲(greedy)</em> と表現する。まずできるだけたくさんマッチしてから引き返すからだ。これらの後ろにクエスチョンマークを置けば( <code>+?</code> , <code>*?</code> , <code>??</code> , <code>{}?</code> )、貪欲ではなくなって、できるだけ少なくマッチするようになる。残りのパターンが上手くマッチしないときだけさらに多くマッチするようになるんだ。</p>
 
-<p><a class="p_ident" id="p_0L47KZXZKa" href="#p_0L47KZXZKa" tabindex="-1" role="presentation"></a>And that is exactly what we want in this case. By having the star match the smallest stretch of characters that brings us to a <code>*/</code>, we consume one block comment and nothing more.</p>
+<p>そして、これがまさにこの例で必要なものだ。 <code>[^]*</code> のマッチを <code>[^]*?</code> にして最小限だけマッチするように変えれば、ブロックコメント1つ分だけマッチして、それ以上に広がることはない。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_MCNF7GxfR1" href="#c_MCNF7GxfR1" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">stripComments</span>(<span class="cm-def">code</span>) {
   <span class="cm-keyword">return</span> <span class="cm-variable-2">code</span>.<span class="cm-property">replace</span>(<span class="cm-string-2">/\/\/.*|\/\*[^]*?\*\//g</span>, <span class="cm-string">&quot;&quot;</span>);
@@ -420,13 +419,13 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">stripComments</span>(<span class="cm-string">&quot;1 /* a */+/* b */ 1&quot;</span>));
 <span class="cm-comment">// → 1 + 1</span></pre>
 
-<p><a class="p_ident" id="p_o+3JCFC4Dr" href="#p_o+3JCFC4Dr" tabindex="-1" role="presentation"></a>A lot of bugs in regular expression programs can be traced to unintentionally using a greedy operator where a nongreedy one would work better. When using a repetition operator, consider the nongreedy variant first.</p>
+<p>正規表現プログラムのバグの多くは、非貪欲にした方が上手くいくところで、貪欲な演算子を使ってしまっていることが原因だ。繰返しの演算子を使うときには、まずは非貪欲なバージョンを使うことを考えよう。</p>
 
-<h2><a class="h_ident" id="h_Rhu25fogrG" href="#h_Rhu25fogrG" tabindex="-1" role="presentation"></a>Dynamically creating RegExp objects</h2>
+<h2><a class="h_ident" id="h_tZqcyUmbsI" href="#h_tZqcyUmbsI" tabindex="-1" role="presentation"></a>RegExpオブジェクトの動的な生成</h2>
 
-<p><a class="p_ident" id="p_34PsyHYX4x" href="#p_34PsyHYX4x" tabindex="-1" role="presentation"></a>There are cases where you might not know the exact pattern you need to match against when you are writing your code. Say you want to look for the user’s name in a piece of text and enclose it in underscore characters to make it stand out. Since you will know the name only once the program is actually running, you can’t use the slash-based notation.</p>
+<p>コードを書いている時点では、マッチさせるべきパターンが分からないという場合もある。ちょっとしたテキストからユーザの名前を探して、アンダースコアを挟んで目立つようにしたいとしよう。プログラムが実行されるまではユーザの名前は分からないから、スラッシュを使った記法は使えない。</p>
 
-<p><a class="p_ident" id="p_KAQggWa80Y" href="#p_KAQggWa80Y" tabindex="-1" role="presentation"></a>But you can build up a string and use the <code>RegExp</code> constructor on that. Here’s an example:</p>
+<p>この場合は文字列を組み立ててから、 <code>RegExp</code> コンストラクターに渡せばいい。以下はその例だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_3yQimfD35d" href="#c_3yQimfD35d" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">name</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;harry&quot;</span>;
 <span class="cm-keyword">let</span> <span class="cm-def">text</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;Harry is a suspicious character.&quot;</span>;
@@ -434,11 +433,11 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">text</span>.<span class="cm-property">replace</span>(<span class="cm-variable">regexp</span>, <span class="cm-string">&quot;_$1_&quot;</span>));
 <span class="cm-comment">// → _Harry_ is a suspicious character.</span></pre>
 
-<p><a class="p_ident" id="p_J6H1NBoQy/" href="#p_J6H1NBoQy/" tabindex="-1" role="presentation"></a>When creating the <code>\b</code> boundary markers, we have to use two backslashes because we are writing them in a normal string, not a slash-enclosed regular expression. The second argument to the <code>RegExp</code> constructor contains the options for the regular expression—in this case, <code>&quot;gi&quot;</code> for global and case insensitive.</p>
+<p><code>\b</code> で境界マーカーを作るときは、普通の文字列の中に書いているから、バックスラッシュをもう1つ足してエスケープしないといけない。 <code>RegExp</code> の2つ目の引数は正規表現のオプションだ。この場合の <code>&quot;gi&quot;</code> はグローバルで、大文字小文字を区別しないという意味だ。</p>
 
-<p><a class="p_ident" id="p_UPAgEiKHfS" href="#p_UPAgEiKHfS" tabindex="-1" role="presentation"></a>But what if the name is <code>&quot;dea+hl[]rd&quot;</code> because our user is a nerdy teenager? That would result in a nonsensical regular expression that won’t actually match the user’s name.</p>
+<p>ユーザが中二病で、名前が <code>&quot;dea+hl[]rd&quot;</code> だったらどうすればいい?これではめちゃくちゃな正規表現が出来上がってしまって、ユーザ名とマッチしないだろう。</p>
 
-<p><a class="p_ident" id="p_Q+hqmMv8NT" href="#p_Q+hqmMv8NT" tabindex="-1" role="presentation"></a>To work around this, we can add backslashes before any character that has a special meaning.</p>
+<p>これをなんとかするためには、特別な意味を持つ文字全てをバックスラッシュでエスケープすればいい。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_VVThPW6YGV" href="#c_VVThPW6YGV" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">name</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;dea+hl[]rd&quot;</span>;
 <span class="cm-keyword">let</span> <span class="cm-def">text</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;This dea+hl[]rd guy is super annoying.&quot;</span>;
@@ -447,24 +446,24 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">text</span>.<span class="cm-property">replace</span>(<span class="cm-variable">regexp</span>, <span class="cm-string">&quot;_$&amp;_&quot;</span>));
 <span class="cm-comment">// → This _dea+hl[]rd_ guy is super annoying.</span></pre>
 
-<h2><a class="h_ident" id="h_Txg7z4j/ei" href="#h_Txg7z4j/ei" tabindex="-1" role="presentation"></a>The search method</h2>
+<h2><a class="h_ident" id="h_G+nHsSMf6f" href="#h_G+nHsSMf6f" tabindex="-1" role="presentation"></a>searchメソッド</h2>
 
-<p><a class="p_ident" id="p_3QlEdRm5L2" href="#p_3QlEdRm5L2" tabindex="-1" role="presentation"></a>The <code>indexOf</code> method on strings cannot be called with a regular expression. But there is another method, <code>search</code>, that does expect a regular expression. Like <code>indexOf</code>, it returns the first index on which the expression was found, or -1 when it wasn’t found.</p>
+<p>文字列の <code>indexOf</code> メソッドは、正規表現を引数にして呼ぶことはできない。でも、 <code>search</code> というもう1つのメソッドがある。これは正規表現を引数に取って、 <code>indexOf</code> と同じように、そのパターンが最初に見つかったインデックスを返す。見つからなかった場合には-1が返される。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_diUfxE6ifs" href="#c_diUfxE6ifs" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;  word&quot;</span>.<span class="cm-property">search</span>(<span class="cm-string-2">/\S/</span>));
 <span class="cm-comment">// → 2</span>
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;    &quot;</span>.<span class="cm-property">search</span>(<span class="cm-string-2">/\S/</span>));
 <span class="cm-comment">// → -1</span></pre>
 
-<p><a class="p_ident" id="p_tqlyvUKoi5" href="#p_tqlyvUKoi5" tabindex="-1" role="presentation"></a>Unfortunately, there is no way to indicate that the match should start at a given offset (like we can with the second argument to <code>indexOf</code>), which would often be useful.</p>
+<p>残念ながら、マッチを始めるポジションを指定することはできない( <code>indexOf</code> に2番目の引数を与えるように)。できれば便利だっただろうけど。</p>
 
-<h2><a class="h_ident" id="h_duFTd2hqd0" href="#h_duFTd2hqd0" tabindex="-1" role="presentation"></a>The lastIndex property</h2>
+<h2><a class="h_ident" id="h_Uz0BBxwxHY" href="#h_Uz0BBxwxHY" tabindex="-1" role="presentation"></a>lastIndexプロパティ</h2>
 
-<p><a class="p_ident" id="p_MvO8+re1D+" href="#p_MvO8+re1D+" tabindex="-1" role="presentation"></a>The <code>exec</code> method similarly does not provide a convenient way to start searching from a given position in the string. But it does provide an <em>in</em>convenient way.</p>
+<p><code>exec</code> メソッドも同じように、文字列の探索開始場所を指定する便利な方法がない。だけど、不便な方法だったら、ある。</p>
 
-<p><a class="p_ident" id="p_F+JgzwxLtK" href="#p_F+JgzwxLtK" tabindex="-1" role="presentation"></a>Regular expression objects have properties. One such property is <code>source</code>, which contains the string that expression was created from. Another property is <code>lastIndex</code>, which controls, in some limited circumstances, where the next match will start.</p>
+<p>正規表現オブジェクトにはいくつかのプロパティがある。たとえば <code>source</code> プロパティは正規表現が生成された元の文字列を保持している。そして <code>lastIndex</code> プロパティは、特定の状況でだけ、次のマッチが開始するポジションをコントロールする。</p>
 
-<p><a class="p_ident" id="p_Ld5Vcdy0jB" href="#p_Ld5Vcdy0jB" tabindex="-1" role="presentation"></a>Those circumstances are that the regular expression must have the global (<code>g</code>) or sticky (<code>y</code>) option enabled, and the match must happen through the <code>exec</code> method. Again, a less confusing solution would have been to just allow an extra argument to be passed to <code>exec</code>, but confusion is an essential feature of JavaScript’s regular expression interface.</p>
+<p><a class="p_ident" id="p_0hDNfTtQRd" href="#p_0hDNfTtQRd" tabindex="-1" role="presentation"></a>その状況というのは、正規表現のグローバル( <code>g</code> )かスティッキー( <code>y</code> )のオプションが有効になっていて、マッチングが <code>exec</code> メソッドで行われているということだ。ここでも、もっと分かりやすいやり方は <code>exec</code> メソッッドにもう1つ引数を渡せるようにすることだろうけど、分かりにくさはJavaScriptの正規表現インターフェイスの欠かせない機能のようなものなんだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_nXsHtqIJdF" href="#c_nXsHtqIJdF" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">pattern</span> <span class="cm-operator">=</span> <span class="cm-string-2">/y/g</span>;
 <span class="cm-variable">pattern</span>.<span class="cm-property">lastIndex</span> <span class="cm-operator">=</span> <span class="cm-number">3</span>;
@@ -474,9 +473,9 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">pattern</span>.<span class="cm-property">lastIndex</span>);
 <span class="cm-comment">// → 5</span></pre>
 
-<p><a class="p_ident" id="p_hjLQ+57mDd" href="#p_hjLQ+57mDd" tabindex="-1" role="presentation"></a>If the match was successful, the call to <code>exec</code> automatically updates the <code>lastIndex</code> property to point after the match. If no match was found, <code>lastIndex</code> is set back to zero, which is also the value it has in a newly constructed regular expression object.</p>
+<p><a class="p_ident" id="p_cXpMwVrt3i" href="#p_cXpMwVrt3i" tabindex="-1" role="presentation"></a>マッチが成功すると、 <code>exec</code> メソッドは自動的に <code>lastIndex</code> をマッチした位置の次にアップデートする。失敗した場合には <code>lastIndex</code> は0に戻される。新しく作られた正規表現オブジェクトにも初期値として0が与えられる。</p>
 
-<p><a class="p_ident" id="p_dQPVkpMm7y" href="#p_dQPVkpMm7y" tabindex="-1" role="presentation"></a>The difference between the global and the sticky options is that, when sticky is enabled, the match will succeed only if it starts directly at <code>lastIndex</code>, whereas with global, it will search ahead for a position where a match can start.</p>
+<p>グローバルとスティッキーの違いは、スティッキーが有効の場合には、マッチが <code>lastIndex</code> から始まっている場合にだけ成功になるということだ。一方で、グローバルの場合にはマッチャーは前の方を探しに行って、マッチが開始できるポジションを探す。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_98GwGRIMj8" href="#c_98GwGRIMj8" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">global</span> <span class="cm-operator">=</span> <span class="cm-string-2">/abc/g</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">global</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;xyz abc&quot;</span>));
@@ -485,7 +484,7 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">sticky</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;xyz abc&quot;</span>));
 <span class="cm-comment">// → null</span></pre>
 
-<p><a class="p_ident" id="p_042bNmzNZK" href="#p_042bNmzNZK" tabindex="-1" role="presentation"></a>When using a shared regular expression value for multiple <code>exec</code> calls, these automatic updates to the <code>lastIndex</code> property can cause problems. Your regular expression might be accidentally starting at an index that was left over from a previous call.</p>
+<p>同じ正規表現オブジェクトを複数の <code>exec</code> で共有する場合には、 <code>lastIndex</code> の自動アップデートが問題を起こすかもしれない。マッチングが、 <code>exec</code> が前の呼び出しで覚えた位置から始まってしまうかもしれないからだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_wrx2wO0P8M" href="#c_wrx2wO0P8M" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">digit</span> <span class="cm-operator">=</span> <span class="cm-string-2">/\d/g</span>;
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">digit</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;here it is: 1&quot;</span>));
@@ -493,16 +492,16 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">digit</span>.<span class="cm-property">exec</span>(<span class="cm-string">&quot;and now: 1&quot;</span>));
 <span class="cm-comment">// → null</span></pre>
 
-<p><a class="p_ident" id="p_9l7tQ3SsME" href="#p_9l7tQ3SsME" tabindex="-1" role="presentation"></a>Another interesting effect of the global option is that it changes the way the <code>match</code> method on strings works. When called with a global expression, instead of returning an array similar to that returned by <code>exec</code>, <code>match</code> will find <em>all</em> matches of the pattern in the string and return an array containing the matched strings.</p>
+<p>他にも面白いのは、グローバルオプションが文字列の <code>match</code> メソッドのふるまいも変えてしまうことだ。 <code>match</code> は、 <code>exec</code> によって返される配列のようなものとは違って、文字列からパターンのマッチを <em>全て</em> 探して、それらを含む配列を返すようになるんだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_weT/d5+8vE" href="#c_weT/d5+8vE" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">&quot;Banana&quot;</span>.<span class="cm-property">match</span>(<span class="cm-string-2">/an/g</span>));
 <span class="cm-comment">// → [&quot;an&quot;, &quot;an&quot;]</span></pre>
 
-<p><a class="p_ident" id="p_zFHO63a2iV" href="#p_zFHO63a2iV" tabindex="-1" role="presentation"></a>So be cautious with global regular expressions. The cases where they are necessary—calls to <code>replace</code> and places where you want to explicitly use <code>lastIndex</code>—are typically the only places where you want to use them.</p>
+<p>というわけで正規表現のグローバルオプションには注意しよう。そして必要なときだけ使うようにしよう。 <code>replace</code> メソッドを呼び出すときや、 <code>lastIndex</code> を明示的に使いたいときが典型的な使い道だろう。</p>
 
-<h3><a class="i_ident" id="i_m0fs21dHEg" href="#i_m0fs21dHEg" tabindex="-1" role="presentation"></a>Looping over matches</h3>
+<h3><a class="i_ident" id="i_QRYRKZKylj" href="#i_QRYRKZKylj" tabindex="-1" role="presentation"></a>マッチのループ</h3>
 
-<p><a class="p_ident" id="p_Rhy/hnaaT+" href="#p_Rhy/hnaaT+" tabindex="-1" role="presentation"></a>A common thing to do is to scan through all occurrences of a pattern in a string, in a way that gives us access to the match object in the loop body. We can do this by using <code>lastIndex</code> and <code>exec</code>.</p>
+<p>文字列中からパターンの出現全てをスキャンしていって、ループ内でマッチオブジェクトにアクセスしたい、ということがよくある。 <code>lastIndex</code> と <code>exec</code> を使えばこれを実現できる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_rSzEnbVHja" href="#c_rSzEnbVHja" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">input</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;A string with 3 numbers in it... 42 and 88.&quot;</span>;
 <span class="cm-keyword">let</span> <span class="cm-def">number</span> <span class="cm-operator">=</span> <span class="cm-string-2">/\b\d+\b/g</span>;
@@ -514,50 +513,53 @@ expressions</em>. Regular expressions are a way to describe patterns in string d
 <span class="cm-comment">//   Found 42 at 33</span>
 <span class="cm-comment">//   Found 88 at 40</span></pre>
 
-<p><a class="p_ident" id="p_ZdCI2+edqA" href="#p_ZdCI2+edqA" tabindex="-1" role="presentation"></a>This makes use of the fact that the value of an assignment expression (<code>=</code>) is the assigned value. So by using <code>match = number.<wbr>exec(input)</code> as the condition in the <code>while</code> statement, we perform the match at the start of each iteration, save its result in a binding, and stop looping when no more matches are found.</p>
+<p>ここでは、代入式( <code>=</code> )の値自体も、代入される値になることを利用している。 <code>while</code> 宣言の条件として <code>match = number.<wbr>exec(input)</code> を使うと、各イテレーションの最初にマッチングを行って、結果を <code>match</code> バインディングに保存して、マッチしなくなればループを終了することになる。</p>
 
-<h2 id="ini"><a class="h_ident" id="h_RGsf6ah1EY" href="#h_RGsf6ah1EY" tabindex="-1" role="presentation"></a>Parsing an INI file</h2>
+<h2 id="ini"><a class="h_ident" id="h_8o3BpubpJl" href="#h_8o3BpubpJl" tabindex="-1" role="presentation"></a>INIファイルのパース</h2>
 
-<p><a class="p_ident" id="p_JbrLORqV9r" href="#p_JbrLORqV9r" tabindex="-1" role="presentation"></a>To conclude the chapter, we’ll look at a problem that calls for regular expressions. Imagine we are writing a program to automatically collect information about our enemies from the Internet. (We will not actually write that program here, just the part that reads the configuration file. Sorry.) The configuration file looks like this:</p>
+<p>この章を終える前に、正規表現が必要になる問題を見てみよう。インターネットから敵の情報を自動で収集するプログラムを書くことを想像しよう。(ここでは実際にそのプログラムは書かない。設定ファイルを読み込む部分だけだ。申し訳ない。)設定ファイルはこういう見た目になるだろう。</p>
 
-<pre class="snippet cm-s-default" data-language="text/plain" ><a class="c_ident" id="c_RV3f5fiptq" href="#c_RV3f5fiptq" tabindex="-1" role="presentation"></a>searchengine=https://duckduckgo.com/?q=$1
+<pre class="snippet cm-s-default" data-language="text/plain" ><a class="c_ident" id="c_/2jyS6L+W5" href="#c_/2jyS6L+W5" tabindex="-1" role="presentation"></a>searchengine=https://duckduckgo.com/?q=$1
 spitefulness=9.7
+;訳注 spitefulness: 悪意・敵意の度合い
 
-; comments are preceded by a semicolon...
-; each section concerns an individual enemy
+; comments are preceded by a semicolon...(コメントはセミコロンの後に続ける)
+; each section concerns an individual enemy(各セクションが個々の敵を扱う)
 [larry]
 fullname=Larry Doe
 type=kindergarten bully
 website=http://www.geocities.com/CapeCanaveral/11451
+;訳注 kindergarten bully: 幼稚園のいじめっ子
 
 [davaeorn]
 fullname=Davaeorn
 type=evil wizard
-outputdir=/home/marijn/enemies/davaeorn</pre>
+outputdir=/home/marijn/enemies/davaeorn
+;訳注 evil wizard: 悪の魔法使い</pre>
 
-<p><a class="p_ident" id="p_OgIQS1TJxB" href="#p_OgIQS1TJxB" tabindex="-1" role="presentation"></a>The exact rules for this format (which is a widely used format, usually called an <em>INI</em> file) are as follows:</p>
+<p><a class="p_ident" id="p_5+sfP6l0gN" href="#p_5+sfP6l0gN" tabindex="-1" role="presentation"></a>このフォーマットのルールは以下のように整理できる。これは広く使われているフォーマットで、 <em>INI</em> ファイルと呼ばれる。</p>
 
 <ul>
 
 <li>
 
-<p><a class="p_ident" id="p_jIewfc/40B" href="#p_jIewfc/40B" tabindex="-1" role="presentation"></a>Blank lines and lines starting with semicolons are ignored.</p></li>
+<p>空の行と、セミコロンで始まる行は無視される。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_O/dGCr+aR5" href="#p_O/dGCr+aR5" tabindex="-1" role="presentation"></a>Lines wrapped in <code>[</code> and <code>]</code> start a new section.</p></li>
+<p><code>[</code> と <code>]</code> で囲まれた行は、新しいセクションの始まりになる。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_l2Yjl1fUVB" href="#p_l2Yjl1fUVB" tabindex="-1" role="presentation"></a>Lines containing an alphanumeric identifier followed by an <code>=</code> character add a setting to the current section.</p></li>
+<p>英数字の名前(識別子)の後に <code>=</code> が続く行は、現在のセクションに設定を追加する。</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_bCaQwCXJCi" href="#p_bCaQwCXJCi" tabindex="-1" role="presentation"></a>Anything else is invalid.</p></li></ul>
+<p>それ以外のものは無効になる。</p></li></ul>
 
-<p><a class="p_ident" id="p_clbD+OAS4y" href="#p_clbD+OAS4y" tabindex="-1" role="presentation"></a>Our task is to convert a string like this into an object whose properties hold strings for settings written before the first section header and subobjects for sections, with those subobjects holding the section’s settings.</p>
+<p>ぼくらのタスクは上のような文字列を1つのオブジェクトにまとめることだ。このオブジェクトが、始めのセクションより前に書かれた設定と各セクションを表すサブオブジェクトをプロパティとして持つようにする。セクションごとのサブオブジェクトには、そのセクションの設定を保持させる。</p>
 
-<p><a class="p_ident" id="p_8U3vMRn7g4" href="#p_8U3vMRn7g4" tabindex="-1" role="presentation"></a>Since the format has to be processed line by line, splitting up the file into separate lines is a good start. We saw the <code>split</code> method in <a href="04_data.html#split">Chapter 4</a>. Some operating systems, however, use not just a newline character to separate lines but a carriage return character followed by a newline (<code>&quot;\r\n&quot;</code>). Given that the <code>split</code> method also allows a regular expression as its argument, we can use a regular expression like <code>/\r?\n/</code> to split in a way that allows both <code>&quot;\n&quot;</code> and <code>&quot;\r\n&quot;</code> between lines.</p>
+<p><a class="p_ident" id="p_5AqqPPoTNi" href="#p_5AqqPPoTNi" tabindex="-1" role="presentation"></a>INIフォーマットは行ごとに処理しないといけないから、まずはファイルの内容を行ごとに分けてしまうと取りかかりやすい。<a href="04_data.html#split">4</a>章では <code>split</code> メソッドについて見た。OSによっては、行を分けるために改行文字だけではなく、キャリッジリターン文字と改行文字を合わせて使っている場合がある( <code>&quot;\r\n&quot;</code> のように)。 <code>split</code> メソッドは正規表現も引数に受け取ることもできるから、 <code>/\r?\n/</code> を渡せば <code>&quot;\n&quot;</code> と <code>&quot;\r\n&quot;</code> のどちらの改行にも対応できる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_neI86/XXg2" href="#c_neI86/XXg2" tabindex="-1" role="presentation"></a><span class="cm-keyword">function</span> <span class="cm-def">parseINI</span>(<span class="cm-def">string</span>) {
   <span class="cm-comment">// Start with an object to hold the top-level fields</span>
@@ -582,24 +584,23 @@ outputdir=/home/marijn/enemies/davaeorn</pre>
 <span class="cm-string-2">city=Tessaloniki`</span>));
 <span class="cm-comment">// → {name: &quot;Vasilis&quot;, address: {city: &quot;Tessaloniki&quot;}}</span></pre>
 
-<p><a class="p_ident" id="p_86q0K3iF4C" href="#p_86q0K3iF4C" tabindex="-1" role="presentation"></a>The code goes over the file’s lines and builds up an object. Properties at the top are stored directly into that object, whereas properties found in sections are stored in a separate section object. The <code>section</code> binding points at the object for the current section.</p>
+<p>このコードはファイルを行ごとに見ていって、1つのオブジェクトを組み立てる。ファイルの頭で見つかったプロパティはオブジェクトに直接保持されて、セクション内のプロパティはセクション毎のオブジェクトに保持される。 <code>section</code> バインディングは、そのとき扱っている行のセクションを示している。</p>
 
-<p><a class="p_ident" id="p_ixTfvSC1VN" href="#p_ixTfvSC1VN" tabindex="-1" role="presentation"></a>There are two kinds of significant lines—section headers or property lines. When a line is a regular property, it is stored in the current section. When it is a section header, a new section object is created, and <code>section</code> is set to point at it.</p>
+<p>セクションヘッダーの行とプロパティの行という特徴的な2種類の行がある。ある行が普通のプロパティであれば、現在のセクションに保持される。セクションヘッダーの行であれば、新しいセクションのためにオブジェクトが作られて、 <code>section</code> バインディングはそのオブジェクトを指すようになる。</p>
 
-<p><a class="p_ident" id="p_FPzqsloIkT" href="#p_FPzqsloIkT" tabindex="-1" role="presentation"></a>Note the recurring use of <code>^</code> and <code>$</code> to make sure the expression matches the whole line, not just part of it. Leaving these out results in code that mostly works but behaves strangely for some input, which can be a difficult bug to track down.</p>
+<p><code>^</code> と <code>$</code> を毎回書いて、確実に行全体がマッチするようにしていることに注意してほしい。これをなくしてしまうと、たいていの場合には上手くいくのにたまに失敗するコードになってしまう。これは追跡が難しいバグだ。</p>
 
-<p><a class="p_ident" id="p_ACT8bIScp+" href="#p_ACT8bIScp+" tabindex="-1" role="presentation"></a>The pattern <code>if (match = string.<wbr>match(.<wbr>.<wbr>.<wbr>))</code> is similar to the trick of using an assignment as the condition for <code>while</code>. You often aren’t sure that your call to <code>match</code> will succeed, so you can access the resulting object only inside an <code>if</code> statement that tests for this. To not break the pleasant chain of <code>else if</code> forms, we assign the result of the match to a binding and immediately use that assignment as the test for the <code>if</code> statement.</p>
+<p><code>if (match = string.<wbr>match(.<wbr>.<wbr>.<wbr>))</code> のパターンは <code>while</code> の条件部分で代入を使うワザと同じだ。 <code>match</code> の呼び出しは成功するかどうか分からないことが多いから、それをテストする <code>if</code> 文の中でだけ結果の <code>match</code> オブジェクトにアクセスする。 <code>else if</code> 形式の分かりやすいチェインを壊したくないから、マッチの結果をバインディングに代入して、その代入が生む値を <code>if</code> 文のテストで使っているんだ。</p>
 
-<p><a class="p_ident" id="p_mwlBKfUu5D" href="#p_mwlBKfUu5D" tabindex="-1" role="presentation"></a>If a line is not a section header or a property, the function checks whether it is a comment or an empty line using the expression <code>/^\s*(;.*)?$/</code>. Do you see how it works? The part between the parentheses will match comments, and the <code>?</code> makes sure it also matches lines containing only whitespace. When a line doesn’t match any of the expected forms, the function throws an exception.</p>
+<p>ある行がセクションヘッダーとプロパティのどちらでもなければ、 <code>/^\s*(;.*)?$/</code> という正規表現でコメント行なのか空行なのかチェックされる。どういう仕組みか分かるだろうか?カッコの間の部分はコメントにマッチする。そこに <code>?</code> が続くからホワイトスペースだけの行にもマッチするようになっている。期待される形式のどれにもマッチしない行があれば、 <code>parseINI</code>関数は例外を発生させる。</p>
 
-<h2><a class="h_ident" id="h_+y54//b0l+" href="#h_+y54//b0l+" tabindex="-1" role="presentation"></a>International characters</h2>
+<h2><a class="h_ident" id="h_GDxe7QvqDv" href="#h_GDxe7QvqDv" tabindex="-1" role="presentation"></a>国際文字</h2>
 
-<p><a class="p_ident" id="p_2zJ37rLrbl" href="#p_2zJ37rLrbl" tabindex="-1" role="presentation"></a>Because of JavaScript’s initial simplistic implementation and the fact that this simplistic approach was later set in stone as standard behavior, JavaScript’s regular expressions are rather dumb about characters that do not appear in the English language. For example, as far as JavaScript’s regular expressions are concerned, a “word
-character” is only one of the 26 characters in the Latin alphabet (uppercase or lowercase), decimal digits, and, for some reason, the underscore character. Things like <em>é</em> or <em>β</em>, which most definitely are word characters, will not match <code>\w</code> (and <em>will</em> match uppercase <code>\W</code>, the nonword category).</p>
+<p><a class="p_ident" id="p_JtpQsLoXY0" href="#p_JtpQsLoXY0" tabindex="-1" role="presentation"></a>JavaScriptの初期の実装が単純なものだった上に、この単純なアプローチがもはや動かせないものになってしまったから、JavaScriptの正規表現は英語で使われる文字以外に関してはアホとしかいいようがない。例えば、&quot;言葉の文字&quot;( <code>\w</code> )として扱われるのはラテンアルファベットの26文字(の大文字と小文字)と十進数の数字とアンダースコアだけだ。 <em>é</em> や <em>β</em> はどう考えても言葉の文字だけど、 <code>\w</code> にはマッチしないで、 <code>\W</code> (言葉以外)にマッチする。</p>
 
-<p><a class="p_ident" id="p_H4r1oRJB6J" href="#p_H4r1oRJB6J" tabindex="-1" role="presentation"></a>By a strange historical accident, <code>\s</code> (whitespace) does not have this problem and matches all characters that the Unicode standard considers whitespace, including things like the nonbreaking space and the Mongolian vowel separator.</p>
+<p><a class="p_ident" id="p_mrC9mmEm7k" href="#p_mrC9mmEm7k" tabindex="-1" role="presentation"></a>歴史的な偶然で <code>\s</code> (ホワイトスペース)にはこの問題がなくて、Unicode標準がホワイトスペースと見なす文字全てにマッチする。ノーブレークスペースやモンゴル語の母音を分ける文字でも問題ないんだ。</p>
 
-<p><a class="p_ident" id="p_Ln5OarYp4l" href="#p_Ln5OarYp4l" tabindex="-1" role="presentation"></a>Another problem is that, by default, regular expressions work on code units, as discussed in <a href="05_higher_order.html#code_units">Chapter 5</a>, not actual characters. This means characters that are composed of two code units behave strangely.</p>
+<p><a class="p_ident" id="p_UNX7DvbvMg" href="#p_UNX7DvbvMg" tabindex="-1" role="presentation"></a>もう1つの問題は、デフォルトの正規表現は(<a href="05_higher_order.html#code_units">5</a>章で見てきた)コードユニット毎に作用するということだ(実際の文字ごとではなく)。だから、2つのコードユニットを使う文字ではおかしな挙動になるんだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_CfMTYxun8D" href="#c_CfMTYxun8D" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/🍎{3}/</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;🍎🍎🍎&quot;</span>));
 <span class="cm-comment">// → false</span>
@@ -608,11 +609,11 @@ character” is only one of the 26 characters in the Latin alphabet (uppercase o
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/&lt;.&gt;/u</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;&lt;🌹&gt;&quot;</span>));
 <span class="cm-comment">// → true</span></pre>
 
-<p><a class="p_ident" id="p_j4Kcv6J/rF" href="#p_j4Kcv6J/rF" tabindex="-1" role="presentation"></a>The problem is that the 🍎 in the first line is treated as two code units, and the <code>{3}</code> part is applied only to the second one. Similarly, the dot matches a single code unit, not the two that make up the rose emoji.</p>
+<p><a class="p_ident" id="p_MdO1n/nUjP" href="#p_MdO1n/nUjP" tabindex="-1" role="presentation"></a>問題は、最初の行での🍎は2コードユニットとして扱われるから <code>{3}</code> の部分が2つ目の🍎までしかマッチできないことだ。同じように、ドットは1コードユニットにしかマッチできないから、バラの絵文字の2コードユニットには失敗してしまうんだ。</p>
 
-<p><a class="p_ident" id="p_1OZOJ3sk/b" href="#p_1OZOJ3sk/b" tabindex="-1" role="presentation"></a>You must add a <code>u</code> option (for Unicode) to your regular expression to make it treat such characters properly. The wrong behavior remains the default, unfortunately, because changing that might cause problems for existing code that depends on it.</p>
+<p>こういう文字を上手く扱うには正規表現に <code>u</code> オプション(Unicodeという意味)を付けるしかない。デフォルトの動作はおかしいままだけど、それを変えてしまうと既存のコードがおかしくなってしまうかもしれないんだ。</p>
 
-<p><a class="p_ident" id="p_MmzTSqcyKg" href="#p_MmzTSqcyKg" tabindex="-1" role="presentation"></a>Though this was only just standardized and is, at the time of writing, not widely supported yet, it is possible to use <code>\p</code> in a regular expression (that must have the Unicode option enabled) to match all characters to which the Unicode standard assigns a given property.</p>
+<p>この本を書いている時点では、標準化されたばかりで広くサポートされているわけではないけど、正規表現で <code>\p</code> を使えば、そのプロパティにUnicode標準が割り当てる文字全てにマッチさせることもできる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_+jV1oln0sr" href="#c_+jV1oln0sr" tabindex="-1" role="presentation"></a><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/\p{Script=Greek}/u</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;α&quot;</span>));
 <span class="cm-comment">// → true</span>
@@ -623,141 +624,143 @@ character” is only one of the 26 characters in the Latin alphabet (uppercase o
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string-2">/\p{Alphabetic}/u</span>.<span class="cm-property">test</span>(<span class="cm-string">&quot;!&quot;</span>));
 <span class="cm-comment">// → false</span></pre>
 
-<p><a class="p_ident" id="p_5NxQGhRrMq" href="#p_5NxQGhRrMq" tabindex="-1" role="presentation"></a>Unicode defines a number of useful properties, though finding the one that you need may not always be trivial. You can use the <code>\p{Property=Value}</code> notation to match any character that has the given value for that property. If the property name is left off, as in <code>\p{Name}</code>, the name is assumed to be either a binary property such as <code>Alphabetic</code> or a category such as <code>Number</code>.</p>
+<p><a class="p_ident" id="p_jZHfu9dFbz" href="#p_jZHfu9dFbz" tabindex="-1" role="presentation"></a>Unicodeには便利なプロパティがたくさん用意されているけど、その中から必要なものを探してくるのは大変かもしれない。 <code>\p{Property=Value}</code> と書けば、そのプロパティのValueを持っている文字全てにマッチできる。プロパティ名を省略して <code>\p{Name}</code> とすると、 <code>Alphabetic</code> のようなバイナリープロパティの値か、 <code>Number</code> のようなカテゴリー名として扱われる。</p>
 
-<h2 id="summary_regexp"><a class="h_ident" id="h_ErccPg/l98" href="#h_ErccPg/l98" tabindex="-1" role="presentation"></a>Summary</h2>
+<h2 id="summary_regexp"><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
 
-<p><a class="p_ident" id="p_/hQX04GtpS" href="#p_/hQX04GtpS" tabindex="-1" role="presentation"></a>Regular expressions are objects that represent patterns in strings. They use their own language to express these patterns.</p>
+<p>正規表現は文字列のパターンを表現するオブジェクトだ。以下のように、オリジナルの言語でパターンを表現する。</p>
 
 <table>
 
-<tr><td><code>/abc/</code></td><td>A sequence of characters</td>
+<tr><td><code>/abc/</code></td><td>文字のシーケンス</td>
 
 </tr>
 
-<tr><td><code>/[abc]/</code></td><td>Any character from a set of characters</td>
+<tr><td><code>/[abc]/</code></td><td>文字セットのうちのどれか</td>
 
 </tr>
 
-<tr><td><code>/[^abc]/</code></td><td>Any character <em>not</em> in a set of characters</td>
+<tr><td><code>/[^abc]/</code></td><td>文字セットに <em>含まれない</em> 全ての文字</td>
 
 </tr>
 
-<tr><td><code>/[0-9]/</code></td><td>Any character in a range of characters</td>
+<tr><td><code>/[0-9]/</code></td><td>文字範囲に含まれる全ての文字</td>
 
 </tr>
 
-<tr><td><code>/x+/</code></td><td>One or more occurrences of the pattern <code>x</code></td>
+<tr><td><code>/x+/</code></td><td>パターン <code>x</code> が1回以上出現</td>
 
 </tr>
 
-<tr><td><code>/x+?/</code></td><td>One or more occurrences, nongreedy</td>
+<tr><td><code>/x+?/</code></td><td>1回以上出現、貪欲ではない</td>
 
 </tr>
 
-<tr><td><code>/x*/</code></td><td>Zero or more occurrences</td>
+<tr><td><code>/x*/</code></td><td>0回以上出現</td>
 
 </tr>
 
-<tr><td><code>/x?/</code></td><td>Zero or one occurrence</td>
+<tr><td><code>/x?/</code></td><td>0回以上出現</td>
 
 </tr>
 
-<tr><td><code>/x{2,4}/</code></td><td>Two to four occurrences</td>
+<tr><td><code>/x{2,4}/</code></td><td>2から4回出現</td>
 
 </tr>
 
-<tr><td><code>/(abc)/</code></td><td>A group</td>
+<tr><td><code>/(abc)/</code></td><td>グループ</td>
 
 </tr>
 
-<tr><td><code>/a|b|c/</code></td><td>Any one of several patterns</td>
+<tr><td><code>/a|b|c/</code></td><td>複数のパターンのどれか</td>
 
 </tr>
 
-<tr><td><code>/\d/</code></td><td>Any digit character</td>
+<tr><td><code>/\d/</code></td><td>全ての十進数文字</td>
 
 </tr>
 
-<tr><td><code>/\w/</code></td><td>An alphanumeric character (“word character”)</td>
+<tr><td><code>/\w/</code></td><td>英数字 (&quot;言葉の文字&quot;)</td>
 
 </tr>
 
-<tr><td><code>/\s/</code></td><td>Any whitespace character</td>
+<tr><td><code>/\s/</code></td><td>ホワイトスペース</td>
 
 </tr>
 
-<tr><td><code>/./</code></td><td>Any character except newlines</td>
+<tr><td><code>/./</code></td><td>改行以外の全ての文字</td>
 
 </tr>
 
-<tr><td><code>/\b/</code></td><td>A word boundary</td>
+<tr><td><code>/\b/</code></td><td>単語の境界</td>
 
 </tr>
 
-<tr><td><code>/^/</code></td><td>Start of input</td>
+<tr><td><code>/^/</code></td><td>入力の始まり</td>
 
 </tr>
 
-<tr><td><code>/$/</code></td><td>End of input</td>
+<tr><td><code>/$/</code></td><td>入力の終わり</td>
 
 </tr>
 
 </table>
 
-<p><a class="p_ident" id="p_AVY5pFcEyH" href="#p_AVY5pFcEyH" tabindex="-1" role="presentation"></a>A regular expression has a method <code>test</code> to test whether a given string matches it. It also has a method <code>exec</code> that, when a match is found, returns an array containing all matched groups. Such an array has an <code>index</code> property that indicates where the match started.</p>
+<p>正規表現には <code>test</code> というメソッドがあって、与えられた文字列がマッチするかどうかテストする。また、 <code>exec</code> メソッドは、マッチしたときには、マッチしたグループを全て含んだ配列を返す。この配列には <code>index</code> プロパティがあって、マッチの開始位置を示す。</p>
 
-<p><a class="p_ident" id="p_FoVJlvxp9q" href="#p_FoVJlvxp9q" tabindex="-1" role="presentation"></a>Strings have a <code>match</code> method to match them against a regular expression and a <code>search</code> method to search for one, returning only the starting position of the match. Their <code>replace</code> method can replace matches of a pattern with a replacement string or function.</p>
+<p>文字列には <code>match</code> というメソッドがあって、引数の正規表現とマッチするか調べる。 <code>search</code> メソッドはマッチ開始位置だけを返す。 <code>replace</code> メソッドは、マッチしたパターンを文字列か関数で置き換える。</p>
 
-<p><a class="p_ident" id="p_APfM9C3A6j" href="#p_APfM9C3A6j" tabindex="-1" role="presentation"></a>Regular expressions can have options, which are written after the closing slash. The <code>i</code> option makes the match case insensitive. The <code>g</code> option makes the expression <em>global</em>, which, among other things, causes the <code>replace</code> method to replace all instances instead of just the first. The <code>y</code> option makes it sticky, which means that it will not search ahead and skip part of the string when looking for a match. The <code>u</code> option turns on Unicode mode, which fixes a number of problems around the handling of characters that take up two code units.</p>
+<p><a class="p_ident" id="p_9YpnO4d0XH" href="#p_9YpnO4d0XH" tabindex="-1" role="presentation"></a>正規表現には閉じるスラッシュの後にオプションを付けられる。 <code>i</code> オプションはマッチングが大文字小文字を区別しないようにする。 <code>g</code> オプションは正規表現を <em>グローバル</em> に変えて、特に <code>replace</code> メソッドを始めのマッチだけではなく全てのマッチを置き換えるようにする。 <code>y</code> オプションはマッチをスティッキーにする。つまり、マッチを探すときに文字列をスキップして前に進めないようにするんだ。 <code>u</code> オプションはUnicodeモードをオンにする。これは2コードユニットの文字に関する問題を解決してくれるんだ。</p>
 
-<p><a class="p_ident" id="p_mvLGdyUb97" href="#p_mvLGdyUb97" tabindex="-1" role="presentation"></a>Regular expressions are a sharp tool with an awkward handle. They simplify some tasks tremendously but can quickly become unmanageable when applied to complex problems. Part of knowing how to use them is resisting the urge to try to shoehorn things that they cannot cleanly express into them.</p>
+<p>正規表現は、切れ味鋭いツールに不格好な持ち手が付いたようなものだ。タスクをものすごくシンプルにすることもあれば、複雑な問題に使おうとしてすぐに制御不能になることもある。正規表現の使い方を知るということは、正規表現では上手く表現できない問題にも無理やり当てはめたくなる衝動に逆らうことでもあるんだ。</p>
 
 <h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
 
-<p><a class="p_ident" id="p_meNfX2B/+s" href="#p_meNfX2B/+s" tabindex="-1" role="presentation"></a>It is almost unavoidable that, in the course of working on these exercises, you will get confused and frustrated by some regular expression’s inexplicable behavior. Sometimes it helps to enter your expression into an online tool like <a href="https://www.debuggex.com/"><em>https://debuggex.com</em></a> to see whether its visualization corresponds to what you intended and to experiment with the way it responds to various input strings.</p>
+<p><a class="p_ident" id="p_ZLZe6zjlTr" href="#p_ZLZe6zjlTr" tabindex="-1" role="presentation"></a>このエクササイズに取り組んでいる間、正規表現の不可解なふるまいに混乱したりイラついたりするのは、まず避けられないだろう。<a href="https://www.debuggex.com/"><em>https://debuggex.com</em></a>のようなオンラインツールに入力して、可視化されたものが意図に合っているか見たり、文字の入力にどう反応するか実験してみたりするといい。</p>
 
 <h3><a class="i_ident" id="i_vDM8PzwQWU" href="#i_vDM8PzwQWU" tabindex="-1" role="presentation"></a>Regexp golf</h3>
 
-<p><a class="p_ident" id="p_1t8xXpFN7O" href="#p_1t8xXpFN7O" tabindex="-1" role="presentation"></a><em>Code golf</em> is a term used for the game of trying to express a particular program in as few characters as possible. Similarly, <em>regexp golf</em> is the practice of writing as tiny a regular expression as possible to match a given pattern, and <em>only</em> that pattern.</p>
+<p>(正規表現ゴルフ)</p>
 
-<p><a class="p_ident" id="p_VGCqgCur6C" href="#p_VGCqgCur6C" tabindex="-1" role="presentation"></a>For each of the following items, write a regular expression to test whether any of the given substrings occur in a string. The regular expression should match only strings containing one of the substrings described. Do not worry about word boundaries unless explicitly mentioned. When your expression works, see whether you can make it any smaller.</p>
+<p><em>コードゴルフ</em> は、あるプログラムを可能な限り短く表現するゲームだ。同じように、 <em>正規表現ゴルフ</em> はできるだけ小さい正規表現で与えられたパターン( <em>だけ</em> )にマッチさせる、というものだ。</p>
+
+<p>次のアイテムそれぞれに、部分文字列が文字列の中にあるかどうかテストする正規表現を書こう。この正規表現は部分文字列を含んでいるものだけにマッチするようにしないといけない。単語の境界については明示的に指定しない限り気にしなくていい。きちんと動作するようになったら、さらに短くできるか考えてみよう。</p>
 
 <ol>
 
 <li>
 
-<p><a class="p_ident" id="p_togdFO+/b9" href="#p_togdFO+/b9" tabindex="-1" role="presentation"></a><em>car</em> and <em>cat</em></p></li>
+<p><a class="p_ident" id="p_xvWnbeToqT" href="#p_xvWnbeToqT" tabindex="-1" role="presentation"></a><em>car</em> と <em>cat</em></p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_2Q37Tsr9DS" href="#p_2Q37Tsr9DS" tabindex="-1" role="presentation"></a><em>pop</em> and <em>prop</em></p></li>
+<p><a class="p_ident" id="p_GyRYO2ZOIs" href="#p_GyRYO2ZOIs" tabindex="-1" role="presentation"></a><em>pop</em> と <em>prop</em></p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_2Ah4dFikw1" href="#p_2Ah4dFikw1" tabindex="-1" role="presentation"></a><em>ferret</em>, <em>ferry</em>, and <em>ferrari</em></p></li>
+<p><a class="p_ident" id="p_NCSfDeF7SR" href="#p_NCSfDeF7SR" tabindex="-1" role="presentation"></a><em>ferret</em>, <em>ferry</em>, そして <em>ferrari</em></p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_ttiBCcePDl" href="#p_ttiBCcePDl" tabindex="-1" role="presentation"></a>Any word ending in <em>ious</em></p></li>
+<p><a class="p_ident" id="p_mTg3ONUIhL" href="#p_mTg3ONUIhL" tabindex="-1" role="presentation"></a><em>ious</em> で終わる全ての単語</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_XnqTy5SopM" href="#p_XnqTy5SopM" tabindex="-1" role="presentation"></a>A whitespace character followed by a period, comma, colon, or semicolon</p></li>
+<p>ホワイトスペースにピリオド、コンマ、もしくはセミコロンが続いたもの</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_Ku7hE3qqDn" href="#p_Ku7hE3qqDn" tabindex="-1" role="presentation"></a>A word longer than six letters</p></li>
+<p><a class="p_ident" id="p_wd/ZbuqMwr" href="#p_wd/ZbuqMwr" tabindex="-1" role="presentation"></a>6文字より長い単語</p></li>
 
 <li>
 
-<p><a class="p_ident" id="p_mFDWQqRtWe" href="#p_mFDWQqRtWe" tabindex="-1" role="presentation"></a>A word without the letter <em>e</em> (or <em>E</em>)</p></li>
+<p><a class="p_ident" id="p_LnjCe/FXPh" href="#p_LnjCe/FXPh" tabindex="-1" role="presentation"></a><em>e</em> (もしくは <em>E</em>)の文字が入っていない単語</p></li>
 
 </ol>
 
-<p><a class="p_ident" id="p_Tzjl1Axr+h" href="#p_Tzjl1Axr+h" tabindex="-1" role="presentation"></a>Refer to the table in the <a href="09_regexp.html#summary_regexp">chapter summary</a> for help. Test each solution with a few test strings.</p>
+<p><a href="09_regexp.html#summary_regexp">章のまとめ</a>の表をヘルプとして参照しよう。それぞれの回答をいくつかのテスト文字列で試してみよう。</p>
 
-<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Ilu9sT4yKB" href="#c_Ilu9sT4yKB" tabindex="-1" role="presentation"></a><span class="cm-comment">// Fill in the regular expressions</span>
+<pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_GKjX1B6/kX" href="#c_GKjX1B6/kX" tabindex="-1" role="presentation"></a><span class="cm-comment">// 正規表現を埋めよう</span>
 
 <span class="cm-variable">verify</span>(<span class="cm-string-2">/.../</span>,
        [<span class="cm-string">&quot;my car&quot;</span>, <span class="cm-string">&quot;bad cats&quot;</span>],
@@ -801,9 +804,11 @@ character” is only one of the 26 characters in the Latin alphabet (uppercase o
 
 <h3><a class="i_ident" id="i_dTiEW14oG0" href="#i_dTiEW14oG0" tabindex="-1" role="presentation"></a>Quoting style</h3>
 
-<p><a class="p_ident" id="p_x7xoQ6mk60" href="#p_x7xoQ6mk60" tabindex="-1" role="presentation"></a>Imagine you have written a story and used single quotation marks throughout to mark pieces of dialogue. Now you want to replace all the dialogue quotes with double quotes, while keeping the single quotes used in contractions like <em>aren’t</em>.</p>
+<p>(クオートのスタイル)</p>
 
-<p><a class="p_ident" id="p_k3Y0NF9w4b" href="#p_k3Y0NF9w4b" tabindex="-1" role="presentation"></a>Think of a pattern that distinguishes these two kinds of quote usage and craft a call to the <code>replace</code> method that does the proper replacement.</p>
+<p><a class="p_ident" id="p_sHr9S/fcCS" href="#p_sHr9S/fcCS" tabindex="-1" role="presentation"></a>物語を書いていて、その中ではシングルクオーテーションを会話文を表すために使っているとしよう。でも、全ての会話文のクオートをダブルクオートに替えたくなった。 <em>aren’t</em> のような短縮形で使われるシングルクオートはそのままにしつつ、だ。</p>
+
+<p>この2種類のクオートの用途を区別するパターンを考えてみよう。そして、この置き換えを実行する <code>replace</code> メソッドの呼び出しをしてみよう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_sPrcOR+s/4" href="#c_sPrcOR+s/4" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">text</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;'I'm the cook,' he said, 'it's my job.'&quot;</span>;
 <span class="cm-comment">// Change this call.</span>
@@ -812,15 +817,17 @@ character” is only one of the 26 characters in the Latin alphabet (uppercase o
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_rNoBQVCfFp" href="#p_rNoBQVCfFp" tabindex="-1" role="presentation"></a>The most obvious solution is to replace only quotes with a nonword character on at least one side—something like <code>/\W'|'\W/</code>. But you also have to take the start and end of the line into account.</p>
+<p>一番簡単な回答は少なくとも片側に言葉以外の文字があるクオートを置き換えることだ。例えば、 <code>/\W'|'\W/</code> のようにして。でも、行の始めと終わりも考慮しないといけない。</p>
 
-<p><a class="p_ident" id="p_1SUsrUgWek" href="#p_1SUsrUgWek" tabindex="-1" role="presentation"></a>In addition, you must ensure that the replacement also includes the characters that were matched by the <code>\W</code> pattern so that those are not dropped. This can be done by wrapping them in parentheses and including their groups in the replacement string (<code>$1</code>, <code>$2</code>). Groups that are not matched will be replaced by nothing.</p>
+<p>さらに、置き換えの文字列が <code>\W</code> パターンでマッチした文字列を含むようにしないといけない。これは、そのパターンをカッコで囲んでおいて、置き換え文字列にそのグループ(<code>$1</code>, <code>$2</code>)を入れればいい。マッチしなかったグループは、無と置き換えられる(置き換えられない)。</p>
 
 </div></div>
 
 <h3><a class="i_ident" id="i_izldJoT3uv" href="#i_izldJoT3uv" tabindex="-1" role="presentation"></a>Numbers again</h3>
 
-<p><a class="p_ident" id="p_0OQXsuIIcQ" href="#p_0OQXsuIIcQ" tabindex="-1" role="presentation"></a>Write an expression that matches only JavaScript-style numbers. It must support an optional minus <em>or</em> plus sign in front of the number, the decimal dot, and exponent notation—<code>5e-3</code> or <code>1E10</code>—again with an optional sign in front of the exponent. Also note that it is not necessary for there to be digits in front of or after the dot, but the number cannot be a dot alone. That is, <code>.5</code> and <code>5.</code> are valid JavaScript numbers, but a lone dot <em>isn’t</em>.</p>
+<p>(数値再び)</p>
+
+<p><a class="p_ident" id="p_78aDwuALBZ" href="#p_78aDwuALBZ" tabindex="-1" role="presentation"></a>JavaScriptスタイルの数値だけにマッチする正規表現を書こう。オプションで数字の前のマイナス記号 <em>もしくは</em> プラス記号を受けつけるようにする。それから十進数のドットもだ。さらに、 <code>5e-3</code> や <code>1E10</code> のような指数の表記も受け付ける(ここでも指数の前に符号を付けられるようにする)。それから小数点のドットの前や後ろに数字がなくても問題ない(とはいえ、ドットだけではいけない)。つまり、 <code>.5</code> や <code>5.</code> は有効なJavaScriptの数字で、ドットだけは <em>有効ではない</em> 。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_aHAzeMYYGe" href="#c_aHAzeMYYGe" tabindex="-1" role="presentation"></a><span class="cm-comment">// Fill in this regular expression.</span>
 <span class="cm-keyword">let</span> <span class="cm-def">number</span> <span class="cm-operator">=</span> <span class="cm-string-2">/^...$/</span>;
@@ -841,13 +848,13 @@ character” is only one of the 26 characters in the Latin alphabet (uppercase o
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_sWIFtGBNR7" href="#p_sWIFtGBNR7" tabindex="-1" role="presentation"></a>First, do not forget the backslash in front of the period.</p>
+<p>まずは、ピリオドの前にバックスラッシュを付けるのを忘れないように。</p>
 
-<p><a class="p_ident" id="p_ShOca+aF11" href="#p_ShOca+aF11" tabindex="-1" role="presentation"></a>Matching the optional sign in front of the number, as well as in front of the exponent, can be done with <code>[+\-]?</code> or <code>(\+|-|)</code> (plus, minus, or nothing).</p>
+<p>数字や指数の前に付けるオプションの符号にマッチさせるには、 <code>[+\-]?</code> や <code>(\+|-|)</code> を使えばいい(プラスかマイナスか何もないか、という意味になる)。</p>
 
-<p><a class="p_ident" id="p_z9QJjd6IxQ" href="#p_z9QJjd6IxQ" tabindex="-1" role="presentation"></a>The more complicated part of the exercise is the problem of matching both <code>&quot;5.&quot;</code> and <code>&quot;.5&quot;</code> without also matching <code>&quot;.&quot;</code>. For this, a good solution is to use the <code>|</code> operator to separate the two cases—either one or more digits optionally followed by a dot and zero or more digits <em>or</em> a dot followed by one or more digits.</p>
+<p><a class="p_ident" id="p_z4U70yP65+" href="#p_z4U70yP65+" tabindex="-1" role="presentation"></a>このエクササイズの複雑なところは、 <code>&quot;5.&quot;</code> と <code>&quot;.5&quot;</code> の両方にマッチさせるところだ( <code>&quot;.&quot;</code> にはマッチさせず)。ここで良い解決策になるのが <code>|</code> 演算子を使って2つの場合を分けることだ。つまり、1個以上の数字にオプションでドットと0個以上の数字が続く場合と、ドットに1つ以上の数字が続く場合だ。</p>
 
-<p><a class="p_ident" id="p_WHNmLsGl4C" href="#p_WHNmLsGl4C" tabindex="-1" role="presentation"></a>Finally, to make the <em>e</em> case insensitive, either add an <code>i</code> option to the regular expression or use <code>[eE]</code>.</p>
+<p><a class="p_ident" id="p_WOazpBSh4J" href="#p_WOazpBSh4J" tabindex="-1" role="presentation"></a>最後に、 <em>e</em> の大文字と小文字を区別しなくなるように、正規表現に <code>i</code> オプションを加えるか、 <code>[eE]</code> を使おう。</p>
 
 </div></div><nav><a href="08_error.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="10_modules.html" title="next chapter">▶</a></nav>
 </article>
