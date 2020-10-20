@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Modules :: Eloquent JavaScript</title>
+  <title>モジュール :: Eloquent JavaScript</title>
   <link rel=stylesheet href="js/node_modules/codemirror/lib/codemirror.css">
   <script src="js/acorn_codemirror.js"></script>
   <link rel=stylesheet href="css/ejs.css">
@@ -12,73 +12,73 @@
 <article>
 <nav><a href="09_regexp.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="11_async.html" title="next chapter">▶</a></nav>
 
-<h1><span class=chap_num>Chapter 10</span>Modules</h1>
+<h1><span class=chap_num>Chapter 10</span>モジュール</h1>
 
 <blockquote>
 
-<p><a class="p_ident" id="p_OwlHMaRbBt" href="#p_OwlHMaRbBt" tabindex="-1" role="presentation"></a>Write code that is easy to delete, not easy to extend.</p>
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a>消しやすいコードを書け。拡張しやすいものではなく。</p>
 
 <footer>Tef, <cite>Programming is Terrible</cite></footer>
 
 </blockquote><figure class="chapter framed"><img src="img/chapter_picture_10.jpg" alt="Picture of a building built from modular pieces"></figure>
 
-<p><a class="p_ident" id="p_lt7t/NZub8" href="#p_lt7t/NZub8" tabindex="-1" role="presentation"></a>The ideal program has a crystal-clear structure. The way it works is easy to explain, and each part plays a well-defined role.</p>
+<p>理想的なプログラムとは水晶みたいにクリアな構造をもったものだ。仕組みを説明するのが簡単で、各部は明確に定義された役割を果たす。</p>
 
-<p><a class="p_ident" id="p_HLTCewyOYT" href="#p_HLTCewyOYT" tabindex="-1" role="presentation"></a>A typical real program grows organically. New pieces of functionality are added as new needs come up. Structuring—and preserving structure—is additional work. It’s work that will pay off only in the future, the <em>next</em> time someone works on the program. So it is tempting to neglect it and allow the parts of the program to become deeply entangled.</p>
+<p>実際のプログラムは有機的に成長していく場合が多い。新しいニーズがあれば新しい機能が加えられる。コードを構成してそれをきちんと維持していくのは、もうひと仕事になるんだ。この手間は、 <em>次回</em> 誰かがそのプログラムに取り組むときになって、初めて役に立つ。だから構成を無視してプログラムのパーツがぐちゃぐちゃになってしまうのを放置する誘惑にかられることになる。</p>
 
-<p><a class="p_ident" id="p_Ph53LAfIAv" href="#p_Ph53LAfIAv" tabindex="-1" role="presentation"></a>This causes two practical issues. First, understanding such a system is hard. If everything can touch everything else, it is difficult to look at any given piece in isolation. You are forced to build up a holistic understanding of the entire thing. Second, if you want to use any of the functionality from such a program in another situation, rewriting it may be easier than trying to disentangle it from its context.</p>
+<p><a class="p_ident" id="p_KuJ51zMK0i" href="#p_KuJ51zMK0i" tabindex="-1" role="presentation"></a>これは2つ実際的な問題を招くことになる。1つ目は、そういうシステムを理解するのは難しいということだ。全てのコードが他の全てのコードと関係しているかもしれなければ、一部分を分けて扱うのが難しくなる。そしてコードの全てについて理解しなければいけなくなる。2つ目は、そういうプログラムの機能を他の状況で使おうとしたときに、その部分だけ文脈から抜き出すより、書き直した方がマシかもしれないということだ。</p>
 
-<p><a class="p_ident" id="p_pzOEW37Kfc" href="#p_pzOEW37Kfc" tabindex="-1" role="presentation"></a>The phrase “big ball of mud” is often used for such large, structureless programs. Everything sticks together, and when you try to pick out a piece, the whole thing comes apart, and your hands get dirty.</p>
+<p>“大きい泥団子”というフレーズはそうした、大きくて構造がないプログラムを指して使われる。全てがくっついてしまって、一部を取り出そうとすれば、全体がバラバラになって手は泥だらけになる。</p>
 
-<h2><a class="h_ident" id="h_BOlGLA/wK7" href="#h_BOlGLA/wK7" tabindex="-1" role="presentation"></a>Modules</h2>
+<h2><a class="h_ident" id="h_hnjMYiQayI" href="#h_hnjMYiQayI" tabindex="-1" role="presentation"></a>モジュール(Modules)</h2>
 
-<p><a class="p_ident" id="p_LoWZBZ2Vpv" href="#p_LoWZBZ2Vpv" tabindex="-1" role="presentation"></a><em>Modules</em> are an attempt to avoid these problems. A module is a piece of program that specifies which other pieces it relies on and which functionality it provides for other modules to use (its <em>interface</em>).</p>
+<p><em>モジュール</em> とはこの問題を避けるための方法だ。モジュールとはひとまとまりのプログラムで、他のどのコードを使うかや、他のコードから使える機能( <em>インターフェイス</em> という)を定めたものだ。</p>
 
-<p><a class="p_ident" id="p_kjhUrZ1SF0" href="#p_kjhUrZ1SF0" tabindex="-1" role="presentation"></a>Module interfaces have a lot in common with object interfaces, as we saw them in <a href="06_object.html#interface">Chapter 6</a>. They make part of the module available to the outside world and keep the rest private. By restricting the ways in which modules interact with each other, the system becomes more like LEGO, where pieces interact through well-defined connectors, and less like mud, where everything mixes with everything.</p>
+<p><a class="p_ident" id="p_2xQ59Ikc2m" href="#p_2xQ59Ikc2m" tabindex="-1" role="presentation"></a>モジュールとオブジェクトのインターフェイス(<a href="06_object.html#interface">6</a>章で見た)はよく似ている。モジュールの一部を外側の世界から見えるようにして、残りはプライベートに留めておく。モジュール同士の関わり合い方を制限することで、システムはLEGOのようになる。つまり、部品同士が明確に決められたコネクタで接することになって、全てごちゃごちゃになった泥みたいではなくなるんだ。</p>
 
-<p><a class="p_ident" id="p_l+1k6bprY2" href="#p_l+1k6bprY2" tabindex="-1" role="presentation"></a>The relations between modules are called <em>dependencies</em>. When a module needs a piece from another module, it is said to depend on that module. When this fact is clearly specified in the module itself, it can be used to figure out which other modules need to be present to be able to use a given module and to automatically load dependencies.</p>
+<p><a class="p_ident" id="p_3ljisXwZYA" href="#p_3ljisXwZYA" tabindex="-1" role="presentation"></a>モジュール同士の関係は、 <em>依存関係(dependency)</em> と呼ばれる。あるモジュールが、他のモジュールの一部を使っている状態を、そのモジュールに依存していると表現する。この関係をモジュール自体に明確に定義しておけば、他にどんなモジュールが必要か調べて、それを自動的に読み込むためにその情報が役に立つ。</p>
 
-<p><a class="p_ident" id="p_4WkC7snvFx" href="#p_4WkC7snvFx" tabindex="-1" role="presentation"></a>To separate modules in that way, each needs its own private scope.</p>
+<p>このようにモジュールを分割するには、プライベートスコープが必要だ。</p>
 
-<p><a class="p_ident" id="p_bgQuCetNwq" href="#p_bgQuCetNwq" tabindex="-1" role="presentation"></a>Just putting your JavaScript code into different files does not satisfy these requirements. The files still share the same global namespace. They can, intentionally or accidentally, interfere with each other’s bindings. And the dependency structure remains unclear. We can do better, as we’ll see later in the chapter.</p>
+<p><a class="p_ident" id="p_7mIJI/9fxR" href="#p_7mIJI/9fxR" tabindex="-1" role="presentation"></a>ただJavaScriptのコードを別々に分けただけではこの要求を満たせない。これらのファイルは同じグローバルな名前空間を共有したままだ。わざとにしろ偶然にしろ、お互いのバインディングに干渉してしまう可能性があるんだ。それに依存関係も不明確なままだ。もっと上手くやれる方法については、この章の後ろの方で見ていく。</p>
 
-<p><a class="p_ident" id="p_uf1CU70zfG" href="#p_uf1CU70zfG" tabindex="-1" role="presentation"></a>Designing a fitting module structure for a program can be difficult. In the phase where you are still exploring the problem, trying different things to see what works, you might want to not worry about it too much since it can be a big distraction. Once you have something that feels solid, that’s a good time to take a step back and organize it.</p>
+<p>プログラムに合ったモジュール構造を設計するのは簡単ではない。プログラムがどうなっていくか探る段階では、モジュール構造について心配し過ぎると気が散ってしまう。何か確固としたものができたと思ったら、立ち止まって構成を考えるときだ。</p>
 
-<h2><a class="h_ident" id="h_CpmQEv+4ez" href="#h_CpmQEv+4ez" tabindex="-1" role="presentation"></a>Packages</h2>
+<h2><a class="h_ident" id="h_ywWB1KKpS9" href="#h_ywWB1KKpS9" tabindex="-1" role="presentation"></a>パッケージ</h2>
 
-<p><a class="p_ident" id="p_g7o14y8ONd" href="#p_g7o14y8ONd" tabindex="-1" role="presentation"></a>One of the advantages of building a program out of separate pieces, and being actually able to run those pieces on their own, is that you might be able to apply the same piece in different programs.</p>
+<p>独立した部品からプログラムを組み立てて、実際にその部品が周囲と独立に動作することのアドバンテージは、同じ部品を別のプログラムに使えるということだ。</p>
 
-<p><a class="p_ident" id="p_iBvlR95Pda" href="#p_iBvlR95Pda" tabindex="-1" role="presentation"></a>But how do you set this up? Say I want to use the <code>parseINI</code> function from <a href="09_regexp.html#ini">Chapter 9</a> in another program. If it is clear what the function depends on (in this case, nothing), I can just copy all the necessary code into my new project and use it. But then, if I find a mistake in that code, I’ll probably fix it in whichever program I’m working with at the time and forget to also fix it in the other program.</p>
+<p>でも、それをどうやって実現したらいいだろう?<a href="09_regexp.html#ini">9</a>章の <code>parseINI</code> 関数を他のプログラムでも使いたいとしよう。この関数が何に依存しているか(この場合には何もないけど)分かっていれば、必要なコード全てを新しいプロジェクトにコピーしてきて使えばいいだけだ。でもそのうちにコードの間違いが見つかったとして、今取り組んでプロジェクトでは修正するだろうけど、その他のプログラムでは修正を忘れるだろう。</p>
 
-<p><a class="p_ident" id="p_TA/SfLJ50i" href="#p_TA/SfLJ50i" tabindex="-1" role="presentation"></a>Once you start duplicating code, you’ll quickly find yourself wasting time and energy moving copies around and keeping them up-to-date.</p>
+<p>コードの複製を一旦始めてしまうと、コピーして回って最新に保つために、時間とエネルギーを無駄にしていることにすぐに気がつくだろう。</p>
 
-<p><a class="p_ident" id="p_CNI2vOkPJp" href="#p_CNI2vOkPJp" tabindex="-1" role="presentation"></a>That’s where <em>packages</em> come in. A package is a chunk of code that can be distributed (copied and installed). It may contain one or more modules and has information about which other packages it depends on. A package also usually comes with documentation explaining what it does so that people who didn’t write it might still be able to use it.</p>
+<p>そこで <em>パッケージ</em> が登場する。パッケージとは配布(コピーとインストール)可能なコードのかたまりで、いくつかのモジュールと、そのパッケージが依存する他のパッケージについての情報が含まれている。また、パッケージにはたいてい動作を説明するドキュメントがついているから、書いた人以外でも使えるようになっている。</p>
 
-<p><a class="p_ident" id="p_sZgcoPgtEe" href="#p_sZgcoPgtEe" tabindex="-1" role="presentation"></a>When a problem is found in a package or a new feature is added, the package is updated. Now the programs that depend on it (which may also be packages) can upgrade to the new version.</p>
+<p>何か問題が見つかったり新しい機能が加えられたりすれば、パッケージはアップデートされる。そして、そのパッケージに依存するプログラム(それもまたパッケージかもしれない)も新しいバージョンにアップグレードされる。</p>
 
-<p id="modules_npm"><a class="p_ident" id="p_oiLHr3lvbw" href="#p_oiLHr3lvbw" tabindex="-1" role="presentation"></a>Working in this way requires infrastructure. We need a place to store and find packages and a convenient way to install and upgrade them. In the JavaScript world, this infrastructure is provided by NPM (<a href="https://npmjs.org"><em>https://npmjs.org</em></a>).</p>
+<p id="modules_npm"><a class="p_ident" id="p_hvA/8jN3Mg" href="#p_hvA/8jN3Mg" tabindex="-1" role="presentation"></a>この仕組みのためにはインフラが必要だ。パッケージを保存して検索して、快適にインストールして、アップグレードする場所が必要になる。JavaScriptの世界ではこのインフラはNPM(<a href="https://npmjs.org"><em>https://npmjs.org</em></a>)によって提供されている。</p>
 
-<p><a class="p_ident" id="p_WUPNc5b7D2" href="#p_WUPNc5b7D2" tabindex="-1" role="presentation"></a>NPM is two things: an online service where one can download (and upload) packages and a program (bundled with Node.js) that helps you install and manage them.</p>
+<p><a class="p_ident" id="p_17xHbP+pvS" href="#p_17xHbP+pvS" tabindex="-1" role="presentation"></a>NPMは2つの意味で使われる。1つはパッケージをダウンロード(とアップロード)できるオンラインサービスのことだ。もう1つはパッケージをダウンロードして管理するのを助けるプログラム(Node.jsに同梱されている)だ。</p>
 
-<p><a class="p_ident" id="p_kcXuOxm8Rl" href="#p_kcXuOxm8Rl" tabindex="-1" role="presentation"></a>At the time of writing, there are more than half a million different packages available on NPM. A large portion of those are rubbish, I should mention, but almost every useful, publicly available package can be found on there. For example, an INI file parser, similar to the one we built in <a href="09_regexp.html">Chapter 9</a>, is available under the package name <code>ini</code>.</p>
+<p><a class="p_ident" id="p_+grrn8qdTS" href="#p_+grrn8qdTS" tabindex="-1" role="presentation"></a>これを書いている時点でNPMには50万以上のパッケージがある。そのうちのかなりの割合がゴミだ。とはいえ、便利で誰でも使えるパッケージがほとんどなんでも揃っている。例えば、<a href="09_regexp.html">9</a>章で作ったINIファイルパーサーと同じようなものが <code>ini</code> という名前のパッケージで公開されている。</p>
 
-<p><a class="p_ident" id="p_irXmhzBaaT" href="#p_irXmhzBaaT" tabindex="-1" role="presentation"></a><a href="20_node.html">Chapter 20</a> will show how to install such packages locally using the <code>npm</code> command line program.</p>
+<p><a href="20_node.html">20</a>章ではコマンドラインプログラムの <code>npm</code> を使ってそうしたパッケージをインストールする方法を学ぶ。</p>
 
-<p><a class="p_ident" id="p_D/2FJ7Crwg" href="#p_D/2FJ7Crwg" tabindex="-1" role="presentation"></a>Having quality packages available for download is extremely valuable. It means that we can often avoid reinventing a program that 100 people have written before and get a solid, well-tested implementation at the press of a few keys.</p>
+<p><a class="p_ident" id="p_MQuG4LYrgo" href="#p_MQuG4LYrgo" tabindex="-1" role="presentation"></a>クオリティの高いパッケージがダウンロードできることにはとても価値がある。なぜなら、これまで100人ぐらいは書いたようなプログラムを再開発することもなく、よくテストされた実装がちょっとキーボードを叩いただけで手に入るからだ。</p>
 
-<p><a class="p_ident" id="p_4hMCknNFh+" href="#p_4hMCknNFh+" tabindex="-1" role="presentation"></a>Software is cheap to copy, so once someone has written it, distributing it to other people is an efficient process. But writing it in the first place <em>is</em> work, and responding to people who have found problems in the code, or who want to propose new features, is even more work.</p>
+<p>ソフトウェアはコピーするコストが安い。一度書いてしまえば他の人への配布は効率的にできる。でも初めに書くのはちょっとした仕事になるし、見つかった問題や新しい機能の提案に反応するのはさらに大変だ。</p>
 
-<p><a class="p_ident" id="p_K/LevaOaUV" href="#p_K/LevaOaUV" tabindex="-1" role="presentation"></a>By default, you own the copyright to the code you write, and other people may use it only with your permission. But because some people are just nice and because publishing good software can help make you a little bit famous among programmers, many packages are published under a license that explicitly allows other people to use it.</p>
+<p>デフォルトでは、君は自分で書いたコードの権利を持っていて、他の人は君の許可があれば使ってもいいことになる。だけど、単に親切だからだったり、良いソフトウェアを公開するとプログラマーの世界で有名なれるからだったり理由は様々だけど、多くのパッケージは他の人が使うことを明示的に許可するライセンスの下で公開されている。</p>
 
-<p><a class="p_ident" id="p_sWMlqqRmbd" href="#p_sWMlqqRmbd" tabindex="-1" role="presentation"></a>Most code on NPM is licensed this way. Some licenses require you to also publish code that you build on top of the package under the same license. Others are less demanding, just requiring that you keep the license with the code as you distribute it. The JavaScript community mostly uses the latter type of license. When using other people’s packages, make sure you are aware of their license.</p>
+<p><a class="p_ident" id="p_90gv9BBXuP" href="#p_90gv9BBXuP" tabindex="-1" role="presentation"></a>NPMではたいていのコードはこのようにライセンスされている。パッケージの中には、それを使って作ったコードも同じライセンスの下で公開することを要求するものもある。その他はそこまで要求が高くなくて、配布するときにライセンスを変更しないように求めるぐらいだ。JavaScriptのコミュニティはたいてい後者のタイプのライセンスが使われる。他の人が作ったパッケージを使うときには、ライセンスに気をつけよう。</p>
 
-<h2><a class="h_ident" id="h_QQ/m+TRmqd" href="#h_QQ/m+TRmqd" tabindex="-1" role="presentation"></a>Improvised modules</h2>
+<h2><a class="h_ident" id="h_ktmOKbfaUu" href="#h_ktmOKbfaUu" tabindex="-1" role="presentation"></a>モジュールの改善</h2>
 
-<p><a class="p_ident" id="p_VhfSheFY3t" href="#p_VhfSheFY3t" tabindex="-1" role="presentation"></a>Until 2015, the JavaScript language had no built-in module system. Yet people had been building large systems in JavaScript for more than a decade, and they <em>needed</em> modules.</p>
+<p><a class="p_ident" id="p_ZKqbkTe8dW" href="#p_ZKqbkTe8dW" tabindex="-1" role="presentation"></a>2015年までJavaScriptにはモジュールシステムが組み込まれていなかった。それでもJavaScriptで大きいシステムを組み立てるということが10年以上行われていて、モジュールが <em>必要とされていた</em> 。</p>
 
-<p><a class="p_ident" id="p_EThAZWj4TA" href="#p_EThAZWj4TA" tabindex="-1" role="presentation"></a>So they designed their own module systems on top of the language. You can use JavaScript functions to create local scopes and objects to represent module interfaces.</p>
+<p><a class="p_ident" id="p_78aDwuALBZ" href="#p_78aDwuALBZ" tabindex="-1" role="presentation"></a>だから、JavaScriptの上に自分たちでモジュールシステムをデザインするということが行われた。JavaScriptの関数を使えば、ローカルスコープとモジュールのインターフェイスを表現するオブジェクトが作れるんだ。</p>
 
-<p><a class="p_ident" id="p_3jjByT+Dg0" href="#p_3jjByT+Dg0" tabindex="-1" role="presentation"></a>This is a module for going between day names and numbers (as returned by <code>Date</code>’s <code>getDay</code> method). Its interface consists of <code>weekDay.name</code> and <code>weekDay.number</code>, and it hides its local binding <code>names</code> inside the scope of a function expression that is immediately invoked.</p>
+<p>以下のモジュールは、曜日の名前とそれを表す数字( <code>Date</code> オブジェクトの <code>getDay</code> メソッドの返り値と同じ)を、両方向に変換する。ここでインターフェイスは <code>weekDay.name</code> と <code>weekDay.number</code> からできてきて、ローカルバインディングの <code>names</code> は、その場で呼び出される関数値が作り出すスコープに隠されている。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_m+yRMF5NXw" href="#c_m+yRMF5NXw" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">weekDay</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {
   <span class="cm-keyword">const</span> <span class="cm-def">names</span> <span class="cm-operator">=</span> [<span class="cm-string">&quot;Sunday&quot;</span>, <span class="cm-string">&quot;Monday&quot;</span>, <span class="cm-string">&quot;Tuesday&quot;</span>, <span class="cm-string">&quot;Wednesday&quot;</span>,
@@ -92,15 +92,15 @@
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">weekDay</span>.<span class="cm-property">name</span>(<span class="cm-variable">weekDay</span>.<span class="cm-property">number</span>(<span class="cm-string">&quot;Sunday&quot;</span>)));
 <span class="cm-comment">// → Sunday</span></pre>
 
-<p><a class="p_ident" id="p_uv8xnuw95L" href="#p_uv8xnuw95L" tabindex="-1" role="presentation"></a>This style of modules provides isolation, to a certain degree, but it does not declare dependencies. Instead, it just puts its interface into the global scope and expects its dependencies, if any, to do the same. For a long time this was the main approach used in web programming, but it is mostly obsolete now.</p>
+<p><a class="p_ident" id="p_yoTRNDuWuq" href="#p_yoTRNDuWuq" tabindex="-1" role="presentation"></a>このスタイルのモジュールで、ある程度の分離はできるけど、依存関係については何も言っていない。ただインターフェイスをグローバルスコープにさらして、依存するモジュールも同じようにしているのを期待しているだけだ。長い間がこれがwebプログラミングのメインのアプローチだったけど、今ではほとんど時代遅れだ。</p>
 
-<p><a class="p_ident" id="p_i8xxHMuJw+" href="#p_i8xxHMuJw+" tabindex="-1" role="presentation"></a>If we want to make dependency relations part of the code, we’ll have to take control of loading dependencies. Doing that requires being able to execute strings as code. JavaScript can do this.</p>
+<p>依存関係もコードの一部に含めたければ、依存するコードの読み込みをコントロールできなければいけない。そのためには文字列をコードとして実行できなければいけない。そしてJavaScriptには、それができるんだ。</p>
 
-<h2 id="eval"><a class="h_ident" id="h_oeOkEDaadU" href="#h_oeOkEDaadU" tabindex="-1" role="presentation"></a>Evaluating data as code</h2>
+<h2 id="eval"><a class="h_ident" id="h_+e60Z1LxjY" href="#h_+e60Z1LxjY" tabindex="-1" role="presentation"></a>データをコードとして評価</h2>
 
-<p><a class="p_ident" id="p_jvij1au4eP" href="#p_jvij1au4eP" tabindex="-1" role="presentation"></a>There are several ways to take data (a string of code) and run it as part of the current program.</p>
+<p>データ(文字列としてのコード)を取り込んでプログラムの一部として実行する方法はいくつかある。</p>
 
-<p><a class="p_ident" id="p_8T3Py6Zkwc" href="#p_8T3Py6Zkwc" tabindex="-1" role="presentation"></a>The most obvious way is the special operator <code>eval</code>, which will execute a string in the <em>current</em> scope. This is usually a bad idea because it breaks some of the properties that scopes normally have, such as it being easily predictable which binding a given name refers to.</p>
+<p>一番分かりやすい方法は <code>eval</code> を使うことだ。 <code>eval</code> は <em>現在の</em> スコープで文字列を実行する。これはスコープが普通持っている機能をいくつか破壊してしまうから、たいてい悪いアイデアだ。例えば、どのバインディングが何を参照しているか分かりづらくなってしまう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_14x3bOXX9G" href="#c_14x3bOXX9G" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-number">1</span>;
 <span class="cm-keyword">function</span> <span class="cm-def">evalAndReturnX</span>(<span class="cm-def">code</span>) {
@@ -113,25 +113,25 @@
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">x</span>);
 <span class="cm-comment">// → 1</span></pre>
 
-<p><a class="p_ident" id="p_wzjzmC3uLa" href="#p_wzjzmC3uLa" tabindex="-1" role="presentation"></a>A less scary way of interpreting data as code is to use the <code>Function</code> constructor. It takes two arguments: a string containing a comma-separated list of argument names and a string containing the function body. It wraps the code in a function value so that it gets its own scope and won’t do odd things with other scopes.</p>
+<p>もう少し安全な方法は <code>Function</code> コンストラクターを使ってデータをコードとして解釈することだ。 <code>Function</code> コンストラクターは2つ引数を取る。1つ目はコンマで区切った引数リストを含む文字列だ。2つ目は、関数の本体を含む文字列だ。この方法では、コードは関数値に包まれることになるから自分自身のスコープを持つことになって、外側に悪さをしなくなる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Mc9BAi4AVK" href="#c_Mc9BAi4AVK" tabindex="-1" role="presentation"></a><span class="cm-keyword">let</span> <span class="cm-def">plusOne</span> <span class="cm-operator">=</span> <span class="cm-variable">Function</span>(<span class="cm-string">&quot;n&quot;</span>, <span class="cm-string">&quot;return n + 1;&quot;</span>);
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">plusOne</span>(<span class="cm-number">4</span>));
 <span class="cm-comment">// → 5</span></pre>
 
-<p><a class="p_ident" id="p_vgKeYBfC4h" href="#p_vgKeYBfC4h" tabindex="-1" role="presentation"></a>This is precisely what we need for a module system. We can wrap the module’s code in a function and use that function’s scope as module scope.</p>
+<p>これこそモジュールシステムに必要な機能だ。モジュールのコードを関数に包んで、その関数のスコープをモジュールのスコープとして使えばいい。</p>
 
 <h2><a class="h_ident" id="h_N33QHgUxbG" href="#h_N33QHgUxbG" tabindex="-1" role="presentation"></a>CommonJS</h2>
 
-<p id="commonjs"><a class="p_ident" id="p_kAtCGxNjIq" href="#p_kAtCGxNjIq" tabindex="-1" role="presentation"></a>The most widely used approach to bolted-on JavaScript modules is called <em>CommonJS modules</em>. Node.js uses it and is the system used by most packages on NPM.</p>
+<p id="commonjs"><a class="p_ident" id="p_ESB46DDC22" href="#p_ESB46DDC22" tabindex="-1" role="presentation"></a>一番広く使われている後付けのモジュールシステムは <em>CommonJSモジュール</em> だ。Node.jsはこれを使っているし、Node.jsはたいていのNPMパッケージが使っているシステムだ。</p>
 
-<p><a class="p_ident" id="p_NM2zfHqLcE" href="#p_NM2zfHqLcE" tabindex="-1" role="presentation"></a>The main concept in CommonJS modules is a function called <code>require</code>. When you call this with the module name of a dependency, it makes sure the module is loaded and returns its interface.</p>
+<p><a class="p_ident" id="p_N33QHgUxbG" href="#p_N33QHgUxbG" tabindex="-1" role="presentation"></a>CommonJSモジュールのメインのコンセンプトは <code>require</code> という関数だ。この関数に依存関係にあるモジュール名を渡して呼び出すと、モジュールが読み込まれて、そのインターフェイスが返り値になる。</p>
 
-<p><a class="p_ident" id="p_CNeZtts3Cz" href="#p_CNeZtts3Cz" tabindex="-1" role="presentation"></a>Because the loader wraps the module code in a function, modules automatically get their own local scope. All they have to do is call <code>require</code> to access their dependencies and put their interface in the object bound to <code>exports</code>.</p>
+<p><code>require</code> 関数はモジュールのコードを関数で包み込むから、読み込まれたモジュールは自動的に自分自身のスコープを持つ。モジュールにアクセスするには <code>require</code> を呼び出すだけでいいし、モジュール側では <code>exports</code> オブジェクトにインターフェイスをさらしておくだけでいい。</p>
 
-<p><a class="p_ident" id="p_ew2dDAURuM" href="#p_ew2dDAURuM" tabindex="-1" role="presentation"></a>This example module provides a date-formatting function. It uses two packages from NPM—<code>ordinal</code> to convert numbers to strings like <code>&quot;1st&quot;</code> and <code>&quot;2nd&quot;</code>, and <code>date-names</code> to get the English names for weekdays and months. It exports a single function, <code>formatDate</code>, which takes a <code>Date</code> object and a template string.</p>
+<p><a class="p_ident" id="p_kPncRBVflY" href="#p_kPncRBVflY" tabindex="-1" role="presentation"></a>以下の例は日付をフォーマットする関数を提供するモジュールだ。このモジュールは2つのNPMパッケージに依存している。 <code>ordinal</code> は数字を <code>”1st”</code> や <code>”2nd”</code> のような文字列に変換する。 <code>date-names</code> からは曜日や月の英語名が得られる。このモジュールは <code>formatDate</code> という1つの関数をエクスポートする。この関数は <code>Date</code> オブジェクトとテンプレートにする文字列を受け取る。</p>
 
-<p><a class="p_ident" id="p_fH0b3BN1Fp" href="#p_fH0b3BN1Fp" tabindex="-1" role="presentation"></a>The template string may contain codes that direct the format, such as <code>YYYY</code> for the full year and <code>Do</code> for the ordinal day of the month. You could give it a string like <code>&quot;MMMM Do YYYY&quot;</code> to get output like “November 22nd 2017”.</p>
+<p><a class="p_ident" id="p_G2RTiSRzpG" href="#p_G2RTiSRzpG" tabindex="-1" role="presentation"></a>テンプレートにする文字列はフォーマットを指定するコードを含む。例えば、 <code>YYYY</code> は4桁の年で、 <code>Do</code> は序数での日付だ。 <code>”MMMM Do YYYY”</code> のような文字列を渡せば、 <code>”November 22nd 2017”</code> という出力になる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_hEFnba6fud" href="#c_hEFnba6fud" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> <span class="cm-def">ordinal</span> <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">&quot;ordinal&quot;</span>);
 <span class="cm-keyword">const</span> {<span class="cm-def">days</span>, <span class="cm-def">months</span>} <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">&quot;date-names&quot;</span>);
@@ -147,9 +147,9 @@
   });
 };</pre>
 
-<p><a class="p_ident" id="p_jvrgfRxGB4" href="#p_jvrgfRxGB4" tabindex="-1" role="presentation"></a>The interface of <code>ordinal</code> is a single function, whereas <code>date-names</code> exports an object containing multiple things—<code>days</code> and <code>months</code> are arrays of names. Destructuring is very convenient when creating bindings for imported interfaces.</p>
+<p><a class="p_ident" id="p_NWoZK3kTsE" href="#p_NWoZK3kTsE" tabindex="-1" role="presentation"></a><code>ordinal</code> のインターフェイスは1つの関数だ。一方で <code>date-names</code> はいろいろ含んだオブジェクトをエクスポートする。 <code>days</code> と <code>months</code> は、それぞれが名前の配列だ。インポートしたインターフェイスからバインディングを作るには分割代入がとても便利だ。</p>
 
-<p><a class="p_ident" id="p_cHv4rZkvfj" href="#p_cHv4rZkvfj" tabindex="-1" role="presentation"></a>The module adds its interface function to <code>exports</code> so that modules that depend on it get access to it. We could use the module like this:</p>
+<p>上のモジュールは <code>exports</code> オブジェクトにインターフェイスになる関数を加えている。だからそれに依存するコードはこの関数にアクセスができて、下の例のようにモジュールを使える。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_pWURcHuHTt" href="#c_pWURcHuHTt" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> {<span class="cm-def">formatDate</span>} <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">&quot;./format-date&quot;</span>);
 
@@ -157,7 +157,7 @@
                        <span class="cm-string">&quot;dddd the Do&quot;</span>));
 <span class="cm-comment">// → Friday the 13th</span></pre>
 
-<p id="require"><a class="p_ident" id="p_vmJrDleGRH" href="#p_vmJrDleGRH" tabindex="-1" role="presentation"></a>We can define <code>require</code>, in its most minimal form, like this:</p>
+<p id="require">自分で <code>require</code> を定義することもできる。最小の形だったら以下のようになるだろう。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript"  data-sandbox="require"><a class="c_ident" id="c_CSMfqoYOzp" href="#c_CSMfqoYOzp" tabindex="-1" role="presentation"></a><span class="cm-variable">require</span>.<span class="cm-property">cache</span> <span class="cm-operator">=</span> <span class="cm-variable">Object</span>.<span class="cm-property">create</span>(<span class="cm-atom">null</span>);
 
@@ -172,99 +172,98 @@
   <span class="cm-keyword">return</span> <span class="cm-variable">require</span>.<span class="cm-property">cache</span>[<span class="cm-variable-2">name</span>].<span class="cm-property">exports</span>;
 }</pre>
 
-<p><a class="p_ident" id="p_sc1VEkBDCY" href="#p_sc1VEkBDCY" tabindex="-1" role="presentation"></a>In this code, <code>readFile</code> is a made-up function that reads a file and returns its contents as a string. Standard JavaScript provides no such functionality—but different JavaScript environments, such as the browser and Node.js, provide their own ways of accessing files. The example just pretends that <code>readFile</code> exists.</p>
+<p><a class="p_ident" id="p_GJyQsLYT14" href="#p_GJyQsLYT14" tabindex="-1" role="presentation"></a>このコードでは <code>readFile</code> は作り物の関数で、ファイルを読み込んで中身を文字列として返すものだとしよう。標準のJavaScriptには、そういう機能はないけど、ブラウザーやNode.jsの環境によってそれぞれにファイルにアクセスする方法が用意されている。この例では単に <code>readFile</code> 関数が存在するということにしている。</p>
 
-<p><a class="p_ident" id="p_DxNIETFONd" href="#p_DxNIETFONd" tabindex="-1" role="presentation"></a>To avoid loading the same module multiple times, <code>require</code> keeps a store (cache) of already loaded modules. When called, it first checks if the requested module has been loaded and, if not, loads it. This involves reading the module’s code, wrapping it in a function, and calling it.</p>
+<p>同じモジュールを何度も読み込むのを防ぐために、 <code>require</code> 関数は既に読み込んだものを保存(キャッシュ)している。 <code>require</code> を呼び出すと、まずはそのモジュールが既に読み込まれているかどうが確認されて、まだの場合だけ読み込む。ここで、モジュールのコードが読み込まれて、関数に包まれて、呼び出される。</p>
 
-<p><a class="p_ident" id="p_tI7DzFSLjM" href="#p_tI7DzFSLjM" tabindex="-1" role="presentation"></a>The interface of the <code>ordinal</code> package we saw before is not an object but a function. A quirk of the CommonJS modules is that, though the module system will create an empty interface object for you (bound to <code>exports</code>), you can replace that with any value by overwriting <code>module.exports</code>. This is done by many modules to export a single value instead of an interface object.</p>
+<p><a class="p_ident" id="p_G4AW/XHvyz" href="#p_G4AW/XHvyz" tabindex="-1" role="presentation"></a><code>ordinal</code> パッケージのインターフェイスはオブジェクトではなくて関数だ。CommonJSモジュールのおかしいところは、システム自身は空のインターフェイスオブジェクト( <code>exports</code> にバインドされる)を用意しているのに、 <code>module.exports</code> を上書きすれば、どんな値にもできることだ。たくさんのモジュールでインターフェイスオブジェクトではなくて、1つの値だけをエクスポートする、ということが行われている。</p>
 
-<p><a class="p_ident" id="p_1en0vUqbeI" href="#p_1en0vUqbeI" tabindex="-1" role="presentation"></a>By defining <code>require</code>, <code>exports</code>, and <code>module</code> as parameters for the generated wrapper function (and passing the appropriate values when calling it), the loader makes sure that these bindings are available in the module’s scope.</p>
+<p><code>require</code> , <code>exports</code> , <code>module</code> をラッパー関数のパラメーターとして定義して、適切な値で呼び出せば、 <code>require</code> 関数はモジュールのスコープ内でそれらのバインディングが使えるようにする。</p>
 
-<p><a class="p_ident" id="p_xriS0EN27o" href="#p_xriS0EN27o" tabindex="-1" role="presentation"></a>The way the string given to <code>require</code> is translated to an actual filename or web address differs in different systems. When it starts with <code>&quot;./&quot;</code> or <code>&quot;../&quot;</code>, it is generally interpreted as relative to the current module’s filename. So <code>&quot;./<wbr>format-date&quot;</code> would be the file named <code>format-date.js</code> in the same directory.</p>
+<p><code>require</code> に渡された文字列が、ファイル名とwebアドレスのどちらに解釈されるかはシステムによって変わる。 <code>”./”</code> もしくは <code>”../”</code> で始まる場合には、一般的に、そのモジュールのファイル名からの相対パスとして解釈される。つまり <code>&quot;./<wbr>format-date&quot;</code> なら、同じディレクトリの <code>format-date.js</code> という名前のファイルということになる。</p>
 
-<p><a class="p_ident" id="p_L5+LG67XHa" href="#p_L5+LG67XHa" tabindex="-1" role="presentation"></a>When the name isn’t relative, Node.js will look for an installed package by that name. In the example code in this chapter, we’ll interpret such names as referring to NPM packages. We’ll go into more detail on how to install and use NPM modules in <a href="20_node.html">Chapter 20</a>.</p>
+<p><a class="p_ident" id="p_XY1RLgBv7D" href="#p_XY1RLgBv7D" tabindex="-1" role="presentation"></a>名前が相対パスで書かれていない場合には、Node.jsはインストールされたパッケージからその名前を探す。この章の例ではそうした名前がNPMパッケージとして解釈されることにしよう。NPMモジュールをインストールして使う方法は<a href="20_node.html">20</a>章で詳しく扱う。</p>
 
-<p id="modules_ini"><a class="p_ident" id="p_B5bzWP/zEC" href="#p_B5bzWP/zEC" tabindex="-1" role="presentation"></a>Now, instead of writing our own INI file parser, we can use one from NPM.</p>
+<p id="modules_ini"><a class="p_ident" id="p_uDGpTokBLh" href="#p_uDGpTokBLh" tabindex="-1" role="presentation"></a>というわけで、INIファイルパーサーを自分で書かなくてもNPMから取ってきて使えるようになった。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_LfcCXOMZGr" href="#c_LfcCXOMZGr" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> {<span class="cm-def">parse</span>} <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">&quot;ini&quot;</span>);
 
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">parse</span>(<span class="cm-string">&quot;x = 10\ny = 20&quot;</span>));
 <span class="cm-comment">// → {x: &quot;10&quot;, y: &quot;20&quot;}</span></pre>
 
-<h2><a class="h_ident" id="h_hF2FmOVxw7" href="#h_hF2FmOVxw7" tabindex="-1" role="presentation"></a>ECMAScript modules</h2>
+<h2><a class="h_ident" id="h_Fkd2zSK+76" href="#h_Fkd2zSK+76" tabindex="-1" role="presentation"></a>ECMAScriptモジュール</h2>
 
-<p><a class="p_ident" id="p_ZB3AF/XP4y" href="#p_ZB3AF/XP4y" tabindex="-1" role="presentation"></a>CommonJS modules work quite well and, in combination with NPM, have allowed the JavaScript community to start sharing code on a large scale.</p>
+<p><a class="p_ident" id="p_k5APHvkjL/" href="#p_k5APHvkjL/" tabindex="-1" role="presentation"></a>CommonJSモジュールとNPMとのコンビネーションは上手くいっていて、JavaScriptコミュニティはコードを大きなスケールでシェアするようになった。</p>
 
-<p><a class="p_ident" id="p_yy6++k1U8b" href="#p_yy6++k1U8b" tabindex="-1" role="presentation"></a>But they remain a bit of a duct-tape hack. The notation is slightly awkward—the things you add to <code>exports</code> are not available in the local scope, for example. And because <code>require</code> is a normal function call taking any kind of argument, not just a string literal, it can be hard to determine the dependencies of a module without running its code.</p>
+<p>でもちょっとつぎはぎのハックのようにも思える。この記法は少し変なところがある。例えば <code>exports</code> に加えたものはローカルスコープでは使えない。それに、 <code>require</code> は文字列以外でも引数に渡せる普通の関数だから、実際にコードを走らせてみるまではモジュールの依存関係を決めるのも難しい。</p>
 
-<p id="es"><a class="p_ident" id="p_fGE1JkAJHH" href="#p_fGE1JkAJHH" tabindex="-1" role="presentation"></a>This is why the JavaScript standard from 2015 introduces its own, different module system. It is usually called <em>ES modules</em>, where <em>ES</em> stands for ECMAScript. The main concepts of dependencies and interfaces remain the same, but the details differ. For one thing, the notation is now integrated into the language. Instead of calling a function to access a dependency, you use a special <code>import</code> keyword.</p>
+<p id="es"><a class="p_ident" id="p_b2IMaFclNX" href="#p_b2IMaFclNX" tabindex="-1" role="presentation"></a>だから2015年からJavaScript標準に別のモジュールシステムが導入された。これは <em>ESモジュール</em> と呼ばれる。ここで <em>ES</em> はECMAScriptのことだ。依存関係とインターフェイスのメインコンセプトは変わっていないけど、細かいところに違いがある。例えば、記法が言語自体に取り入れられていて、 <code>require</code> 関数を呼び出す代りに、 <code>import</code> という特別なキーワードを使うことができる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_EpiH8qOAcJ" href="#c_EpiH8qOAcJ" tabindex="-1" role="presentation"></a><span class="cm-keyword">import</span> <span class="cm-def">ordinal</span> <span class="cm-keyword">from</span> <span class="cm-string">&quot;ordinal&quot;</span>;
 <span class="cm-keyword">import</span> {<span class="cm-def">days</span>, <span class="cm-def">months</span>} <span class="cm-keyword">from</span> <span class="cm-string">&quot;date-names&quot;</span>;
 
 <span class="cm-keyword">export</span> <span class="cm-keyword">function</span> <span class="cm-def">formatDate</span>(<span class="cm-def">date</span>, <span class="cm-def">format</span>) { <span class="cm-comment">/* ... */</span> }</pre>
 
-<p><a class="p_ident" id="p_Md0hUIO/t1" href="#p_Md0hUIO/t1" tabindex="-1" role="presentation"></a>Similarly, the <code>export</code> keyword is used to export things. It may appear in front of a function, class, or binding definition (<code>let</code>, <code>const</code>, or <code>var</code>).</p>
+<p>同じように <code>export</code> キーワードが何かをエクスポートするために使える。関数やクラスやバインディングの定義(<code>let</code> , <code>const</code> , <code>var</code> )の前に <code>export</code> を付ければいい。</p>
 
-<p><a class="p_ident" id="p_2XcNI5i8RP" href="#p_2XcNI5i8RP" tabindex="-1" role="presentation"></a>An ES module’s interface is not a single value but a set of named bindings. The preceding module binds <code>formatDate</code> to a function. When you import from another module, you import the <em>binding</em>, not the value, which means an exporting module may change the value of the binding at any time, and the modules that import it will see its new value.</p>
+<p><a class="p_ident" id="p_v21Kh5Tun0" href="#p_v21Kh5Tun0" tabindex="-1" role="presentation"></a>ESモジュールのインターフェイスは1つの値ではなくて、名前付きバインディングのセットだ。上のモジュールは <code>formatDate</code> を関数にバインドしている。他のモジュールからインポートするとき、値そのものではなくて <em>バインディングを</em> インポートすることになる。つまり、エクスポートする側のモジュールが、バインディングが保持する値をいつ書き換えるか分からなくて、インポートする側では違う値を受け取ることになるかもしれないんだ。</p>
 
-<p><a class="p_ident" id="p_H96aQvDt7C" href="#p_H96aQvDt7C" tabindex="-1" role="presentation"></a>When there is a binding named <code>default</code>, it is treated as the module’s main exported value. If you import a module like <code>ordinal</code> in the example, without braces around the binding name, you get its <code>default</code> binding. Such modules can still export other bindings under different names alongside their <code>default</code> export.</p>
+<p><code>default</code> という名前のバインディングがあれば、モジュールがメインでエクスポートする値として扱われる。 <code>ordinal</code> のようなモジュールをバインディング名に波カッコを付けないでインポートすると、その <code>default</code> バインディングが返ってくる。こうしたモジュールは、 <code>default</code> エクスポートと同時に他のバインディングに別の名前を付けてエクスポートすることもできる。</p>
 
-<p><a class="p_ident" id="p_C4XHB0ByrT" href="#p_C4XHB0ByrT" tabindex="-1" role="presentation"></a>To create a default export, you write <code>export default</code> before an expression, a function declaration, or a class declaration.</p>
+<p>デフォルトエクスポートをするためには、 <code>export default</code> を式や関数宣言やクラス宣言の前に書けばいい。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_Y6Wnu9X+/W" href="#c_Y6Wnu9X+/W" tabindex="-1" role="presentation"></a><span class="cm-keyword">export</span> <span class="cm-keyword">default</span> [<span class="cm-string">&quot;Winter&quot;</span>, <span class="cm-string">&quot;Spring&quot;</span>, <span class="cm-string">&quot;Summer&quot;</span>, <span class="cm-string">&quot;Autumn&quot;</span>];</pre>
 
-<p><a class="p_ident" id="p_XbHIrV+nuJ" href="#p_XbHIrV+nuJ" tabindex="-1" role="presentation"></a>It is possible to rename imported bindings using the word <code>as</code>.</p>
+<p>インポートしたバインディングを <code>as</code> キーワードで名前変更することもできる。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_I7jPaQvsXj" href="#c_I7jPaQvsXj" tabindex="-1" role="presentation"></a><span class="cm-keyword">import</span> {<span class="cm-def">days</span> <span class="cm-keyword">as</span> <span class="cm-def">dayNames</span>} <span class="cm-keyword">from</span> <span class="cm-string">&quot;date-names&quot;</span>;
 
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">dayNames</span>.<span class="cm-property">length</span>);
 <span class="cm-comment">// → 7</span></pre>
 
-<p><a class="p_ident" id="p_oqym70c7ZR" href="#p_oqym70c7ZR" tabindex="-1" role="presentation"></a>Another important difference is that ES module imports happen before a module’s script starts running. That means <code>import</code> declarations may not appear inside functions or blocks, and the names of dependencies must be quoted strings, not arbitrary expressions.</p>
+<p><a class="p_ident" id="p_neuruqAaGQ" href="#p_neuruqAaGQ" tabindex="-1" role="presentation"></a>その他の大きな違いとしてはESモジュールのインポートはスクリプトの実行の前に起こるということだ。だから <code>import</code> 宣言は関数やブロックの中でしてはいけないし、読み込むモジュールの名前もクオートされた文字列でないといけない(どんな式でもいいわけではない)。</p>
 
-<p><a class="p_ident" id="p_+UaRV7zy4m" href="#p_+UaRV7zy4m" tabindex="-1" role="presentation"></a>At the time of writing, the JavaScript community is in the process of adopting this module style. But it has been a slow process. It took a few years, after the format was specified, for browsers and Node.js to start supporting it. And though they mostly support it now, this support still has issues, and the discussion on how such modules should be distributed through NPM is still ongoing.</p>
+<p><a class="p_ident" id="p_JUfmwiEzbn" href="#p_JUfmwiEzbn" tabindex="-1" role="presentation"></a>これを書いている時点では、JavaScriptのコミュニティはこのスタイルのモジュールを取り入れている途中だ。でもこれはゆっくりとしたプロセスだ。フォーマットが決定されてから、ブラウザやNode.jsがサポートするようになるまで数年かかった。それに、サポートされるようになったといってもまだ問題が残っているし、こうしたモジュールをどうやってNPMで配布するかはまだ議論が続いている。</p>
 
-<p><a class="p_ident" id="p_UEipP/dEjR" href="#p_UEipP/dEjR" tabindex="-1" role="presentation"></a>Many projects are written using ES modules and then automatically converted to some other format when published. We are in a transitional period in which two different module systems are used side by side, and it is useful to be able to read and write code in either of them.</p>
+<p><a class="p_ident" id="p_JNY48M73Fe" href="#p_JNY48M73Fe" tabindex="-1" role="presentation"></a>多くのプロジェクトではESモジュールが使われていて、公開するときには他のフォーマットに自動的に変換される。今は変化の時期で、2つのシステムが同時に使われているから、どちらでもコードを読み書きできるようになっておけば便利だ。</p>
 
-<h2><a class="h_ident" id="h_zWTXAU93DC" href="#h_zWTXAU93DC" tabindex="-1" role="presentation"></a>Building and bundling</h2>
+<h2><a class="h_ident" id="h_g7bXBO2OCm" href="#h_g7bXBO2OCm" tabindex="-1" role="presentation"></a>ビルディングとバンドリング</h2>
 
-<p><a class="p_ident" id="p_Si0Uy8W7Rk" href="#p_Si0Uy8W7Rk" tabindex="-1" role="presentation"></a>In fact, many JavaScript projects aren’t even, technically, written in JavaScript. There are extensions, such as the type checking dialect mentioned in <a href="08_error.html#typing">Chapter 8</a>, that are widely used. People also often start using planned extensions to the language long before they have been added to the platforms that actually run JavaScript.</p>
+<p><a class="p_ident" id="p_k32Te7IlUg" href="#p_k32Te7IlUg" tabindex="-1" role="presentation"></a>実際のところ、多くのJavaScriptプロジェクトは、厳密には、JavaScriptで書かれてさえいない。<a href="08_error.html#typing">8</a>章で扱った型をチェックする方言のような拡張版が広く使われている。JavaScriptを実行するプラットフォームに実際に追加される前の、計画段階の拡張機能が使われていることも多いんだ。</p>
 
-<p><a class="p_ident" id="p_8YI40LC/+x" href="#p_8YI40LC/+x" tabindex="-1" role="presentation"></a>To make this possible, they <em>compile</em> their code, translating it from their chosen JavaScript dialect to plain old JavaScript—or even to a past version of JavaScript—so that old browsers can run it.</p>
+<p>これを可能にするために、コードの <em>コンパイル</em> が行われる。つまり、あるJavaScriptの方言から、普通のJavaScriptや、古いブラウザでも実行できるような過去のバージョンのJavaScriptに翻訳されるということだ。</p>
 
-<p><a class="p_ident" id="p_xCwSgQaAdq" href="#p_xCwSgQaAdq" tabindex="-1" role="presentation"></a>Including a modular program that consists of 200 different files in a web page produces its own problems. If fetching a single file over the network takes 50 milliseconds, loading the whole program takes 10 seconds, or maybe half that if you can load several files simultaneously. That’s a lot of wasted time. Because fetching a single big file tends to be faster than fetching a lot of tiny ones, web programmers have started using tools that roll their programs (which they painstakingly split into modules) back into a single big file before they publish it to the Web. Such tools are called <em>bundlers</em>.</p>
+<p><a class="p_ident" id="p_6c8ISG0IU9" href="#p_6c8ISG0IU9" tabindex="-1" role="presentation"></a>200もの別々のファイルにモジュール化されたプログラムをwebページに読みこもうとするのも問題を発生させる。もし1ファイルをネットワークから読み込むのに50ミリ秒かかるとしたら、全体のプログラムを読み込むのには10秒かかる。複数のファイルを同時に読み込めるとしてもその半分ぐらいはかかるだろう。これはとんでもない時間の無駄だ。1つの大きなファイルを読み込む方が小さいファイルをたくさん読み込むよりは速いから、webプログラマはプログラムをwebに公開する前にはツールを使って1つの大きなファイルにまとめるということを始めている(頑張って別々のモジュールに分けたのに)。こうしたツールを <em>バンドラー</em> と呼ぶ。</p>
 
-<p><a class="p_ident" id="p_F5bhvXPahh" href="#p_F5bhvXPahh" tabindex="-1" role="presentation"></a>And we can go further. Apart from the number of files, the <em>size</em> of the files also determines how fast they can be transferred over the network. Thus, the JavaScript community has invented <em>minifiers</em>. These are tools that take a JavaScript program and make it smaller by automatically removing comments and whitespace, renaming bindings, and replacing pieces of code with equivalent code that take up less space.</p>
+<p><a class="p_ident" id="p_lBCs7is78Q" href="#p_lBCs7is78Q" tabindex="-1" role="presentation"></a>さらに進んだこともできる。ファイル数だけではなく、ファイルの <em>サイズ</em> もネットワークを伝わる速さを決める。というわけでJavaScriptのコミュニティは _ミニファイアー_を発明した。このツールはJavaScriptのプログラムからコメントやホワイトスペースを取り去ったり、バインディングの名前を変更したり、コードの一部をスペースを取らない同等のコードと置き換えたりして、サイズを小さくする。</p>
 
-<p><a class="p_ident" id="p_0kzBnsBjVM" href="#p_0kzBnsBjVM" tabindex="-1" role="presentation"></a>So it is not uncommon for the code that you find in an NPM package or that runs on a web page to have gone through <em>multiple</em> stages of transformation—converted from modern JavaScript to historic JavaScript, from ES module format to CommonJS, bundled, and minified. We won’t go into the details of these tools in this book since they tend to be boring and change rapidly. Just be aware that the JavaScript code you run is often not the code as it was written.</p>
+<p><a class="p_ident" id="p_yJQqrJbWmN" href="#p_yJQqrJbWmN" tabindex="-1" role="presentation"></a>NPMのパッケージやwebページで走っているコードが <em>何度も</em> 変換を経ている、ということもよくある。そこではモダンなJavaScriptから歴史的なJavaScriptへ、ESモジュールのフォーマットからCommonJSへ、といった変換や、バンドル、ミニファイといったことが行われている。この本では、こうしたツールの詳細については扱わない。退屈だし、すぐに変化してしまうからだ。ただ実行されているJavaScriptのコードは書かれたときのままではないことが多い、ということを知っておこう。</p>
 
-<h2><a class="h_ident" id="h_P8pyzbI9vO" href="#h_P8pyzbI9vO" tabindex="-1" role="presentation"></a>Module design</h2>
+<h2><a class="h_ident" id="h_RlJBeTaKK+" href="#h_RlJBeTaKK+" tabindex="-1" role="presentation"></a>モジュールのデザイン</h2>
 
-<p><a class="p_ident" id="p_8K2T8s7itK" href="#p_8K2T8s7itK" tabindex="-1" role="presentation"></a>Structuring programs is one of the subtler aspects of programming. Any nontrivial piece of functionality can be modeled in various ways.</p>
+<p>プログラムを構成を作るのは、プログラミングの中では微妙な側面だ。どんな重要な機能でもいろいろな方法でモデル化できる。</p>
 
-<p><a class="p_ident" id="p_98c2qP5s8p" href="#p_98c2qP5s8p" tabindex="-1" role="presentation"></a>Good program design is subjective—there are trade-offs involved and matters of taste. The best way to learn the value of well-structured design is to read or work on a lot of programs and notice what works and what doesn’t. Don’t assume that a painful mess is “just the way it is”. You can improve the structure of almost everything by putting more thought into it.</p>
+<p>何が良いプログラムのデザインか、というのは主観的だ。トレードオフがあるし、趣味の問題もある。良い構成のプログラムにどれほど価値があるか知るには、いろいろなプログラムを読んだり取り組んだりして、何が上手くいくか何が上手くいかないか気づくことだ。苦痛なごちゃごちゃしたプログラムを”そのまま”にしておくのはやめよう。どんなプログラムでも深く考えれば構造を良くすることができる。</p>
 
-<p><a class="p_ident" id="p_AF7qUrMoR4" href="#p_AF7qUrMoR4" tabindex="-1" role="presentation"></a>One aspect of module design is ease of use. If you are designing something that is intended to be used by multiple people—or even by yourself, in three months when you no longer remember the specifics of what you did—it is helpful if your interface is simple and predictable.</p>
+<p><a class="p_ident" id="p_rJSxua2XOs" href="#p_rJSxua2XOs" tabindex="-1" role="presentation"></a>モジュールをデザインする時の観点の1つに使いやすさがある。他の人達が使うものをデザインするなら(自分だけが使うとしても3ヶ月もすれば覚えていないんだから)、インターフェイスはシンプルで予測しやすいものにしておいた方が便利だ。</p>
 
-<p><a class="p_ident" id="p_hHDSnM2Orb" href="#p_hHDSnM2Orb" tabindex="-1" role="presentation"></a>That may mean following existing conventions. A good example is the <code>ini</code> package. This module imitates the standard <code>JSON</code> object by providing <code>parse</code> and <code>stringify</code> (to write an INI file) functions, and, like <code>JSON</code>, converts between strings and plain objects. So the interface is small and familiar, and after you’ve worked with it once, you’re likely to remember how to use it.</p>
+<p><a class="p_ident" id="p_5+sfP6l0gN" href="#p_5+sfP6l0gN" tabindex="-1" role="presentation"></a>これは既存の習慣に従うことかもしれない。 <code>ini</code> パッケージは良い例だ。このモジュールは標準の <code>JSON</code> オブジェクトを真似ていて <code>parse</code> と <code>stringify</code> (INIファイルを書き出す)というメソッドを提供していて、 <code>JSON</code> と同じく文字列とオブジェクトとの変換ができる。インターフェイスが小さくて親しみがあるものになっているから、一度このパッケージを触ってみたら使い方を忘れることはないだろう。</p>
 
-<p><a class="p_ident" id="p_uS+as91Giv" href="#p_uS+as91Giv" tabindex="-1" role="presentation"></a>Even if there’s no standard function or widely used package to imitate, you can keep your modules predictable by using simple data
-structures and doing a single, focused thing. Many of the INI-file parsing modules on NPM provide a function that directly reads such a file from the hard disk and parses it, for example. This makes it impossible to use such modules in the browser, where we don’t have direct file system access, and adds complexity that would have been better addressed by <em>composing</em> the module with some file-reading function.</p>
+<p><a class="p_ident" id="p_X+io91po9S" href="#p_X+io91po9S" tabindex="-1" role="presentation"></a>真似するような標準関数や広く使われているパッケージがなかったとしても、シンプルなデータ構造や1つの役割に専念させることで、モジュールの動作を予測しやすくしておくことは大事だ。例えば、NPMにあるINIファイルを読み取るモジュールは、直接ハードディスクからファイルを読み込んでからパースするものが多い。これでは、ブラウザのような直接ファイルシステムにアクセスできない環境で使うことが不可能になってしまう。INIファイルのパースだけ行うモジュールとファイル読み込み関数を <em>組み合わせ</em> た方がシプルに解決できるところを複雑にしてしまうんだ。</p>
 
-<p><a class="p_ident" id="p_JYcq/PgjlO" href="#p_JYcq/PgjlO" tabindex="-1" role="presentation"></a>This points to another helpful aspect of module design—the ease with which something can be composed with other code. Focused modules that compute values are applicable in a wider range of programs than bigger modules that perform complicated actions with side effects. An INI file reader that insists on reading the file from disk is useless in a scenario where the file’s content comes from some other source.</p>
+<p><a class="p_ident" id="p_Tx8flwawlO" href="#p_Tx8flwawlO" tabindex="-1" role="presentation"></a>モジュールのデザインに関するもう1つの観点は、他のコードとの組み合わせやすさだ。値の計算に専念するモジュールは、複雑な動作をして副作用が多いものよりも、幅広いプログラムに適用できる。ディスクからファイルを読み取るINIファイルリーダは、ディスク以外からデータが来る場面では使い道がなくなってしまう。</p>
 
-<p><a class="p_ident" id="p_6cqySeVoki" href="#p_6cqySeVoki" tabindex="-1" role="presentation"></a>Relatedly, stateful objects are sometimes useful or even necessary, but if something can be done with a function, use a function. Several of the INI file readers on NPM provide an interface style that requires you to first create an object, then load the file into your object, and finally use specialized methods to get at the results. This type of thing is common in the object-oriented tradition, and it’s terrible. Instead of making a single function call and moving on, you have to perform the ritual of moving your object through various states. And because the data is now wrapped in a specialized object type, all code that interacts with it has to know about that type, creating unnecessary interdependencies.</p>
+<p><a class="p_ident" id="p_JIni9WKWz/" href="#p_JIni9WKWz/" tabindex="-1" role="presentation"></a>これに関連して、状態を持つオブジェクトは便利なこともあるし必要なこともあるけど、関数で済ませられるなら関数を使おう。NPMのINIファイルリーダの多くが、オブジェクトのインターフェイスを使うスタイルをとっている。そこでは、まずはオブジェクトを作って、オブジェクトにファイルを読み込んで、結果にアクセスするための特別なメソッドを使う、ということが行われる。このタイプのやり方はオブジェクト指向の伝統では一般的だけど、ひどいやり方だ。ただ1度関数を呼び出して先に進めばいいところを、オブジェクトにいろいろな状態を通過させるという儀式をしないといけない。そしてデータは特別なタイプのオブジェクトに包まれてしまうから、そのオブジェクトと関わるコードがそのタイプについて知らないといけなくなって、意味のない依存関係を作り出してしまうんだ。</p>
 
-<p><a class="p_ident" id="p_uR7iWbgBIy" href="#p_uR7iWbgBIy" tabindex="-1" role="presentation"></a>Often defining new data structures can’t be avoided—only a few basic ones are provided by the language standard, and many types of data have to be more complex than an array or a map. But when an array suffices, use an array.</p>
+<p>新しいデータ型を定義するのが避けられないことも多い。JavaScriptの標準にはいくつかの基本的なものしか含まれていないし、ただの配列やマップよりも複雑な型が必要なデータも多い。でも配列で十分なときには、配列を使おう。</p>
 
-<p><a class="p_ident" id="p_gE7WoNX7+Z" href="#p_gE7WoNX7+Z" tabindex="-1" role="presentation"></a>An example of a slightly more complex data structure is the graph from <a href="07_robot.html">Chapter 7</a>. There is no single obvious way to represent a graph in JavaScript. In that chapter, we used an object whose properties hold arrays of strings—the other nodes reachable from that node.</p>
+<p><a class="p_ident" id="p_IrhaQ7lynd" href="#p_IrhaQ7lynd" tabindex="-1" role="presentation"></a>もう少し複雑なデータ構造の例としては、<a href="07_robot.html">7</a>章のグラフがある。JavaScriptでグラフを表現するには、これしかないという方法はない。7章では、オブジェクトのプロパティが配列で、配列にはそのノードからたどり着けるノードを文字列で保持する、というデータを使った。</p>
 
-<p><a class="p_ident" id="p_17Fkotj+nV" href="#p_17Fkotj+nV" tabindex="-1" role="presentation"></a>There are several different pathfinding packages on NPM, but none of them uses this graph format. They usually allow the graph’s edges to have a weight, which is the cost or distance associated with it. That isn’t possible in our representation.</p>
+<p><a class="p_ident" id="p_fZTrvwf1QX" href="#p_fZTrvwf1QX" tabindex="-1" role="presentation"></a>NPMには経路探索のためのパッケージがいろいろあるけど、上のフォーマットでグラフを表すものはない。たいていの場合は、エッジに重み(移動コストや距離)を持たせられるようになっているからだ。僕らのオブジェクトでは重みは表現できない。</p>
 
-<p><a class="p_ident" id="p_d3wpFXYEjN" href="#p_d3wpFXYEjN" tabindex="-1" role="presentation"></a>For example, there’s the <code>dijkstrajs</code> package. A well-known approach to pathfinding, quite similar to our <code>findRoute</code> function, is called <em>Dijkstra’s algorithm</em>, after Edsger Dijkstra, who first wrote it down. The <code>js</code> suffix is often added to package names to indicate the fact that they are written in JavaScript. This <code>dijkstrajs</code> package uses a graph format similar to ours, but instead of arrays, it uses objects whose property values are numbers—the weights of the edges.</p>
+<p><a class="p_ident" id="p_63mTBKCYha" href="#p_63mTBKCYha" tabindex="-1" role="presentation"></a>例えば、 <code>dijkstrajs</code> というパッケージがある。 <em>Dijkstraのアルゴリズム</em> とは初めて書き起こしたEdsger Dijkstraにちなんで名付けられた、有名な経路探索のアプローチで、僕らの <code>findRoute</code> 関数によく似ている。 <code>js</code> がパッケージ名の後ろにつくのはJavaScriptで書かれたと示すためだ。 <code>dijkstrajs</code> は僕らのグラフフォーマットと似たものを使っているけど、プロパティが保持する値はエッジの重みを表す数字、というオブジェクトを使っている。</p>
 
-<p><a class="p_ident" id="p_3iug1e4kQG" href="#p_3iug1e4kQG" tabindex="-1" role="presentation"></a>So if we wanted to use that package, we’d have to make sure that our graph was stored in the format it expects. All edges get the same weight since our simplified model treats each road as having the same cost (one turn).</p>
+<p>だから <code>dijkstrajs</code> パッケージを使いたければ、グラフを必要なフォーマットで保存しなければいけない。全てのエッジは同じ重みを持つことにしよう。僕らの単純なモデルでは全部の道が同じコスト(1ターン)として扱われるからだ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_NyRXVpwPYN" href="#c_NyRXVpwPYN" tabindex="-1" role="presentation"></a><span class="cm-keyword">const</span> {<span class="cm-def">find_path</span>} <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">&quot;dijkstrajs&quot;</span>);
 
@@ -279,21 +278,23 @@ structures and doing a single, focused thing. Many of the INI-file parsing modul
 <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">find_path</span>(<span class="cm-variable">graph</span>, <span class="cm-string">&quot;Post Office&quot;</span>, <span class="cm-string">&quot;Cabin&quot;</span>));
 <span class="cm-comment">// → [&quot;Post Office&quot;, &quot;Alice's House&quot;, &quot;Cabin&quot;]</span></pre>
 
-<p><a class="p_ident" id="p_X8Ulb726ZC" href="#p_X8Ulb726ZC" tabindex="-1" role="presentation"></a>This can be a barrier to composition—when various packages are using different data structures to describe similar things, combining them is difficult. Therefore, if you want to design for composability, find out what data structures other people are using and, when possible, follow their example.</p>
+<p>このフォーマットの違いが組み合わせの邪魔になるかもしれない。いろいろなパッケージが同じ事を表現するのに別々のデータ構造を使っていると組み合わせは難しくなる。だから、組み合わせ易いデザインにしたければ、他の人達が使っているデータ構造を調べて、できればその例に従おう。</p>
 
-<h2><a class="h_ident" id="h_ErccPg/l98" href="#h_ErccPg/l98" tabindex="-1" role="presentation"></a>Summary</h2>
+<h2><a class="h_ident" id="h_WvYIPtb9vj" href="#h_WvYIPtb9vj" tabindex="-1" role="presentation"></a>まとめ</h2>
 
-<p><a class="p_ident" id="p_OX2jY0nGFw" href="#p_OX2jY0nGFw" tabindex="-1" role="presentation"></a>Modules provide structure to bigger programs by separating the code into pieces with clear interfaces and dependencies. The interface is the part of the module that’s visible from other modules, and the dependencies are the other modules that it makes use of.</p>
+<p>モジュールは、大きなプログラムに構造を与えて、インターフェイスや依存関係が明確な部品に分割する。インターフェイスはモジュールの中で他のモジュールから視える部分だ。依存するモジュールというのはあるモジュールが使う他のモジュールのことだ。</p>
 
-<p><a class="p_ident" id="p_sYCJxIhCEI" href="#p_sYCJxIhCEI" tabindex="-1" role="presentation"></a>Because JavaScript historically did not provide a module system, the CommonJS system was built on top of it. Then at some point it <em>did</em> get a built-in system, which now coexists uneasily with the CommonJS system.</p>
+<p><a class="p_ident" id="p_bys5FFgg/D" href="#p_bys5FFgg/D" tabindex="-1" role="presentation"></a>JavaScriptは、歴史的にはモジュールシステムがなかったから、CommonJSシステムが後付けされた。その後になって組込みのシステムができて、今ではCommonJSシステムと共生している。</p>
 
-<p><a class="p_ident" id="p_wDM2Q8HBcB" href="#p_wDM2Q8HBcB" tabindex="-1" role="presentation"></a>A package is a chunk of code that can be distributed on its own. NPM is a repository of JavaScript packages. You can download all kinds of useful (and useless) packages from it.</p>
+<p><a class="p_ident" id="p_SKabEt+EUh" href="#p_SKabEt+EUh" tabindex="-1" role="presentation"></a>パッケージは単独で配布できるようにしたコードのかたまりだ。NPMはJavaScriptパッケージのリポジトリだ。いろいろと便利なパッケージ(や役立たずなパッケージ)をNPMからダウンロードできる。</p>
 
 <h2><a class="h_ident" id="h_TcUD2vzyMe" href="#h_TcUD2vzyMe" tabindex="-1" role="presentation"></a>Exercises</h2>
 
 <h3><a class="i_ident" id="i_CJKk6NIC0T" href="#i_CJKk6NIC0T" tabindex="-1" role="presentation"></a>A modular robot</h3>
 
-<p id="modular_robot"><a class="p_ident" id="p_nPAEnO4pep" href="#p_nPAEnO4pep" tabindex="-1" role="presentation"></a>These are the bindings that the project from <a href="07_robot.html">Chapter 7</a> creates:</p>
+<p>モジュール化されたロボット</p>
+
+<p id="modular_robot"><a href="07_robot.html">7</a>章のプロジェクトで作ったバインディングがいくつかある。</p>
 
 <pre class="snippet cm-s-default" data-language="text/plain" ><a class="c_ident" id="c_/nxTd1W0Sy" href="#c_/nxTd1W0Sy" tabindex="-1" role="presentation"></a>roads
 buildGraph
@@ -307,35 +308,37 @@ routeRobot
 findRoute
 goalOrientedRobot</pre>
 
-<p><a class="p_ident" id="p_0LdymcLoV8" href="#p_0LdymcLoV8" tabindex="-1" role="presentation"></a>If you were to write that project as a modular program, what modules would you create? Which module would depend on which other module, and what would their interfaces look like?</p>
+<p>プロジェクトをモジュール化されたプログラムにしたければ、どんなモジュールを作ればいいだろう?どのモジュールがどのモジュールに依存するだろう?そしてインターフェイスはどんな風になるだろう?</p>
 
-<p><a class="p_ident" id="p_hU/u/IPER+" href="#p_hU/u/IPER+" tabindex="-1" role="presentation"></a>Which pieces are likely to be available prewritten on NPM? Would you prefer to use an NPM package or write them yourself?</p>
+<p><a class="p_ident" id="p_HfYoGdoaSL" href="#p_HfYoGdoaSL" tabindex="-1" role="presentation"></a>どの部分はNPMですでに書かれているものが得られるだろう?NPMパッケージを使いたいか、それとも自分で書きたい?</p>
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_o3MT4wM7DB" href="#p_o3MT4wM7DB" tabindex="-1" role="presentation"></a>Here’s what I would have done (but again, there is no single <em>right</em> way to design a given module):</p>
+<p>ぼくなら以下のようにやるだろう(とはいえ、たった1つの <em>正しい</em> やり方があるわけではいけど)。</p>
 
-<p><a class="p_ident" id="p_56/CQgKTat" href="#p_56/CQgKTat" tabindex="-1" role="presentation"></a>The code used to build the road graph lives in the <code>graph</code> module. Because I’d rather use <code>dijkstrajs</code> from NPM than our own pathfinding code, we’ll make this build the kind of graph data that <code>dijkstrajs</code> expects. This module exports a single function, <code>buildGraph</code>. I’d have <code>buildGraph</code> accept an array of two-element arrays, rather than strings containing hyphens, to make the module less dependent on the input format.</p>
+<p><a class="p_ident" id="p_sDeHHJsanb" href="#p_sDeHHJsanb" tabindex="-1" role="presentation"></a>道のグラフを組み立てるためのコードは <code>graph</code> モジュールに入れる。というのもぼくは、自分で経路探索コードを書くよりも、NPMの <code>dijkstrajs</code> パッケージを使うだろうからだ。 <code>graph</code> では <code>dijkstrajs</code> パッケージが要求するグラフデータを組み立てるようにする。そして <code>buildGraph</code> という関数だけをエクスポートするようにする。 <code>buildGraph</code> 関数は2次元配列を引数に取るようにするだろう(ハイフンで分けた文字列よりは)。こうすれば、モジュールの入力フォーマットへの依存が減らせる。</p>
 
-<p><a class="p_ident" id="p_B6Z6VXRXv9" href="#p_B6Z6VXRXv9" tabindex="-1" role="presentation"></a>The <code>roads</code> module contains the raw road data (the <code>roads</code> array) and the <code>roadGraph</code> binding. This module depends on <code>./graph</code> and exports the road graph.</p>
+<p><code>roads</code> モジュールは生の道データ( <code>roads</code> 配列)と <code>roadGraph</code> バインディングを含む。このモジュールは <code>./graph</code> に依存していて、エクスポートするのは道グラフだ。</p>
 
-<p><a class="p_ident" id="p_JLwefzFde0" href="#p_JLwefzFde0" tabindex="-1" role="presentation"></a>The <code>VillageState</code> class lives in the <code>state</code> module. It depends on the <code>./roads</code> module because it needs to be able to verify that a given road exists. It also needs <code>randomPick</code>. Since that is a three-line function, we could just put it into the <code>state</code> module as an internal helper function. But <code>randomRobot</code> needs it too. So we’d have to either duplicate it or put it into its own module. Since this function happens to exist on NPM in the <code>random-item</code> package, a good solution is to just make both modules depend on that. We can add the <code>runRobot</code> function to this module as well, since it’s small and closely related to state management. The module exports both the <code>VillageState</code> class and the <code>runRobot</code> function.</p>
+<p><a class="p_ident" id="p_i7VixDu00v" href="#p_i7VixDu00v" tabindex="-1" role="presentation"></a><code>VillageState</code> クラスは、 <code>state</code> モジュールに入れる。これは、与えられた道が存在するか確認できないといけないから、 <code>./roads</code> に依存する。ここでは <code>randomPick</code> も必要になる。これはたった3行の関数だから <code>state</code> モジュールの内部的なヘルパー関数としておいてもいい。でも、 <code>randomRobot</code> もこの関数を必要とする。だから、この関数を単に複製するか、個別のモジュールにしておくかしないといけないだろう。この関数はたまたまNPMの <code>random-item</code> パッケージに存在するから、このモジュールを使うようにするのがいい解決策だろう。 <code>runRobot</code> 関数を <code>state</code> モジュールに追加してもいい。というのも、これはちょっとした関数だし、状態のマネージメントに密接に関わっているからだ。このモジュールは<code>VillageState</code> クラスと <code>runRobot</code> 関数の両方をエクスポートする。</p>
 
-<p><a class="p_ident" id="p_wJDmndPhIc" href="#p_wJDmndPhIc" tabindex="-1" role="presentation"></a>Finally, the robots, along with the values they depend on such as <code>mailRoute</code>, could go into an <code>example-robots</code> module, which depends on <code>./roads</code> and exports the robot functions. To make it possible for <code>goalOrientedRobot</code> to do route-finding, this module also depends on <code>dijkstrajs</code>.</p>
+<p>最後に、ロボットは( <code>mailRoute</code> のような依存する値と一緒に)、 <code>example-robots</code> モジュールに入れる。これは <code>./roads</code> に依存して、ロボット関数をエクスポートする。 <code>goalOrientedRobot</code> が経路探索できるように、このモジュールは <code>dijkstrajs</code> パッケージにも依存する。</p>
 
-<p><a class="p_ident" id="p_jU189+mtkS" href="#p_jU189+mtkS" tabindex="-1" role="presentation"></a>By offloading some work to NPM modules, the code became a little smaller. Each individual module does something rather simple and can be read on its own. Dividing code into modules also often suggests further improvements to the program’s design. In this case, it seems a little odd that the <code>VillageState</code> and the robots depend on a specific road graph. It might be a better idea to make the graph an argument to the state’s constructor and make the robots read it from the state object—this reduces dependencies (which is always good) and makes it possible to run simulations on different maps (which is even better).</p>
+<p>いくつかの仕事をNPMに任せることで、コードは少し小さくなる。それぞれのモジュールの仕事はむしろシンプルになったし、単独でも読めるようになっている。コードをモジュールに分けていくと、プログラムのデザインについてさらに改善点が見つかることが多い。この場合、 <code>VillageState</code> とロボットが特定の道のグラフに依存しているのは少し変だ。 グラフを <code>VillageState</code> コンストラクターの引数にして、ロボットはその状態オブジェクトから読み取るようにした方がいいだろう。こうすれば依存関係が減って(これはいつも良い事だ)、違う地図でシミュレーションを実行することもできる(これはさらに良い事だ)。</p>
 
-<p><a class="p_ident" id="p_rfGj5/gdUx" href="#p_rfGj5/gdUx" tabindex="-1" role="presentation"></a>Is it a good idea to use NPM modules for things that we could have written ourselves? In principle, yes—for nontrivial things like the pathfinding function you are likely to make mistakes and waste time writing them yourself. For tiny functions like <code>random-item</code>, writing them yourself is easy enough. But adding them wherever you need them does tend to clutter your modules.</p>
+<p>自分でも書けるようなものにNPMモジュールを使うのは良いアイデアだろうか?原則的には、イエスだ。特に、経路探索関数のように簡単ではなく、ミスをしてしまって時間を無駄にしそうなものは。 <code>random-item</code> のようなちょっとした関数は、自分で書いても十分に簡単だ。でも、必要になるたびに加えていくと、君のモジュールはぐちゃぐちゃになるだろう。</p>
 
-<p><a class="p_ident" id="p_shhnxYPdPj" href="#p_shhnxYPdPj" tabindex="-1" role="presentation"></a>However, you should also not underestimate the work involved in <em>finding</em> an appropriate NPM package. And even if you find one, it might not work well or may be missing some feature you need. On top of that, depending on NPM packages means you have to make sure they are installed, you have to distribute them with your program, and you might have to periodically upgrade them.</p>
+<p>とはいえ、適切なNPMパッケージを <em>見つける</em> ための作業を過小評価してはいけない。それに、もし見つかったとしても上手く動かないかもしれないし、必要な機能が欠けているかもしれない。その上、NPMパッケージに依存するということは、それが確実にインストールされないといけないということで、君のプログラムと一緒に配布するということだから、周期的にアップグレードしないといけないかもしれないんだ。</p>
 
-<p><a class="p_ident" id="p_UgTNT3/2gd" href="#p_UgTNT3/2gd" tabindex="-1" role="presentation"></a>So again, this is a trade-off, and you can decide either way depending on how much the packages help you.</p>
+<p>だからこれもトレードオフになるんだ。パッケージがどれぐらい役に立つかによって判断することができる。</p>
 
 </div></div>
 
 <h3><a class="i_ident" id="i_+pU//gQmZ8" href="#i_+pU//gQmZ8" tabindex="-1" role="presentation"></a>Roads module</h3>
 
-<p><a class="p_ident" id="p_U88wPDSl2i" href="#p_U88wPDSl2i" tabindex="-1" role="presentation"></a>Write a CommonJS module, based on the example from <a href="07_robot.html">Chapter 7</a>, that contains the array of roads and exports the graph data structure representing them as <code>roadGraph</code>. It should depend on a module <code>./graph</code>, which exports a function <code>buildGraph</code> that is used to build the graph. This function expects an array of two-element arrays (the start and end points of the roads).</p>
+<p><a class="p_ident" id="p_rBhWF7YcJI" href="#p_rBhWF7YcJI" tabindex="-1" role="presentation"></a>Roadsモジュール</p>
+
+<p><a class="p_ident" id="p_7JQo1pqmz1" href="#p_7JQo1pqmz1" tabindex="-1" role="presentation"></a><a href="07_robot.html">7</a>章の例を使ってCommonJSモジュールを書いてみよう。道の配列を含んでいて、それを <code>roadGraph</code> として表現するグラフデータ構造をエクスポートする。これは <code>./graph</code> モジュールは依存していて、このモジュールは <code>buildGraph</code> 関数をエクスポートして、この関数を使えばグラフを組み立てられる。この関数の引数は、2要素の配列(道の始点と終点)が入れ子になった配列だ。</p>
 
 <pre class="snippet cm-s-default" data-language="javascript" ><a class="c_ident" id="c_FPEwj7xDOs" href="#c_FPEwj7xDOs" tabindex="-1" role="presentation"></a><span class="cm-comment">// Add dependencies and exports</span>
 
@@ -351,25 +354,27 @@ goalOrientedRobot</pre>
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_KWk09Gyhem" href="#p_KWk09Gyhem" tabindex="-1" role="presentation"></a>Since this is a CommonJS module, you have to use <code>require</code> to import the graph module. That was described as exporting a <code>buildGraph</code> function, which you can pick out of its interface object with a destructuring <code>const</code> declaration.</p>
+<p>これはCommonJSモジュールだから、グラフモジュールをインポートするためには <code>require</code> を使う。グラフモジュールは <code>buildGraph</code> 関数をエクスポートするから、 <code>const</code> 宣言の分割代入を使って、インターフェイスオブジェクトからこの関数だけを引き出せばいい。</p>
 
-<p><a class="p_ident" id="p_zdT6jLwIjp" href="#p_zdT6jLwIjp" tabindex="-1" role="presentation"></a>To export <code>roadGraph</code>, you add a property to the <code>exports</code> object. Because <code>buildGraph</code> takes a data structure that doesn’t precisely match <code>roads</code>, the splitting of the road strings must happen in your module.</p>
+<p><code>roadGraph</code> をエクスポートするためには、 <code>exports</code> オブジェクトにプロパティを追加すればいい。 <code>buildGraph</code> 関数は <code>roads</code> と正確にはマッチしないデータ構造を引数にするから、道を表現する文字列のスプリットは君のモジュール内で処理する。</p>
 
 </div></div>
 
 <h3><a class="i_ident" id="i_E/zWqBFdy8" href="#i_E/zWqBFdy8" tabindex="-1" role="presentation"></a>Circular dependencies</h3>
 
-<p><a class="p_ident" id="p_fl2MZMonQV" href="#p_fl2MZMonQV" tabindex="-1" role="presentation"></a>A circular dependency is a situation where module A depends on B, and B also, directly or indirectly, depends on A. Many module systems simply forbid this because whichever order you choose for loading such modules, you cannot make sure that each module’s dependencies have been loaded before it runs.</p>
+<p>循環依存</p>
 
-<p><a class="p_ident" id="p_b5sTJIUt38" href="#p_b5sTJIUt38" tabindex="-1" role="presentation"></a>CommonJS modules allow a limited form of cyclic dependencies. As long as the modules do not replace their default <code>exports</code> object and don’t access each other’s interface until after they finish loading, cyclic dependencies are okay.</p>
+<p><a class="p_ident" id="p_HsCfDi9xUv" href="#p_HsCfDi9xUv" tabindex="-1" role="presentation"></a>循環依存とは、モジュールAがモジュールBに依存していて、Bもまた(直接的・間接的に)Aに依存しているという状況だ。多くのモジュールシステムでは単にこれを禁止している。というのも、こういうモジュールはどういう順番で読み込んでも、それぞれのモジュール実行前に依存するモジュールが読み込まれてきることが保証されないからだ。</p>
 
-<p><a class="p_ident" id="p_s/oDnu78Ko" href="#p_s/oDnu78Ko" tabindex="-1" role="presentation"></a>The <code>require</code> function given <a href="10_modules.html#require">earlier in this chapter</a> supports this type of dependency cycle. Can you see how it handles cycles? What would go wrong when a module in a cycle <em>does</em> replace its default <code>exports</code> object?</p>
+<p><a class="p_ident" id="p_L8gyPAIFhT" href="#p_L8gyPAIFhT" tabindex="-1" role="presentation"></a>CommonJSモジュールでは限定的に循環依存が許可されている。モジュールがデフォルトの <code>exports</code> オブジェクトを上書きしないで、お互いのインターフェイスに読み込みが終わるまでアクセスしないなら、循環依存もOKだ。</p>
+
+<p><a href="10_modules.html#require">この章の前の方</a>の <code>require</code> 関数はこのタイプの依存の循環をサポートしている。どうやって循環を取り扱っているか分かる?循環の一部のモジュールがデフォルトの <code>exports</code> オブジェクトを上書きしてしまうと何がおかしくなるだろう?</p>
 
 <div class="solution"><div class="solution-text">
 
-<p><a class="p_ident" id="p_nf2U1lY9dq" href="#p_nf2U1lY9dq" tabindex="-1" role="presentation"></a>The trick is that <code>require</code> adds modules to its cache <em>before</em> it starts loading the module. That way, if any <code>require</code> call made while it is running tries to load it, it is already known, and the current interface will be returned, rather than starting to load the module once more (which would eventually overflow the stack).</p>
+<p>ここで使われているワザは <code>require</code> はモジュールを読み込む <em>前に</em> キャッシュに追加するということだ。こうすれば、モジュールを実行している間に <code>require</code> が呼び出されたとしても、それが既知のものだったら現行のインターフェイスが返されて、モジュールをまた読み込まれることはない(そうなったらそのうちスタックがオーバーフローするだろう)。</p>
 
-<p><a class="p_ident" id="p_QAZLbqVKnV" href="#p_QAZLbqVKnV" tabindex="-1" role="presentation"></a>If a module overwrites its <code>module.exports</code> value, any other module that has received its interface value before it finished loading will have gotten hold of the default interface object (which is likely empty), rather than the intended interface value.</p>
+<p>あるモジュールが <code>module.exports</code> の値を上書きしてしまうと、その読み込みが終わる前にインターフェイスを受け取ったモジュールは、意図したインターフェイス値ではなくて、デフォルトのインターフェイスオブジェクト(これは多分空っぽだ)を保持していることになるだろう。</p>
 
 </div></div><nav><a href="09_regexp.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="11_async.html" title="next chapter">▶</a></nav>
 </article>
